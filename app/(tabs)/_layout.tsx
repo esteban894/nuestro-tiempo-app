@@ -1,35 +1,74 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { colors } from "@/constants/colors";
+import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import { StyleSheet } from "react-native";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
+      initialRouteName="index"
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
+        tabBarStyle: styles.tabBar,
+        tabBarActiveTintColor: colors.PRIMARY[500],
+        tabBarInactiveTintColor: colors.NEUTRAL[800],
+        tabBarShowLabel: false,
+        headerStyle: styles.header,
+        headerTitle: "Nuestro Tiempo",
+        headerTitleStyle: styles.headerTitle,
+        headerRight: () => <Ionicons name="heart" size={24} color={colors.PRIMARY[800]} />,
+        headerRightContainerStyle: styles.headerRightContainer,
       }}>
       <Tabs.Screen
-        name="index"
+        name="albums"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "albums",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons size={28} name={focused ? "albums" : "albums-outline"} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="index"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "index",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons size={28} name={focused ? "home" : "home-outline"} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: "account",
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons size={28} name={focused ? "person" : "person-outline"} color={color} />
+          ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: colors.NEUTRAL[200],
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
+    borderTopWidth: 0,
+    elevation: 0,
+    shadowOpacity: 0,
+  },
+  header: {
+    backgroundColor: "transparent",
+    shadowColor: "transparent",
+  },
+  headerTitle: {
+    color: colors.PRIMARY[800],
+    fontFamily: "PlaywriteAUQLD_400Regular",
+  },
+  headerRightContainer: {
+    paddingRight: 15,
+  },
+});
