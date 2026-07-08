@@ -50,8 +50,14 @@ export const FlipCard = ({ isFlipped, front, back, style, duration = 500 }: Flip
 
   return (
     <View style={[styles.container, style]}>
-      <Animated.View style={[styles.face, frontStyle]}>{front}</Animated.View>
-      <Animated.View style={[styles.face, styles.back, backStyle]}>{back}</Animated.View>
+      <Animated.View style={[styles.face, frontStyle]} pointerEvents={isFlipped ? "none" : "auto"}>
+        {front}
+      </Animated.View>
+      <Animated.View
+        style={[styles.face, styles.back, backStyle]}
+        pointerEvents={isFlipped ? "auto" : "none"}>
+        {back}
+      </Animated.View>
     </View>
   );
 };

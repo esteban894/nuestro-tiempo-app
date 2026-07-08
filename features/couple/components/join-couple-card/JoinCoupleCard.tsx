@@ -39,17 +39,19 @@ export const JoinCoupleCard = () => {
       ) : (
         <>
           <Text style={styles.helper}>Ingresa el código que te compartió tu pareja:</Text>
-          <Input
-            value={code}
-            onChangeText={handleChange}
-            placeholder="A1B2C3D4"
-            leftIcon="key-outline"
-            autoCapitalize="characters"
-            autoCorrect={false}
-            maxLength={INVITE_CODE_LENGTH}
-            error={error}
-            style={styles.codeInput}
-          />
+          <View style={styles.codeInputWrapper}>
+            <Input
+              value={code}
+              onChangeText={handleChange}
+              placeholder="A1B2C3D4"
+              leftIcon="key-outline"
+              autoCapitalize="characters"
+              autoCorrect={false}
+              maxLength={INVITE_CODE_LENGTH}
+              error={error}
+              style={styles.codeInput}
+            />
+          </View>
           <Button
             title="Unirse"
             leftIcon="heart"
@@ -77,6 +79,9 @@ const styles = StyleSheet.create({
     color: colors.NEUTRAL[800],
     textAlign: "center",
     marginBottom: 12,
+  },
+  codeInputWrapper: {
+    width: "100%",
   },
   codeInput: {
     letterSpacing: 4,
