@@ -1,9 +1,17 @@
 import { colors } from "@/constants/colors";
+import { useCoupleStore } from "@/features/couple";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { useEffect } from "react";
 import { StyleSheet } from "react-native";
 
 export default function TabLayout() {
+  const fetchCouple = useCoupleStore((state) => state.fetchCouple);
+
+  useEffect(() => {
+    fetchCouple();
+  }, [fetchCouple]);
+
   return (
     <Tabs
       initialRouteName="index"

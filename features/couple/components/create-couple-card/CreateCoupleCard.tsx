@@ -1,21 +1,42 @@
 import { colors } from "@/constants/colors";
 import { Button, Card, Title } from "@/features/common";
+import { useCoupleStore } from "@/features/couple";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
+import { useMutation } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { generateInviteCode } from "../../utils/generateInviteCode";
+import { createCouple } from "../../api/couple.api";
 
 const formatDate = (date: Date) =>
   date.toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" });
 
+const formatDateTime = (date: Date) =>
+  date.toLocaleString("es-ES", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
 export const CreateCoupleCard = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [showPicker, setShowPicker] = useState(false);
-  const [code, setCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const fetchCouple = useCoupleStore((state) => state.fetchCouple);
+
+  const mutation = useMutation({
+    mutationFn: createCouple,
+    onSuccess: () => {
+      setCopied(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      fetchCouple();
+    },
+  });
 
   const handleDateChange = (event: DateTimePickerEvent, selected?: Date) => {
     // En Android el picker es un modal que hay que cerrar manualmente.
@@ -25,14 +46,13 @@ export const CreateCoupleCard = () => {
 
   const handleCreate = () => {
     if (!startDate) return;
-    setCode(generateInviteCode());
-    setCopied(false);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    mutation.reset();
+    mutation.mutate({ startDate: startDate.toISOString() });
   };
 
   const handleCopy = async () => {
-    if (!code) return;
-    await Clipboard.setStringAsync(code);
+    if (!mutation.data) return;
+    await Clipboard.setStringAsync(mutation.data.code);
     setCopied(true);
     Haptics.selectionAsync();
   };
@@ -42,10 +62,13 @@ export const CreateCoupleCard = () => {
       <Ionicons name="heart-circle" size={44} color={colors.PRIMARY[500]} />
       <Title title="Crear pareja" variant="h3" align="center" style={styles.title} />
 
-      {code ? (
+      {mutation.data ? (
         <View style={styles.codeSection}>
           <Text style={styles.helper}>Comparte este código con tu pareja:</Text>
-          <Text style={styles.code}>{code}</Text>
+          <Text style={styles.code}>{mutation.data.code}</Text>
+          <Text style={styles.expiresAt}>
+            Válido hasta {formatDateTime(new Date(mutation.data.expiresAt))}
+          </Text>
           <Button
             title={copied ? "¡Copiado!" : "Copiar código"}
             leftIcon={copied ? "checkmark" : "copy-outline"}
@@ -76,11 +99,14 @@ export const CreateCoupleCard = () => {
             />
           )}
 
+          {mutation.error && <Text style={styles.errorText}>{mutation.error.message}</Text>}
+
           <Button
             title="Crear vínculo"
             leftIcon="link"
             fullWidth
-            disabled={!startDate}
+            isLoading={mutation.isPending}
+            disabled={!startDate || mutation.isPending}
             onPress={handleCreate}
             style={styles.createButton}
           />
@@ -137,6 +163,17 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 6,
     color: colors.PRIMARY[500],
+    marginBottom: 8,
+  },
+  expiresAt: {
+    fontSize: 12,
+    color: colors.NEUTRAL[600],
     marginBottom: 20,
+  },
+  errorText: {
+    fontSize: 12,
+    color: colors.ERROR[500],
+    textAlign: "center",
+    marginBottom: 12,
   },
 });

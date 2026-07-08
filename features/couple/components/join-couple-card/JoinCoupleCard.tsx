@@ -1,29 +1,43 @@
 import { colors } from "@/constants/colors";
 import { Button, Card, Input, Title } from "@/features/common";
+import { useCoupleStore } from "@/features/couple";
 import { Ionicons } from "@expo/vector-icons";
+import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { joinCouple } from "../../api/couple.api";
 import { INVITE_CODE_LENGTH, INVITE_CODE_REGEX } from "../../utils/generateInviteCode";
 
 export const JoinCoupleCard = () => {
   const [code, setCode] = useState("");
-  const [error, setError] = useState<string | undefined>();
-  const [joined, setJoined] = useState(false);
+  const [formatError, setFormatError] = useState<string | undefined>();
+
+  const fetchCouple = useCoupleStore((state) => state.fetchCouple);
+
+  const mutation = useMutation({
+    mutationFn: joinCouple,
+    onSuccess: () => {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      fetchCouple();
+    },
+    onError: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error),
+  });
 
   const handleChange = (value: string) => {
     setCode(value.toUpperCase());
-    if (error) setError(undefined);
+    if (formatError) setFormatError(undefined);
+    if (mutation.error) mutation.reset();
   };
 
   const handleJoin = () => {
     if (!INVITE_CODE_REGEX.test(code)) {
-      setError("El código debe tener 8 dígitos hexadecimales.");
+      setFormatError("El código debe tener 8 dígitos hexadecimales.");
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
-    setJoined(true);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    mutation.reset();
+    mutation.mutate({ code });
   };
 
   return (
@@ -31,7 +45,7 @@ export const JoinCoupleCard = () => {
       <Ionicons name="people-circle" size={44} color={colors.SECONDARY[500]} />
       <Title title="Unirse a una pareja" variant="h3" align="center" style={styles.title} />
 
-      {joined ? (
+      {mutation.isSuccess ? (
         <View style={styles.successSection}>
           <Ionicons name="checkmark-circle" size={56} color={colors.PRIMARY[500]} />
           <Text style={styles.successText}>¡Te uniste a la pareja con el código {code}!</Text>
@@ -48,7 +62,7 @@ export const JoinCoupleCard = () => {
               autoCapitalize="characters"
               autoCorrect={false}
               maxLength={INVITE_CODE_LENGTH}
-              error={error}
+              error={formatError ?? mutation.error?.message}
               style={styles.codeInput}
             />
           </View>
@@ -56,7 +70,8 @@ export const JoinCoupleCard = () => {
             title="Unirse"
             leftIcon="heart"
             fullWidth
-            disabled={code.length === 0}
+            isLoading={mutation.isPending}
+            disabled={code.length === 0 || mutation.isPending}
             onPress={handleJoin}
           />
         </>

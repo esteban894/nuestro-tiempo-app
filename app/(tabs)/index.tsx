@@ -1,5 +1,6 @@
 import { ImageCarousel, Title } from "@/features/common";
 import { CounterCards } from "@/features/common/components/ui/counter-cards/CounterCards";
+import { useCoupleStore } from "@/features/couple";
 import React from "react";
 import { ScrollView, StyleSheet } from "react-native";
 
@@ -10,14 +11,14 @@ const data = [
   "https://picsum.photos/800?4",
 ];
 
-const initDate = "2025-05-03T21:00:00-03:00";
-
 export default function HomeScreen() {
+  const couple = useCoupleStore((state) => state.couple);
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <ImageCarousel data={data} />
       <Title style={styles.title}>Nuestra Historia</Title>
-      <CounterCards initDate={initDate} />
+      {couple && <CounterCards initDate={couple.startDate} />}
     </ScrollView>
   );
 }
