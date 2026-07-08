@@ -20,6 +20,7 @@ export interface OverflowMenuOption {
   icon?: IoniconsName;
   onPress: () => void;
   destructive?: boolean;
+  disabled?: boolean;
 }
 
 interface OverflowMenuProps {
@@ -51,6 +52,7 @@ export const OverflowMenu = ({
   };
 
   const handleSelect = (option: OverflowMenuOption) => {
+    if (option.disabled) return;
     setAnchor(null);
     option.onPress();
   };
@@ -75,8 +77,9 @@ export const OverflowMenu = ({
           {options.map((option) => (
             <TouchableOpacity
               key={option.label}
-              style={styles.row}
+              style={[styles.row, option.disabled && styles.rowDisabled]}
               activeOpacity={0.7}
+              disabled={option.disabled}
               onPress={() => handleSelect(option)}>
               {option.icon && (
                 <Ionicons
@@ -124,6 +127,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 12,
     paddingHorizontal: 16,
+  },
+  rowDisabled: {
+    opacity: 0.4,
   },
   rowIcon: {
     marginRight: 10,

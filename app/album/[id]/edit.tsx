@@ -1,14 +1,34 @@
 import { colors } from "@/constants/colors";
-import { AlbumForm, AlbumFormValues, mockAlbums } from "@/features/albums";
+import { AlbumForm, albumKeys, getAlbum, updateAlbum } from "@/features/albums";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 export default function EditAlbumScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const album = mockAlbums.find((item) => item.id === id);
+  const queryClient = useQueryClient();
 
-  if (!album) {
+  const { data: album, isLoading, isError } = useQuery({
+    queryKey: albumKeys.detail(id),
+    queryFn: () => getAlbum(id),
+    enabled: !!id,
+  });
+
+  const mutation = useMutation({
+    mutationFn: (formData: FormData) => updateAlbum(id, formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: albumKeys.list() });
+      queryClient.invalidateQueries({ queryKey: albumKeys.detail(id) });
+      router.back();
+    },
+  });
+
+  if (isLoading) {
+    return <ActivityIndicator style={styles.loader} color={colors.PRIMARY[500]} />;
+  }
+
+  if (isError || !album) {
     return (
       <View style={styles.notFound}>
         <Text style={styles.notFoundText}>Álbum no encontrado</Text>
@@ -16,23 +36,19 @@ export default function EditAlbumScreen() {
     );
   }
 
-  const handleSubmit = (values: AlbumFormValues) => {
-    album.title = values.title;
-    album.coverImage = values.coverImage;
-    album.isPrivate = values.isPrivate;
-    router.back();
-  };
-
   return (
     <AlbumForm
       submitLabel="Guardar cambios"
-      initialValues={{ title: album.title, coverImage: album.coverImage, isPrivate: album.isPrivate }}
-      onSubmit={handleSubmit}
+      initialValues={{ name: album.name, coverImage: album.coverImage, isPrivate: album.isPrivate }}
+      onSubmit={(formData) => mutation.mutate(formData)}
+      isSubmitting={mutation.isPending}
+      error={mutation.error?.message ?? null}
     />
   );
 }
 
 const styles = StyleSheet.create({
+  loader: { marginTop: 40 },
   notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
   notFoundText: { fontSize: 16, color: colors.NEUTRAL[800] },
 });

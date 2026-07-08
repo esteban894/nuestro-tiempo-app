@@ -6,21 +6,32 @@ import { useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AlbumImagePickerSheet } from "../album-image-picker-sheet/AlbumImagePickerSheet";
 
-export interface AlbumFormValues {
-  title: string;
-  coverImage: string;
-  isPrivate: boolean;
+interface AlbumFormInitialValues {
+  name?: string;
+  coverImage?: string | null;
+  isPrivate?: boolean;
 }
 
 interface AlbumFormProps {
-  initialValues?: Partial<AlbumFormValues>;
-  onSubmit: (values: AlbumFormValues) => void;
+  initialValues?: AlbumFormInitialValues;
+  onSubmit: (formData: FormData) => void;
   submitLabel?: string;
+  isSubmitting?: boolean;
+  error?: string | null;
 }
 
-export const AlbumForm = ({ initialValues, onSubmit, submitLabel = "Guardar" }: AlbumFormProps) => {
-  const [title, setTitle] = useState(initialValues?.title ?? "");
+export const AlbumForm = ({
+  initialValues,
+  onSubmit,
+  submitLabel = "Guardar",
+  isSubmitting = false,
+  error,
+}: AlbumFormProps) => {
+  const [name, setName] = useState(initialValues?.name ?? "");
   const [coverImage, setCoverImage] = useState(initialValues?.coverImage ?? "");
+  // Tracks whether `coverImage` is a freshly-picked local file (needs upload) vs.
+  // the existing remote signed URL passed in via initialValues (leave untouched).
+  const [isNewCoverImage, setIsNewCoverImage] = useState(false);
   const [isPrivate, setIsPrivate] = useState(initialValues?.isPrivate ?? true);
   const [pickerVisible, setPickerVisible] = useState(false);
 
@@ -31,7 +42,10 @@ export const AlbumForm = ({ initialValues, onSubmit, submitLabel = "Guardar" }: 
 
     const result = await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 0.8 });
     const uri = result.assets?.[0]?.uri;
-    if (!result.canceled && uri) setCoverImage(uri);
+    if (!result.canceled && uri) {
+      setCoverImage(uri);
+      setIsNewCoverImage(true);
+    }
   };
 
   const handleChooseFromLibrary = async () => {
@@ -41,11 +55,27 @@ export const AlbumForm = ({ initialValues, onSubmit, submitLabel = "Guardar" }: 
 
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 0.8 });
     const uri = result.assets?.[0]?.uri;
-    if (!result.canceled && uri) setCoverImage(uri);
+    if (!result.canceled && uri) {
+      setCoverImage(uri);
+      setIsNewCoverImage(true);
+    }
   };
 
   const handleSubmit = () => {
-    onSubmit({ title: title.trim(), coverImage, isPrivate });
+    const formData = new FormData();
+    formData.append("name", name.trim());
+    // Server's class-transformer accepts the string "true"/"false".
+    formData.append("isPrivate", String(isPrivate));
+
+    if (isNewCoverImage && coverImage) {
+      const filename = coverImage.split("/").pop() ?? "cover.jpg";
+      const ext = filename.split(".").pop()?.toLowerCase();
+      const type = ext === "png" ? "image/png" : "image/jpeg";
+      // React Native multipart file part shape (not a real Blob) — the cast is required.
+      formData.append("coverImage", { uri: coverImage, name: filename, type } as unknown as Blob);
+    }
+
+    onSubmit(formData);
   };
 
   return (
@@ -67,8 +97,8 @@ export const AlbumForm = ({ initialValues, onSubmit, submitLabel = "Guardar" }: 
       <Input
         label="Título"
         placeholder="Título del álbum"
-        value={title}
-        onChangeText={setTitle}
+        value={name}
+        onChangeText={setName}
       />
 
       <Checkbox
@@ -78,7 +108,16 @@ export const AlbumForm = ({ initialValues, onSubmit, submitLabel = "Guardar" }: 
         style={styles.checkbox}
       />
 
-      <Button title={submitLabel} variant="primary" fullWidth onPress={handleSubmit} />
+      {error && <Text style={styles.errorText}>{error}</Text>}
+
+      <Button
+        title={submitLabel}
+        variant="primary"
+        fullWidth
+        isLoading={isSubmitting}
+        disabled={isSubmitting}
+        onPress={handleSubmit}
+      />
 
       <AlbumImagePickerSheet
         visible={pickerVisible}
@@ -124,5 +163,11 @@ const styles = StyleSheet.create({
   },
   checkbox: {
     marginBottom: 24,
+  },
+  errorText: {
+    fontSize: 13,
+    color: colors.ERROR[500],
+    textAlign: "center",
+    marginBottom: 16,
   },
 });

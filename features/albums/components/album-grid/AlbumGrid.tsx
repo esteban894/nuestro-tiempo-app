@@ -1,13 +1,21 @@
-import { FlatList, StyleSheet } from "react-native";
-import { Album, mockAlbums } from "../../data/mockAlbums";
+import { colors } from "@/constants/colors";
+import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
+import { Album } from "../../api/album.api";
 import { AlbumCard } from "../album-card/AlbumCard";
 
 interface AlbumGridProps {
-  albums?: Album[];
+  albums: Album[];
   onAlbumPress?: (album: Album) => void;
+  onEndReached?: () => void;
+  isFetchingNextPage?: boolean;
 }
 
-export const AlbumGrid = ({ albums = mockAlbums, onAlbumPress }: AlbumGridProps) => {
+export const AlbumGrid = ({
+  albums,
+  onAlbumPress,
+  onEndReached,
+  isFetchingNextPage,
+}: AlbumGridProps) => {
   return (
     <FlatList
       data={albums}
@@ -15,6 +23,13 @@ export const AlbumGrid = ({ albums = mockAlbums, onAlbumPress }: AlbumGridProps)
       numColumns={2}
       columnWrapperStyle={styles.row}
       contentContainerStyle={styles.content}
+      onEndReached={onEndReached}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={
+        isFetchingNextPage ? (
+          <ActivityIndicator style={styles.footer} color={colors.PRIMARY[500]} />
+        ) : null
+      }
       renderItem={({ item, index }) => (
         <AlbumCard album={item} index={index} onPress={onAlbumPress} />
       )}
@@ -29,5 +44,8 @@ const styles = StyleSheet.create({
   },
   row: {
     justifyContent: "space-between",
+  },
+  footer: {
+    marginVertical: 20,
   },
 });

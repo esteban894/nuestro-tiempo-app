@@ -1,6 +1,7 @@
 import { colors } from "@/constants/colors";
-import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { Album } from "../../data/mockAlbums";
+import { Ionicons } from "@expo/vector-icons";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Album } from "../../api/album.api";
 
 interface AlbumCardProps {
   album: Album;
@@ -16,9 +17,15 @@ export const AlbumCard = ({ album, index, onPress }: AlbumCardProps) => {
       style={[styles.card, { transform: [{ rotate: tilt }] }]}
       activeOpacity={0.85}
       onPress={() => onPress?.(album)}>
-      <Image source={{ uri: album.coverImage }} style={styles.image} resizeMode="cover" />
+      {album.coverImage ? (
+        <Image source={{ uri: album.coverImage }} style={styles.image} resizeMode="cover" />
+      ) : (
+        <View style={[styles.image, styles.placeholder]}>
+          <Ionicons name="image-outline" size={40} color={colors.NEUTRAL[600]} />
+        </View>
+      )}
       <Text style={styles.caption} numberOfLines={1}>
-        {album.title}
+        {album.name}
       </Text>
     </TouchableOpacity>
   );
@@ -43,6 +50,11 @@ const styles = StyleSheet.create({
     width: "100%",
     aspectRatio: 1,
     borderRadius: 1,
+  },
+  placeholder: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.NEUTRAL[500],
   },
   caption: {
     marginTop: 10,

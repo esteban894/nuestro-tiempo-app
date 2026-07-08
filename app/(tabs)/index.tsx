@@ -1,22 +1,21 @@
+import { useCurrentAlbumQuery } from "@/features/albums";
 import { ImageCarousel, Title } from "@/features/common";
 import { CounterCards } from "@/features/common/components/ui/counter-cards/CounterCards";
 import { useCoupleStore } from "@/features/couple";
+import { useAlbumImagesQuery } from "@/features/images";
 import React from "react";
 import { ScrollView, StyleSheet } from "react-native";
 
-const data = [
-  "https://picsum.photos/800?1",
-  "https://picsum.photos/800?2",
-  "https://picsum.photos/800?3",
-  "https://picsum.photos/800?4",
-];
-
 export default function HomeScreen() {
   const couple = useCoupleStore((state) => state.couple);
+  const { data: currentAlbum } = useCurrentAlbumQuery();
+  const { data: imagesData } = useAlbumImagesQuery(currentAlbum?.id);
+
+  const images = imagesData?.data.map((image) => image.url) ?? [];
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <ImageCarousel data={data} />
+      <ImageCarousel data={images} />
       <Title style={styles.title}>Nuestra Historia</Title>
       {couple && <CounterCards initDate={couple.startDate} />}
     </ScrollView>

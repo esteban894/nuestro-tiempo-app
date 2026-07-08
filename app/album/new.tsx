@@ -1,20 +1,25 @@
-import { AlbumForm, AlbumFormValues, mockAlbums } from "@/features/albums";
+import { AlbumForm, albumKeys, createAlbum } from "@/features/albums";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 
 export default function NewAlbumScreen() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const handleSubmit = (values: AlbumFormValues) => {
-    const id = Date.now().toString();
-    mockAlbums.push({
-      id,
-      title: values.title,
-      coverImage: values.coverImage,
-      isPrivate: values.isPrivate,
-      images: values.coverImage ? [values.coverImage] : [],
-    });
-    router.replace({ pathname: "/album/[id]", params: { id } });
-  };
+  const mutation = useMutation({
+    mutationFn: createAlbum,
+    onSuccess: (album) => {
+      queryClient.invalidateQueries({ queryKey: albumKeys.list() });
+      router.replace({ pathname: "/album/[id]", params: { id: album.id } });
+    },
+  });
 
-  return <AlbumForm submitLabel="Crear álbum" onSubmit={handleSubmit} />;
+  return (
+    <AlbumForm
+      submitLabel="Crear álbum"
+      onSubmit={(formData) => mutation.mutate(formData)}
+      isSubmitting={mutation.isPending}
+      error={mutation.error?.message ?? null}
+    />
+  );
 }

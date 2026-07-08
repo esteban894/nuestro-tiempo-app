@@ -4,49 +4,68 @@ import {
   AlbumHeader,
   AlbumImagePickerSheet,
   AlbumMeatballsMenu,
-  mockAlbums,
+  albumKeys,
+  getAlbum,
+  setCurrentAlbum,
 } from "@/features/albums";
 import { ImageCarousel, OverflowMenu } from "@/features/common";
+import {
+  ImageFilePart,
+  useAlbumImagesQuery,
+  useCreateImageMutation,
+  useDeleteImageMutation,
+} from "@/features/images";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
-import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function AlbumDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const album = mockAlbums.find((item) => item.id === id);
+  const queryClient = useQueryClient();
 
-  const [images, setImages] = useState(album?.images ?? []);
+  const { data: album, isLoading, isError } = useQuery({
+    queryKey: albumKeys.detail(id),
+    queryFn: () => getAlbum(id),
+    enabled: !!id,
+  });
+
+  const { data: imagesData } = useAlbumImagesQuery(id);
+  const albumImages = imagesData?.data ?? [];
+  const images = albumImages.map((image) => image.url);
+
+  const createImageMutation = useCreateImageMutation();
+  const deleteImageMutation = useDeleteImageMutation();
   const [pickerVisible, setPickerVisible] = useState(false);
-  const [, refresh] = useState(0);
 
-  useFocusEffect(
-    useCallback(() => {
-      refresh((tick) => tick + 1);
-    }, [])
-  );
-
-  if (!album) {
-    return (
-      <View style={styles.notFound}>
-        <Text style={styles.notFoundText}>Álbum no encontrado</Text>
-      </View>
-    );
-  }
+  const markAsCurrentMutation = useMutation({
+    mutationFn: () => setCurrentAlbum(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: albumKeys.current() });
+    },
+  });
 
   const handleEdit = () => router.push({ pathname: "/album/[id]/edit", params: { id } });
 
-  const handleMarkAsCurrent = () => {};
+  const handleMarkAsCurrent = () => markAsCurrentMutation.mutate();
 
   const handleDeleteImage = (index: number) => {
-    album.images.splice(index, 1);
-    setImages([...album.images]);
+    const image = albumImages[index];
+    if (!image) return;
+    deleteImageMutation.mutate({ id: image.id, albumId: id });
+  };
+
+  const buildImageFilePart = (uri: string): ImageFilePart => {
+    const name = uri.split("/").pop() ?? "photo.jpg";
+    const ext = name.split(".").pop()?.toLowerCase();
+    const type = ext === "png" ? "image/png" : "image/jpeg";
+    return { uri, name, type };
   };
 
   const addImage = (uri: string) => {
-    album.images.push(uri);
-    setImages([...album.images]);
+    createImageMutation.mutate({ albumId: id, file: buildImageFilePart(uri) });
   };
 
   const handleTakePhoto = async () => {
@@ -72,18 +91,34 @@ export default function AlbumDetailScreen() {
     if (!result.canceled && uri) addImage(uri);
   };
 
+  if (isLoading) {
+    return <ActivityIndicator style={styles.loader} color={colors.PRIMARY[500]} />;
+  }
+
+  if (isError || !album) {
+    return (
+      <View style={styles.notFound}>
+        <Text style={styles.notFoundText}>Álbum no encontrado</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.screen}>
       <Stack.Screen
         options={{
-          headerTitle: album.title,
+          headerTitle: album.name ?? "",
           headerRight: () => (
-            <AlbumMeatballsMenu onEdit={handleEdit} onMarkAsCurrent={handleMarkAsCurrent} />
+            <AlbumMeatballsMenu
+              onEdit={handleEdit}
+              onMarkAsCurrent={handleMarkAsCurrent}
+              markingAsCurrent={markAsCurrentMutation.isPending}
+            />
           ),
         }}
       />
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <AlbumHeader title={album.title} isPrivate={album.isPrivate} />
+        <AlbumHeader title={album.name ?? ""} isPrivate={album.isPrivate} />
         <ImageCarousel
           data={images}
           renderOverlay={(_, index) => (
@@ -103,7 +138,13 @@ export default function AlbumDetailScreen() {
           )}
         />
       </ScrollView>
-      <AlbumFab icon="camera-outline" onPress={() => setPickerVisible(true)} style={styles.fab} />
+      <AlbumFab
+        icon="camera-outline"
+        onPress={() => {
+          if (!createImageMutation.isPending) setPickerVisible(true);
+        }}
+        style={styles.fab}
+      />
       <AlbumImagePickerSheet
         visible={pickerVisible}
         onClose={() => setPickerVisible(false)}
@@ -118,6 +159,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, position: "relative" },
   container: { flex: 1 },
   content: { paddingBottom: 100 },
+  loader: { marginTop: 40 },
   notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
   notFoundText: { fontSize: 16, color: colors.NEUTRAL[800] },
   imageMenuTrigger: {

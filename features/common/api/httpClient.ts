@@ -22,6 +22,17 @@ export function configureApiAuth(accessors: AuthAccessors) {
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
+/**
+ * Media endpoints (e.g. signed cover image URLs) come back as a path relative to the API,
+ * not an absolute URL — prepend EXPO_PUBLIC_API_URL to build a URL the device can reach.
+ */
+export function resolveMediaUrl(path: string): string;
+export function resolveMediaUrl(path: string | null | undefined): string | null;
+export function resolveMediaUrl(path: string | null | undefined): string | null {
+  if (!path) return null;
+  return `${API_URL ?? ""}${path}`;
+}
+
 type ApiFetchOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
   /** Skip the 401 refresh-and-retry flow (used for public/auth endpoints). */
@@ -54,15 +65,18 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
 
   const { body, skipAuthRetry, headers, ...rest } = options;
   const accessToken = authAccessors?.getAccessToken();
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
 
   const response = await fetch(`${API_URL}${path}`, {
     ...rest,
     headers: {
-      "Content-Type": "application/json",
+      // Let fetch set the multipart boundary itself for FormData bodies.
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...headers,
+      "ngrok-skip-browser-warning": "true",
     },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: isFormData ? (body as FormData) : body !== undefined ? JSON.stringify(body) : undefined,
   });
 
   if (response.status === 401 && !skipAuthRetry && authAccessors) {
