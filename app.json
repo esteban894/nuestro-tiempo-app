@@ -46,7 +46,8 @@
           "photosPermission": "Permitir que Nuestro Tiempo acceda a tus fotos para agregarlas a un álbum.",
           "cameraPermission": "Permitir que Nuestro Tiempo use la cámara para tomar fotos para tus álbumes."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

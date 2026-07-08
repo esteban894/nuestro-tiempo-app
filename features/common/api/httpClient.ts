@@ -1,0 +1,82 @@
+export class ApiError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+type AuthAccessors = {
+  getAccessToken: () => string | null;
+  /** Called on a 401 from an authenticated request. Returns the new access token, or null if the session could not be refreshed. */
+  onUnauthorized: () => Promise<string | null>;
+};
+
+let authAccessors: AuthAccessors | null = null;
+
+export function configureApiAuth(accessors: AuthAccessors) {
+  authAccessors = accessors;
+}
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+type ApiFetchOptions = Omit<RequestInit, "body"> & {
+  body?: unknown;
+  /** Skip the 401 refresh-and-retry flow (used for public/auth endpoints). */
+  skipAuthRetry?: boolean;
+};
+
+function extractErrorMessage(data: unknown, fallback: string): string {
+  if (data && typeof data === "object" && "message" in data) {
+    const message = (data as { message: unknown }).message;
+    if (Array.isArray(message)) return message.join(" ");
+    if (typeof message === "string") return message;
+  }
+  return fallback;
+}
+
+async function parseResponseBody(response: Response): Promise<unknown> {
+  const text = await response.text();
+  if (!text) return undefined;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
+export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
+  if (!API_URL) {
+    throw new Error("EXPO_PUBLIC_API_URL is not set. Add it to your .env file.");
+  }
+
+  const { body, skipAuthRetry, headers, ...rest } = options;
+  const accessToken = authAccessors?.getAccessToken();
+
+  const response = await fetch(`${API_URL}${path}`, {
+    ...rest,
+    headers: {
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...headers,
+    },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+
+  if (response.status === 401 && !skipAuthRetry && authAccessors) {
+    const newAccessToken = await authAccessors.onUnauthorized();
+    if (newAccessToken) {
+      return apiFetch<T>(path, { ...options, skipAuthRetry: true });
+    }
+  }
+
+  const data = await parseResponseBody(response);
+
+  if (!response.ok) {
+    throw new ApiError(response.status, extractErrorMessage(data, response.statusText));
+  }
+
+  return data as T;
+}

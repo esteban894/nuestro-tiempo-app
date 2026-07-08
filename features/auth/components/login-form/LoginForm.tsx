@@ -1,18 +1,31 @@
 import { colors } from "@/constants/colors";
 import { Button, Input, Title } from "@/features/common";
-import { Link, useRouter } from "expo-router";
-import { useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { Link } from "expo-router";
+import { useRef, useState } from "react";
 import { StyleSheet, Text, TextInput } from "react-native";
+import { login } from "../../api/auth.api";
+import { useAuthStore } from "../../store/authStore";
 
 export const LoginForm = () => {
-  const router = useRouter();
+  const setSession = useAuthStore((state) => state.setSession);
 
-  const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const mutation = useMutation({
+    mutationFn: login,
+    onSuccess: ({ user, access_token, refresh_token }) =>
+      setSession(user, { access_token, refresh_token }),
+  });
+
+  const errorMessage = mutation.error?.message;
+
   const handleSubmit = () => {
-    console.log("handle submit");
-    router.navigate("/");
+    mutation.reset();
+    mutation.mutate({ email, password });
   };
 
   return (
@@ -25,12 +38,14 @@ export const LoginForm = () => {
         style={{ marginBottom: 20 }}
       />
       <Input
-        ref={emailRef}
         label="Correo electrónico"
         placeholder="john.doe@example.com"
         leftIcon="mail-outline"
         keyboardType="email-address"
+        autoCapitalize="none"
         returnKeyType="next"
+        value={email}
+        onChangeText={setEmail}
         onSubmitEditing={() => passwordRef.current?.focus()}
       />
       <Input
@@ -40,10 +55,18 @@ export const LoginForm = () => {
         isPassword
         leftIcon="lock-closed-outline"
         returnKeyType="done"
+        value={password}
+        onChangeText={setPassword}
         onSubmitEditing={handleSubmit}
+        error={errorMessage}
       />
 
-      <Button title="Iniciar Sesión" onPress={handleSubmit} style={{ marginBottom: 20 }} />
+      <Button
+        title="Iniciar Sesión"
+        onPress={handleSubmit}
+        isLoading={mutation.isPending}
+        style={{ marginBottom: 20 }}
+      />
 
       <Text style={styles.hasAccount}>¿Aún no tienes una cuenta?</Text>
       <Link href="/(auth)/register" style={styles.link} replace>
