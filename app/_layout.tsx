@@ -46,6 +46,35 @@ export default function RootLayout() {
             headerShadowVisible: false,
           }}
         />
+        <Stack.Screen
+          name="album/[id]"
+          options={{
+            headerBackTitle: "Álbumes",
+            headerTintColor: colors.PRIMARY[800],
+            headerStyle: { backgroundColor: colors.NEUTRAL[200] },
+            headerShadowVisible: false,
+          }}
+        />
+        <Stack.Screen
+          name="album/new"
+          options={{
+            headerTitle: "Nuevo álbum",
+            headerBackTitle: "Álbumes",
+            headerTintColor: colors.PRIMARY[800],
+            headerStyle: { backgroundColor: colors.NEUTRAL[200] },
+            headerShadowVisible: false,
+          }}
+        />
+        <Stack.Screen
+          name="album/[id]/edit"
+          options={{
+            headerTitle: "Editar álbum",
+            headerBackTitle: "Álbum",
+            headerTintColor: colors.PRIMARY[800],
+            headerStyle: { backgroundColor: colors.NEUTRAL[200] },
+            headerShadowVisible: false,
+          }}
+        />
       </Stack>
     </View>
   );

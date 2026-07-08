@@ -8,12 +8,12 @@ interface Props {
 }
 
 const counterLabels = {
-  years: "Años",
-  months: "Meses",
-  days: "Días",
-  hours: "Horas",
-  minutes: "Minutos",
-  seconds: "Segundos",
+  years: { singular: "Año", plural: "Años" },
+  months: { singular: "Mes", plural: "Meses" },
+  days: { singular: "Día", plural: "Días" },
+  hours: { singular: "Hora", plural: "Horas" },
+  minutes: { singular: "Minuto", plural: "Minutos" },
+  seconds: { singular: "Segundo", plural: "Segundos" },
 };
 
 export const CounterCards = ({ initDate }: Props) => {
@@ -65,10 +65,11 @@ export const CounterCards = ({ initDate }: Props) => {
     <View style={styles.container}>
       {Object.entries(timeDiff).map(([key, value]) => {
         if (key === "years" && value === 0) return null;
+        const label = counterLabels[key as keyof typeof counterLabels];
         return (
           <Card key={key} cardStyles={styles.card}>
             <Text style={styles.number}>{String(value).padStart(2, "0")}</Text>
-            <Text style={styles.label}>{counterLabels[key as keyof typeof counterLabels]}</Text>
+            <Text style={styles.label}>{value !== 1 ? label.plural : label.singular}</Text>
           </Card>
         );
       })}

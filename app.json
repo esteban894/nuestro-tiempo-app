@@ -39,7 +39,14 @@
         }
       ],
       "expo-font",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Permitir que Nuestro Tiempo acceda a tus fotos para agregarlas a un álbum.",
+          "cameraPermission": "Permitir que Nuestro Tiempo use la cámara para tomar fotos para tus álbumes."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
