@@ -33,6 +33,16 @@ assets/               # fonts, images
 - Every `features/<name>` folder re-exports its public surface through `index.ts`; import from the feature root (`@/features/common`), not from deep component paths, unless the barrel doesn't cover it yet.
 - Shared UI primitives (Button, Card, Input, Title, CounterCards, ImageCarousel) live in `features/common/components/ui/` — check there before adding a new primitive.
 
+## Domain model
+
+- **User** — starts with no Couple. Becomes part of one by either creating a `CoupleInvite` (from the account page) or entering another user's invite code.
+- **Couple** — made up of exactly 2 users. Formed when one user creates a `CoupleInvite`, which generates an 8-character hexadecimal code; a second user joins the Couple by entering that code.
+- **Album** — belongs to a creator (`User`). Has no direct relation to a `Couple`, but a user must belong to a Couple to create one.
+  - Can be marked `private` at creation. A private album is visible only to its creator, not to the creator's partner.
+  - The creator can toggle an album's private state at any time.
+  - Related to `AlbumMember`s — the creator and their Couple partner.
+- **Image** — belongs to an `Album`. Deleted in cascade when its Album is deleted.
+
 ## State of the codebase
 
 This is an early-stage app: auth screens (`LoginForm`, `RegisterForm`) exist but are **not yet wired to the API** — submit handlers currently just navigate. There is no API client, no env var wiring (`EXPO_PUBLIC_*`), and no auth/session state management yet. When implementing real API integration, check the sibling `nuestro-tiempo-api` README for endpoint shapes (`/api/v1/auth/...`, JWT access + refresh tokens) before inventing a contract.
