@@ -36,6 +36,16 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="couple"
+          options={{
+            headerTitle: "Vincular pareja",
+            headerBackTitle: "Cuenta",
+            headerTintColor: colors.PRIMARY[800],
+            headerStyle: { backgroundColor: colors.NEUTRAL[200] },
+            headerShadowVisible: false,
+          }}
+        />
       </Stack>
     </View>
   );
