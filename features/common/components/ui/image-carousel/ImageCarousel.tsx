@@ -1,26 +1,22 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { ReactNode, useRef, useState } from "react";
-import { Dimensions, Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, {
-  Extrapolation,
-  interpolate,
-  interpolateColor,
-  SharedValue,
-  useAnimatedStyle,
-  useSharedValue,
-} from "react-native-reanimated";
+import { ReactNode, useRef, useState } from "react";
+import { Dimensions, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
+import { ExpandedImageModal } from "./ExpandedImageModal";
+import { PaginationDot } from "./PaginationDot";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 interface Props {
   data: string[];
+  renderArrows?: boolean;
   renderOverlay?: (item: string, index: number) => ReactNode;
 }
 
-export function ImageCarousel({ data, renderOverlay }: Props) {
+export function ImageCarousel({ data, renderArrows = false, renderOverlay }: Props) {
   const ref = useRef<ICarouselInstance>(null);
-  const [expandedImage, setExpandedImage] = useState<string | null>(null);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const progress = useSharedValue(0);
 
   if (data.length === 0) {
@@ -36,6 +32,11 @@ export function ImageCarousel({ data, renderOverlay }: Props) {
 
   const isSingleImage = data.length === 1;
 
+  const handleExpandedIndexChange = (index: number) => {
+    setExpandedIndex(index);
+    ref.current?.scrollTo({ index, animated: false });
+  };
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.carouselContainer}>
@@ -44,12 +45,15 @@ export function ImageCarousel({ data, renderOverlay }: Props) {
           width={width - 40}
           height={400}
           data={data}
-          scrollAnimationDuration={800}
+          scrollAnimationDuration={500}
+          autoPlay={!isSingleImage && expandedIndex === null}
+          autoPlayInterval={2000}
+          loop
           enabled={!isSingleImage}
           onProgressChange={progress}
           renderItem={({ item, index }) => (
             <View style={styles.itemWrapper}>
-              <Pressable onPress={() => setExpandedImage(item)}>
+              <Pressable onPress={() => setExpandedIndex(index)}>
                 <Image source={{ uri: item }} style={styles.image} resizeMode="cover" />
               </Pressable>
               {renderOverlay?.(item, index)}
@@ -57,27 +61,31 @@ export function ImageCarousel({ data, renderOverlay }: Props) {
           )}
         />
 
-        <Pressable
-          disabled={isSingleImage}
-          style={[
-            styles.arrowButton,
-            styles.leftButton,
-            isSingleImage && styles.arrowButtonDisabled,
-          ]}
-          onPress={() => ref.current?.prev()}>
-          <Ionicons name="chevron-back" size={24} color="white" />
-        </Pressable>
+        {renderArrows && (
+          <>
+            <Pressable
+              disabled={isSingleImage}
+              style={[
+                styles.arrowButton,
+                styles.leftButton,
+                isSingleImage && styles.arrowButtonDisabled,
+              ]}
+              onPress={() => ref.current?.prev()}>
+              <Ionicons name="chevron-back" size={24} color="white" />
+            </Pressable>
 
-        <Pressable
-          disabled={isSingleImage}
-          style={[
-            styles.arrowButton,
-            styles.rightButton,
-            isSingleImage && styles.arrowButtonDisabled,
-          ]}
-          onPress={() => ref.current?.next()}>
-          <Ionicons name="chevron-forward" size={24} color="white" />
-        </Pressable>
+            <Pressable
+              disabled={isSingleImage}
+              style={[
+                styles.arrowButton,
+                styles.rightButton,
+                isSingleImage && styles.arrowButtonDisabled,
+              ]}
+              onPress={() => ref.current?.next()}>
+              <Ionicons name="chevron-forward" size={24} color="white" />
+            </Pressable>
+          </>
+        )}
       </View>
 
       <View style={styles.pagination}>
@@ -88,52 +96,14 @@ export function ImageCarousel({ data, renderOverlay }: Props) {
         ))}
       </View>
 
-      <Modal
-        visible={expandedImage !== null}
-        transparent
-        animationType="fade"
-        statusBarTranslucent
-        onRequestClose={() => setExpandedImage(null)}>
-        <View style={styles.modalOverlay}>
-          <Pressable style={styles.modalBackdrop} onPress={() => setExpandedImage(null)} />
-
-          {expandedImage && (
-            <Image
-              source={{ uri: expandedImage }}
-              style={styles.expandedImage}
-              resizeMode="contain"
-            />
-          )}
-
-          <Pressable style={styles.closeButton} onPress={() => setExpandedImage(null)}>
-            <Ionicons name="close" size={28} color="white" />
-          </Pressable>
-        </View>
-      </Modal>
+      <ExpandedImageModal
+        data={data}
+        index={expandedIndex}
+        onClose={() => setExpandedIndex(null)}
+        onIndexChange={handleExpandedIndexChange}
+      />
     </View>
   );
-}
-
-interface PaginationDotProps {
-  index: number;
-  progress: SharedValue<number>;
-}
-
-function PaginationDot({ index, progress }: PaginationDotProps) {
-  const animatedStyle = useAnimatedStyle(() => {
-    const inputRange = [index - 1, index, index + 1];
-
-    const dotWidth = interpolate(progress.value, inputRange, [8, 16, 8], Extrapolation.CLAMP);
-    const backgroundColor = interpolateColor(progress.value, inputRange, [
-      "#cbd5e1",
-      "#111827",
-      "#cbd5e1",
-    ]);
-
-    return { width: dotWidth, backgroundColor };
-  });
-
-  return <Animated.View style={[styles.dot, animatedStyle]} />;
 }
 
 const styles = StyleSheet.create({
@@ -194,35 +164,5 @@ const styles = StyleSheet.create({
     gap: 8,
     alignItems: "center",
     justifyContent: "center",
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 999,
-  },
-  modalOverlay: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.9)",
-  },
-  modalBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  expandedImage: {
-    width,
-    height,
-  },
-  closeButton: {
-    position: "absolute",
-    top: 50,
-    right: 20,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 10,
   },
 });

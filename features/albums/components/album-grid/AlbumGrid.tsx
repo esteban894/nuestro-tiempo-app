@@ -1,5 +1,5 @@
 import { colors } from "@/constants/colors";
-import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet } from "react-native";
 import { Album } from "../../api/album.api";
 import { AlbumCard } from "../album-card/AlbumCard";
 
@@ -8,6 +8,8 @@ interface AlbumGridProps {
   onAlbumPress?: (album: Album) => void;
   onEndReached?: () => void;
   isFetchingNextPage?: boolean;
+  refreshing?: boolean;
+  onRefresh?: () => void;
 }
 
 export const AlbumGrid = ({
@@ -15,6 +17,8 @@ export const AlbumGrid = ({
   onAlbumPress,
   onEndReached,
   isFetchingNextPage,
+  refreshing,
+  onRefresh,
 }: AlbumGridProps) => {
   return (
     <FlatList
@@ -25,6 +29,16 @@ export const AlbumGrid = ({
       contentContainerStyle={styles.content}
       onEndReached={onEndReached}
       onEndReachedThreshold={0.5}
+      refreshControl={
+        onRefresh ? (
+          <RefreshControl
+            refreshing={!!refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.PRIMARY[500]}
+            colors={[colors.PRIMARY[500]]}
+          />
+        ) : undefined
+      }
       ListFooterComponent={
         isFetchingNextPage ? (
           <ActivityIndicator style={styles.footer} color={colors.PRIMARY[500]} />

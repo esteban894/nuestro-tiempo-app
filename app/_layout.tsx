@@ -1,9 +1,9 @@
 import { colors } from "@/constants/colors";
-import { queryClient } from "@/features/common";
 import { useAuthStore } from "@/features/auth";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/features/common";
 import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
 import { PlaywriteAUQLD_400Regular } from "@expo-google-fonts/playwrite-au-qld";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -12,7 +12,6 @@ import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 
 SplashScreen.setOptions({
-  duration: 1000,
   fade: true,
 });
 

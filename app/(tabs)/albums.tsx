@@ -8,7 +8,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 export default function AlbumsScreen() {
   const router = useRouter();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isRefetching, refetch } =
     useAlbumsInfiniteQuery();
 
   const albums = data?.pages.flatMap((page) => page.data) ?? [];
@@ -28,6 +28,8 @@ export default function AlbumsScreen() {
             if (hasNextPage && !isFetchingNextPage) fetchNextPage();
           }}
           isFetchingNextPage={isFetchingNextPage}
+          refreshing={isRefetching}
+          onRefresh={() => refetch()}
         />
       )}
       <AlbumFab style={styles.fab} onPress={() => router.push("/album/new")} />
