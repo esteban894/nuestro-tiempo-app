@@ -1,3 +1,4 @@
+import { colors } from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { ComponentProps } from "react";
 import {
@@ -95,7 +96,7 @@ export const Button = ({
 
   const currentIconSize = iconSize || (size === "small" ? 16 : size === "large" ? 24 : 20);
 
-  const iconColor = variant === "outline" || variant === "ghost" ? "#D32F2F" : "#fff";
+  const iconColor = variant === "outline" || variant === "ghost" ? colors.PRIMARY[800] : "#fff";
 
   return (
     <TouchableOpacity
@@ -105,7 +106,7 @@ export const Button = ({
       {...rest}>
       {isLoading ? (
         <ActivityIndicator
-          color={variant === "outline" || variant === "ghost" ? "#D32F2F" : "#fff"}
+          color={variant === "outline" || variant === "ghost" ? colors.PRIMARY[800] : "#fff"}
           size="small"
         />
       ) : (
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
 
   // Variantes
   primary: {
-    backgroundColor: "#D32F2F",
+    backgroundColor: colors.PRIMARY[500],
   },
   secondary: {
     backgroundColor: "#757575",
@@ -154,7 +155,7 @@ const styles = StyleSheet.create({
   outline: {
     backgroundColor: "transparent",
     borderWidth: 2,
-    borderColor: "#D32F2F",
+    borderColor: colors.PRIMARY[800],
   },
   ghost: {
     backgroundColor: "transparent",
@@ -213,10 +214,10 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   text_outline: {
-    color: "#D32F2F",
+    color: colors.PRIMARY[800],
   },
   text_ghost: {
-    color: "#D32F2F",
+    color: colors.PRIMARY[800],
   },
   text_danger: {
     color: "#fff",

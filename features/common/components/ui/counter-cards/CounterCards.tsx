@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     minWidth: "45%",
     height: 100,
+    shadowColor: colors.PRIMARY[500],
   },
   number: {
     fontSize: 24,

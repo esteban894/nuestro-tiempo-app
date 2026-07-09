@@ -1,8 +1,8 @@
 export const colors = {
   PRIMARY: {
-    200: "#E57373",
-    500: "#D32F2F",
-    800: "#C62828",
+    200: "#EFE1C6",
+    500: "#A9824A",
+    800: "#6E5228",
   },
   SECONDARY: {
     200: "#F48FB1",
