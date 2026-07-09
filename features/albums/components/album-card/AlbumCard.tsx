@@ -24,9 +24,11 @@ export const AlbumCard = ({ album, index, onPress }: AlbumCardProps) => {
           <Ionicons name="image-outline" size={40} color={colors.NEUTRAL[600]} />
         </View>
       )}
-      <Text style={styles.caption} numberOfLines={1}>
-        {album.name}
-      </Text>
+      <View style={styles.captionWrapper}>
+        <Text style={styles.caption} numberOfLines={1}>
+          {album.name}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -36,10 +38,8 @@ const styles = StyleSheet.create({
     width: "48%",
     marginBottom: 24,
     backgroundColor: colors.NEUTRAL[200],
-    borderRadius: 4,
-    paddingHorizontal: 10,
-    paddingTop: 10,
-    paddingBottom: 20,
+    borderRadius: 20,
+    padding: 10,
     elevation: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
@@ -49,18 +49,29 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     aspectRatio: 1,
-    borderRadius: 1,
+    borderRadius: 10,
   },
   placeholder: {
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.NEUTRAL[500],
   },
+  captionWrapper: {
+    position: "absolute",
+    bottom: 10,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 10,
+    alignItems: "center",
+  },
   caption: {
-    marginTop: 10,
+    maxWidth: "100%",
     fontFamily: "PlaywriteAUQLD_400Regular",
     fontSize: 15,
-    color: colors.NEUTRAL[800],
+    color: colors.NEUTRAL[200],
+    backgroundColor: "rgba(0,0,0,0.20)",
+    borderRadius: 5,
     textAlign: "center",
+    paddingHorizontal: 5,
   },
 });
