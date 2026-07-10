@@ -57,7 +57,11 @@ export async function createImage(albumId: string, file: ImageFilePart) {
 export async function createImagesBatch(albumId: string, files: ImageFilePart[]) {
   const formData = new FormData();
   formData.append("albumId", albumId);
-  files.forEach((file) => formData.append("files", file as unknown as Blob));
+  // Each file gets its own field name (rather than repeating "files") to avoid a known
+  // React Native issue where multiple FormData parts under the same key can be dropped
+  // or corrupted by the native networking bridge on some platforms. The API accepts
+  // files under any field name (AnyFilesInterceptor), so this is safe server-side.
+  files.forEach((file, index) => formData.append(`files_${index}`, file as unknown as Blob));
 
   const response = await apiFetch<CreatedImage[]>("/images/batch", { method: "POST", body: formData });
   return response.map((image) => ({ ...image, url: resolveMediaUrl(image.url) }));
