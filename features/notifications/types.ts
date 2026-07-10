@@ -4,6 +4,9 @@
 
 export const NotificationType = {
   COUPLE_JOINED: "couple_joined",
+  ALBUM_SHARED: "album_shared",
+  IMAGE_UPLOADED: "image_uploaded",
+  IMAGES_BATCH_UPLOADED: "images_batch_uploaded",
 } as const;
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
@@ -13,5 +16,25 @@ interface CoupleJoinedNotificationData {
   coupleId: string;
 }
 
+interface AlbumSharedNotificationData {
+  type: typeof NotificationType.ALBUM_SHARED;
+  albumId: string;
+}
+
+interface ImageUploadedNotificationData {
+  type: typeof NotificationType.IMAGE_UPLOADED;
+  albumId: string;
+}
+
+interface ImagesBatchUploadedNotificationData {
+  type: typeof NotificationType.IMAGES_BATCH_UPLOADED;
+  albumId: string;
+  count: number;
+}
+
 // Add new notification data interfaces here and include them in this union.
-export type NotificationData = CoupleJoinedNotificationData;
+export type NotificationData =
+  | CoupleJoinedNotificationData
+  | AlbumSharedNotificationData
+  | ImageUploadedNotificationData
+  | ImagesBatchUploadedNotificationData;

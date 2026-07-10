@@ -11,6 +11,7 @@ export function useCreateImageMutation() {
       createImage(albumId, file),
     onSuccess: (_data, { albumId }) => {
       queryClient.invalidateQueries({ queryKey: imageKeys.byAlbum(albumId) });
+      queryClient.invalidateQueries({ queryKey: imageKeys.byAlbumInfinite(albumId) });
     },
   });
 }

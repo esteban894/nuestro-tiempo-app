@@ -13,6 +13,7 @@ import {
   ImageFilePart,
   useAlbumImagesInfiniteQuery,
   useCreateImageMutation,
+  useCreateImagesBatchMutation,
   useDeleteImageMutation,
 } from "@/features/images";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -48,6 +49,7 @@ export default function AlbumDetailScreen() {
   const imageGridColumns = images.length > 100 ? 3 : undefined;
 
   const createImageMutation = useCreateImageMutation();
+  const createImagesBatchMutation = useCreateImagesBatchMutation();
   const deleteImageMutation = useDeleteImageMutation();
   const [pickerVisible, setPickerVisible] = useState(false);
 
@@ -75,12 +77,13 @@ export default function AlbumDetailScreen() {
     return { uri, name, type };
   };
 
-  const addImage = (uri: string) => {
-    createImageMutation.mutate({ albumId: id, file: buildImageFilePart(uri) });
-  };
-
   const handlePickImages = (uris: string[]) => {
-    uris.forEach(addImage);
+    if (uris.length === 0) return;
+    if (uris.length === 1) {
+      createImageMutation.mutate({ albumId: id, file: buildImageFilePart(uris[0]) });
+      return;
+    }
+    createImagesBatchMutation.mutate({ albumId: id, files: uris.map(buildImageFilePart) });
   };
 
   if (isLoading) {
@@ -153,7 +156,7 @@ export default function AlbumDetailScreen() {
       <AlbumFab
         icon="camera-outline"
         onPress={() => {
-          if (!createImageMutation.isPending) setPickerVisible(true);
+          if (!createImageMutation.isPending && !createImagesBatchMutation.isPending) setPickerVisible(true);
         }}
         style={styles.fab}
       />

@@ -54,6 +54,15 @@ export async function createImage(albumId: string, file: ImageFilePart) {
   return { ...response, url: resolveMediaUrl(response.url) };
 }
 
+export async function createImagesBatch(albumId: string, files: ImageFilePart[]) {
+  const formData = new FormData();
+  formData.append("albumId", albumId);
+  files.forEach((file) => formData.append("files", file as unknown as Blob));
+
+  const response = await apiFetch<CreatedImage[]>("/images/batch", { method: "POST", body: formData });
+  return response.map((image) => ({ ...image, url: resolveMediaUrl(image.url) }));
+}
+
 export async function deleteImage(id: string) {
   return apiFetch<{ deleted: boolean }>(`/images/${id}`, { method: "DELETE" });
 }

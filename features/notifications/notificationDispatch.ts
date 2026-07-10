@@ -1,4 +1,7 @@
+import { albumKeys } from "@/features/albums";
+import { queryClient } from "@/features/common";
 import { useCoupleStore } from "@/features/couple";
+import { imageKeys } from "@/features/images";
 import type * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 import { NotificationData, NotificationType } from "./types";
@@ -28,6 +31,37 @@ const notificationHandlers: NotificationHandlerRegistry = {
     onResponse: () => {
       useCoupleStore.getState().fetchCouple();
       router.replace("/");
+    },
+  },
+
+  [NotificationType.ALBUM_SHARED]: {
+    onReceived: (data) => {
+      queryClient.invalidateQueries({ queryKey: albumKeys.list() });
+      queryClient.invalidateQueries({ queryKey: albumKeys.detail(data.albumId) });
+    },
+    onResponse: (data) => {
+      queryClient.invalidateQueries({ queryKey: albumKeys.list() });
+      router.push({ pathname: "/album/[id]", params: { id: data.albumId } });
+    },
+  },
+
+  [NotificationType.IMAGE_UPLOADED]: {
+    onReceived: (data) => {
+      queryClient.invalidateQueries({ queryKey: imageKeys.byAlbum(data.albumId) });
+      queryClient.invalidateQueries({ queryKey: imageKeys.byAlbumInfinite(data.albumId) });
+    },
+    onResponse: (data) => {
+      router.push({ pathname: "/album/[id]", params: { id: data.albumId } });
+    },
+  },
+
+  [NotificationType.IMAGES_BATCH_UPLOADED]: {
+    onReceived: (data) => {
+      queryClient.invalidateQueries({ queryKey: imageKeys.byAlbum(data.albumId) });
+      queryClient.invalidateQueries({ queryKey: imageKeys.byAlbumInfinite(data.albumId) });
+    },
+    onResponse: (data) => {
+      router.push({ pathname: "/album/[id]", params: { id: data.albumId } });
     },
   },
 };
