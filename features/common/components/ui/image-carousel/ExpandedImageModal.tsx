@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
-import { Dimensions, Modal, Pressable, StyleSheet } from "react-native";
+import { ReactNode, useState } from "react";
+import { Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Carousel from "react-native-reanimated-carousel";
 import { ZoomableImage } from "./ZoomableImage";
@@ -12,9 +12,16 @@ interface Props {
   index: number | null;
   onClose: () => void;
   onIndexChange: (index: number) => void;
+  renderOverlay?: (item: string, index: number) => ReactNode;
 }
 
-export function ExpandedImageModal({ data, index, onClose, onIndexChange }: Props) {
+export function ExpandedImageModal({
+  data,
+  index,
+  onClose,
+  onIndexChange,
+  renderOverlay,
+}: Props) {
   const [isZoomed, setIsZoomed] = useState(false);
   const isSingleImage = data.length <= 1;
 
@@ -38,8 +45,11 @@ export function ExpandedImageModal({ data, index, onClose, onIndexChange }: Prop
             loop={!isSingleImage}
             enabled={!isSingleImage && !isZoomed}
             onSnapToItem={onIndexChange}
-            renderItem={({ item }) => (
-              <ZoomableImage key={item} uri={item} onZoomChange={setIsZoomed} />
+            renderItem={({ item, index: itemIndex }) => (
+              <View style={styles.itemWrapper}>
+                <ZoomableImage key={item} uri={item} onZoomChange={setIsZoomed} />
+                {renderOverlay?.(item, itemIndex)}
+              </View>
             )}
           />
         )}
@@ -61,6 +71,11 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
+  },
+  itemWrapper: {
+    width: "100%",
+    height: "100%",
+    position: "relative",
   },
   closeButton: {
     position: "absolute",

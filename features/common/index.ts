@@ -6,6 +6,7 @@ export * from "./components/ui/checkbox/Checkbox";
 export * from "./components/ui/counter-cards/CounterCards";
 export * from "./components/ui/flip-card/FlipCard";
 export * from "./components/ui/image-carousel/ImageCarousel";
+export * from "./components/ui/image-grid/ImageGrid";
 export * from "./components/ui/input/Input";
 export * from "./components/ui/list-item/ListItem";
 export * from "./components/ui/overflow-menu/OverflowMenu";

@@ -8,10 +8,10 @@ import {
   getAlbum,
   setCurrentAlbum,
 } from "@/features/albums";
-import { ImageCarousel, OverflowMenu } from "@/features/common";
+import { ImageGrid, OverflowMenu } from "@/features/common";
 import {
   ImageFilePart,
-  useAlbumImagesQuery,
+  useAlbumImagesInfiniteQuery,
   useCreateImageMutation,
   useDeleteImageMutation,
 } from "@/features/images";
@@ -19,7 +19,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 export default function AlbumDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -32,9 +32,17 @@ export default function AlbumDetailScreen() {
     enabled: !!id,
   });
 
-  const { data: imagesData } = useAlbumImagesQuery(id);
-  const albumImages = imagesData?.data ?? [];
+  const {
+    data: imagesData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isRefetching: isRefetchingImages,
+    refetch: refetchImages,
+  } = useAlbumImagesInfiniteQuery(id);
+  const albumImages = imagesData?.pages.flatMap((page) => page.data) ?? [];
   const images = albumImages.map((image) => image.url);
+  const imageGridColumns = images.length > 100 ? 3 : undefined;
 
   const createImageMutation = useCreateImageMutation();
   const deleteImageMutation = useDeleteImageMutation();
@@ -117,27 +125,47 @@ export default function AlbumDetailScreen() {
           ),
         }}
       />
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <AlbumHeader title={album.name ?? ""} isPrivate={album.isPrivate} />
-        <ImageCarousel
-          data={images}
-          renderOverlay={(_, index) => (
-            <OverflowMenu
-              triggerIcon="ellipsis-vertical"
-              triggerColor="#fff"
-              triggerStyle={styles.imageMenuTrigger}
-              options={[
-                {
-                  label: "Eliminar foto",
-                  icon: "trash-outline",
-                  destructive: true,
-                  onPress: () => handleDeleteImage(index),
-                },
-              ]}
-            />
-          )}
-        />
-      </ScrollView>
+      <AlbumHeader title={album.name ?? ""} isPrivate={album.isPrivate} />
+      <ImageGrid
+        data={images}
+        numColumns={imageGridColumns}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+        }}
+        isFetchingNextPage={isFetchingNextPage}
+        refreshing={isRefetchingImages}
+        onRefresh={() => refetchImages()}
+        renderOverlay={(_, index) => (
+          <OverflowMenu
+            triggerIcon="ellipsis-vertical"
+            triggerColor="#fff"
+            triggerStyle={styles.imageMenuTrigger}
+            options={[
+              {
+                label: "Eliminar foto",
+                icon: "trash-outline",
+                destructive: true,
+                onPress: () => handleDeleteImage(index),
+              },
+            ]}
+          />
+        )}
+        renderExpandedOverlay={(_, index) => (
+          <OverflowMenu
+            triggerIcon="ellipsis-vertical"
+            triggerColor="#fff"
+            triggerStyle={styles.expandedImageMenuTrigger}
+            options={[
+              {
+                label: "Eliminar foto",
+                icon: "trash-outline",
+                destructive: true,
+                onPress: () => handleDeleteImage(index),
+              },
+            ]}
+          />
+        )}
+      />
       <AlbumFab
         icon="camera-outline"
         onPress={() => {
@@ -157,8 +185,6 @@ export default function AlbumDetailScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, position: "relative" },
-  container: { flex: 1 },
-  content: { paddingBottom: 100 },
   loader: { marginTop: 40 },
   notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
   notFoundText: { fontSize: 16, color: colors.NEUTRAL[800] },
@@ -169,6 +195,15 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
+    backgroundColor: "rgba(0,0,0,0.45)",
+  },
+  expandedImageMenuTrigger: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: "rgba(0,0,0,0.45)",
   },
   fab: {

@@ -22,6 +22,7 @@ export const AlbumGrid = ({
 }: AlbumGridProps) => {
   return (
     <FlatList
+      style={styles.list}
       data={albums}
       keyExtractor={(item) => item.id}
       numColumns={2}
@@ -52,6 +53,9 @@ export const AlbumGrid = ({
 };
 
 const styles = StyleSheet.create({
+  list: {
+    flex: 1,
+  },
   content: {
     padding: 20,
     paddingBottom: 100,
