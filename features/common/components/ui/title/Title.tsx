@@ -1,3 +1,4 @@
+import { useThemeColors } from "@/features/theme";
 import React from "react";
 import { StyleSheet, Text, TextProps } from "react-native";
 
@@ -55,10 +56,11 @@ export const Title = ({
   style,
   ...rest
 }: TitleProps) => {
+  const themeColors = useThemeColors();
   const variantStyle = styles[variant];
 
   const customStyle = {
-    ...(color && { color }),
+    color: color ?? themeColors.NEUTRAL[800],
     ...(weight && { fontWeight: weight }),
     ...(align && { textAlign: align }),
   };

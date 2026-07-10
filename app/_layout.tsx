@@ -1,4 +1,4 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
 import { useAuthStore } from "@/features/auth";
 import { queryClient } from "@/features/common";
 import {
@@ -7,6 +7,7 @@ import {
   registerForPushNotifications,
 } from "@/features/notifications";
 import "@/features/notifications/notificationHandler";
+import { subscribeToSystemScheme, useThemeColors, useThemeStore } from "@/features/theme";
 import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
 import { PlaywriteAUQLD_400Regular } from "@expo-google-fonts/playwrite-au-qld";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -34,15 +35,29 @@ export default function RootLayout() {
   const status = useAuthStore((state) => state.status);
   const hydrate = useAuthStore((state) => state.hydrate);
 
+  const themeHydrated = useThemeStore((state) => state.hydrated);
+  const themeHydrate = useThemeStore((state) => state.hydrate);
+  const resolvedScheme = useThemeStore((state) => state.resolvedScheme);
+  const themeColors = useThemeColors();
+  const styles = createStyles(themeColors);
+
   useEffect(() => {
     hydrate();
   }, [hydrate]);
 
   useEffect(() => {
-    if ((loaded || error) && status !== "idle" && status !== "loading") {
+    themeHydrate();
+  }, [themeHydrate]);
+
+  useEffect(() => {
+    return subscribeToSystemScheme();
+  }, []);
+
+  useEffect(() => {
+    if ((loaded || error) && status !== "idle" && status !== "loading" && themeHydrated) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error, status]);
+  }, [loaded, error, status, themeHydrated]);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -66,7 +81,7 @@ export default function RootLayout() {
     return null;
   }
 
-  if (status === "idle" || status === "loading") {
+  if (status === "idle" || status === "loading" || !themeHydrated) {
     return null;
   }
 
@@ -74,9 +89,9 @@ export default function RootLayout() {
 
   return (
     <View style={styles.view}>
-      <StatusBar style="inverted" />
+      <StatusBar style={resolvedScheme === "dark" ? "light" : "dark"} />
       <QueryClientProvider client={queryClient}>
-        <Stack>
+        <Stack screenOptions={{ contentStyle: { backgroundColor: themeColors.NEUTRAL[200] } }}>
           <Stack.Protected guard={isAuthenticated}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           </Stack.Protected>
@@ -88,8 +103,18 @@ export default function RootLayout() {
             options={{
               headerTitle: "Vincular pareja",
               headerBackTitle: "Cuenta",
-              headerTintColor: colors.PRIMARY[800],
-              headerStyle: { backgroundColor: colors.NEUTRAL[200] },
+              headerTintColor: themeColors.PRIMARY[800],
+              headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
+              headerShadowVisible: false,
+            }}
+          />
+          <Stack.Screen
+            name="settings"
+            options={{
+              headerTitle: "Configuración",
+              headerBackTitle: "Cuenta",
+              headerTintColor: themeColors.PRIMARY[800],
+              headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
               headerShadowVisible: false,
             }}
           />
@@ -97,8 +122,8 @@ export default function RootLayout() {
             name="album/[id]"
             options={{
               headerBackTitle: "Álbumes",
-              headerTintColor: colors.PRIMARY[800],
-              headerStyle: { backgroundColor: colors.NEUTRAL[200] },
+              headerTintColor: themeColors.PRIMARY[800],
+              headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
               headerShadowVisible: false,
             }}
           />
@@ -107,8 +132,8 @@ export default function RootLayout() {
             options={{
               headerTitle: "Nuevo álbum",
               headerBackTitle: "Álbumes",
-              headerTintColor: colors.PRIMARY[800],
-              headerStyle: { backgroundColor: colors.NEUTRAL[200] },
+              headerTintColor: themeColors.PRIMARY[800],
+              headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
               headerShadowVisible: false,
             }}
           />
@@ -117,8 +142,8 @@ export default function RootLayout() {
             options={{
               headerTitle: "Editar álbum",
               headerBackTitle: "Álbum",
-              headerTintColor: colors.PRIMARY[800],
-              headerStyle: { backgroundColor: colors.NEUTRAL[200] },
+              headerTintColor: themeColors.PRIMARY[800],
+              headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
               headerShadowVisible: false,
             }}
           />
@@ -128,6 +153,7 @@ export default function RootLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  view: { backgroundColor: colors.NEUTRAL[200], flex: 1 },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    view: { backgroundColor: colors.NEUTRAL[200], flex: 1 },
+  });

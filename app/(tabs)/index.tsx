@@ -1,9 +1,10 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
 import { useCurrentAlbumQuery } from "@/features/albums";
 import { ImageCarousel, Title } from "@/features/common";
 import { CounterCards } from "@/features/common/components/ui/counter-cards/CounterCards";
 import { useCoupleStore } from "@/features/couple";
 import { useAlbumImagesQuery } from "@/features/images";
+import { useThemeColors } from "@/features/theme";
 import React, { useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet } from "react-native";
 
@@ -13,6 +14,8 @@ export default function HomeScreen() {
   const { data: currentAlbum, refetch: refetchCurrentAlbum } = useCurrentAlbumQuery();
   const { data: imagesData, refetch: refetchImages } = useAlbumImagesQuery(currentAlbum?.id);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
 
   const images = imagesData?.data.map((image) => image.url) ?? [];
 
@@ -41,20 +44,22 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: 20,
-    paddingBottom: 20,
-  },
-  title: {
-    marginVertical: 20,
-    textAlign: "center",
-    fontFamily: "PlaywriteAUQLD_400Regular",
-    fontWeight: "400",
-    textDecorationLine: "underline",
-    color: colors.PRIMARY[500],
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.NEUTRAL[200],
+    },
+    contentContainer: {
+      padding: 20,
+      paddingBottom: 20,
+    },
+    title: {
+      marginVertical: 20,
+      textAlign: "center",
+      fontFamily: "PlaywriteAUQLD_400Regular",
+      fontWeight: "400",
+      textDecorationLine: "underline",
+      color: colors.PRIMARY[500],
+    },
+  });

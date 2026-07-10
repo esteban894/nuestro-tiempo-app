@@ -1,4 +1,5 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
+import { useThemeColors } from "@/features/theme";
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet } from "react-native";
 import { Album } from "../../api/album.api";
 import { AlbumCard } from "../album-card/AlbumCard";
@@ -20,6 +21,9 @@ export const AlbumGrid = ({
   refreshing,
   onRefresh,
 }: AlbumGridProps) => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
+
   return (
     <FlatList
       style={styles.list}
@@ -52,18 +56,19 @@ export const AlbumGrid = ({
   );
 };
 
-const styles = StyleSheet.create({
-  list: {
-    flex: 1,
-  },
-  content: {
-    padding: 20,
-    paddingBottom: 100,
-  },
-  row: {
-    justifyContent: "space-between",
-  },
-  footer: {
-    marginVertical: 20,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    list: {
+      flex: 1,
+    },
+    content: {
+      padding: 20,
+      paddingBottom: 100,
+    },
+    row: {
+      justifyContent: "space-between",
+    },
+    footer: {
+      marginVertical: 20,
+    },
+  });

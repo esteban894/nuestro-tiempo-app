@@ -1,5 +1,6 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
 import { AlbumForm, albumKeys, getAlbum, updateAlbum } from "@/features/albums";
+import { useThemeColors } from "@/features/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
@@ -8,6 +9,8 @@ export default function EditAlbumScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
 
   const { data: album, isLoading, isError } = useQuery({
     queryKey: albumKeys.detail(id),
@@ -47,8 +50,9 @@ export default function EditAlbumScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  loader: { marginTop: 40 },
-  notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
-  notFoundText: { fontSize: 16, color: colors.NEUTRAL[800] },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    loader: { marginTop: 40 },
+    notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
+    notFoundText: { fontSize: 16, color: colors.NEUTRAL[800] },
+  });

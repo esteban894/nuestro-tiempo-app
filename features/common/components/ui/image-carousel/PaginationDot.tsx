@@ -1,3 +1,4 @@
+import { useThemeColors } from "@/features/theme";
 import { StyleSheet } from "react-native";
 import Animated, {
   Extrapolation,
@@ -13,14 +14,18 @@ interface Props {
 }
 
 export function PaginationDot({ index, progress }: Props) {
+  const colors = useThemeColors();
+  const inactiveColor = colors.NEUTRAL[600];
+  const activeColor = colors.NEUTRAL[800];
+
   const animatedStyle = useAnimatedStyle(() => {
     const inputRange = [index - 1, index, index + 1];
 
     const dotWidth = interpolate(progress.value, inputRange, [8, 16, 8], Extrapolation.CLAMP);
     const backgroundColor = interpolateColor(progress.value, inputRange, [
-      "#cbd5e1",
-      "#111827",
-      "#cbd5e1",
+      inactiveColor,
+      activeColor,
+      inactiveColor,
     ]);
 
     return { width: dotWidth, backgroundColor };

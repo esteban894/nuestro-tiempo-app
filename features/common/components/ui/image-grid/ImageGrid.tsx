@@ -1,4 +1,5 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
+import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { ReactNode, useEffect, useState } from "react";
 import {
@@ -36,6 +37,8 @@ export function ImageGrid({
   refreshing,
   onRefresh,
 }: Props) {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const tileWidth = `${(100 - (numColumns - 1) * GAP_PERCENT) / numColumns}%` as `${number}%`;
 
@@ -48,7 +51,7 @@ export function ImageGrid({
   if (data.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="images-outline" size={32} color="#9ca3af" />
+        <Ionicons name="images-outline" size={32} color={colors.NEUTRAL[600]} />
         <Text style={styles.emptyText}>No hay imágenes</Text>
       </View>
     );
@@ -100,41 +103,42 @@ export function ImageGrid({
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-  },
-  emptyContainer: {
-    height: 200,
-    marginHorizontal: 20,
-    borderRadius: 16,
-    backgroundColor: "#f3f4f6",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  emptyText: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#9ca3af",
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingBottom: 100,
-  },
-  row: {
-    justifyContent: "space-between",
-  },
-  tile: {
-    marginBottom: 16,
-    position: "relative",
-  },
-  image: {
-    width: "100%",
-    aspectRatio: 1,
-    borderRadius: 12,
-  },
-  footer: {
-    marginVertical: 20,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    wrapper: {
+      flex: 1,
+    },
+    emptyContainer: {
+      height: 200,
+      marginHorizontal: 20,
+      borderRadius: 16,
+      backgroundColor: colors.NEUTRAL[500],
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+    },
+    emptyText: {
+      fontSize: 15,
+      fontWeight: "500",
+      color: colors.NEUTRAL[600],
+    },
+    content: {
+      paddingHorizontal: 20,
+      paddingBottom: 100,
+    },
+    row: {
+      justifyContent: "space-between",
+    },
+    tile: {
+      marginBottom: 16,
+      position: "relative",
+    },
+    image: {
+      width: "100%",
+      aspectRatio: 1,
+      borderRadius: 12,
+    },
+    footer: {
+      marginVertical: 20,
+    },
+  });

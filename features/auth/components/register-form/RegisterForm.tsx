@@ -1,5 +1,6 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
 import { Button, Input, Title } from "@/features/common";
+import { useThemeColors } from "@/features/theme";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
@@ -9,6 +10,8 @@ import { useAuthStore } from "../../store/authStore";
 
 export const RegisterForm = () => {
   const setSession = useAuthStore((state) => state.setSession);
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
 
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
@@ -102,20 +105,22 @@ export const RegisterForm = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.NEUTRAL[200],
-    padding: 20,
-    borderRadius: 20,
-    margin: 30,
-    marginVertical: "auto",
-  },
-  hasAccount: {
-    textAlign: "center",
-  },
-  link: {
-    textAlign: "center",
-    fontWeight: "bold",
-    color: colors.PRIMARY[500],
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: colors.NEUTRAL[200],
+      padding: 20,
+      borderRadius: 20,
+      margin: 30,
+      marginVertical: "auto",
+    },
+    hasAccount: {
+      textAlign: "center",
+      color: colors.NEUTRAL[800],
+    },
+    link: {
+      textAlign: "center",
+      fontWeight: "bold",
+      color: colors.PRIMARY[500],
+    },
+  });

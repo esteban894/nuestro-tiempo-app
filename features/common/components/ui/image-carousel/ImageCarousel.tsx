@@ -1,3 +1,5 @@
+import { ThemeColors } from "@/constants/colors";
+import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { ReactNode, useRef, useState } from "react";
 import { Dimensions, Image, Pressable, StyleSheet, Text, View } from "react-native";
@@ -18,12 +20,14 @@ export function ImageCarousel({ data, renderArrows = false, renderOverlay }: Pro
   const ref = useRef<ICarouselInstance>(null);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const progress = useSharedValue(0);
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
 
   if (data.length === 0) {
     return (
       <View style={styles.wrapper}>
         <View style={[styles.carouselContainer, styles.emptyContainer]}>
-          <Ionicons name="images-outline" size={32} color="#9ca3af" />
+          <Ionicons name="images-outline" size={32} color={colors.NEUTRAL[600]} />
           <Text style={styles.emptyText}>No hay imágenes</Text>
         </View>
       </View>
@@ -106,63 +110,64 @@ export function ImageCarousel({ data, renderArrows = false, renderOverlay }: Pro
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    alignItems: "center",
-  },
-  carouselContainer: {
-    position: "relative",
-  },
-  emptyContainer: {
-    width: width - 40,
-    height: 400,
-    borderRadius: 16,
-    backgroundColor: "#f3f4f6",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  emptyText: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#9ca3af",
-  },
-  itemWrapper: {
-    width: "100%",
-    height: "100%",
-    position: "relative",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 16,
-  },
-  arrowButton: {
-    position: "absolute",
-    top: "50%",
-    transform: [{ translateY: -20 }],
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 10,
-  },
-  arrowButtonDisabled: {
-    opacity: 0.4,
-  },
-  leftButton: {
-    left: 10,
-  },
-  rightButton: {
-    right: 10,
-  },
-  pagination: {
-    flexDirection: "row",
-    marginTop: 14,
-    gap: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    wrapper: {
+      alignItems: "center",
+    },
+    carouselContainer: {
+      position: "relative",
+    },
+    emptyContainer: {
+      width: width - 40,
+      height: 400,
+      borderRadius: 16,
+      backgroundColor: colors.NEUTRAL[500],
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+    },
+    emptyText: {
+      fontSize: 15,
+      fontWeight: "500",
+      color: colors.NEUTRAL[600],
+    },
+    itemWrapper: {
+      width: "100%",
+      height: "100%",
+      position: "relative",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 16,
+    },
+    arrowButton: {
+      position: "absolute",
+      top: "50%",
+      transform: [{ translateY: -20 }],
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: "rgba(0,0,0,0.45)",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 10,
+    },
+    arrowButtonDisabled: {
+      opacity: 0.4,
+    },
+    leftButton: {
+      left: 10,
+    },
+    rightButton: {
+      right: 10,
+    },
+    pagination: {
+      flexDirection: "row",
+      marginTop: 14,
+      gap: 8,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  });

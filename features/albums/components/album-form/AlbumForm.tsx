@@ -1,5 +1,6 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
 import { Checkbox, Button, Input } from "@/features/common";
+import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -26,6 +27,8 @@ export const AlbumForm = ({
   isSubmitting = false,
   error,
 }: AlbumFormProps) => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
   const [name, setName] = useState(initialValues?.name ?? "");
   const [coverImage, setCoverImage] = useState(initialValues?.coverImage ?? "");
   // Tracks whether `coverImage` is a freshly-picked local file (needs upload) vs.
@@ -108,45 +111,46 @@ export const AlbumForm = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 20,
-  },
-  coverPicker: {
-    alignSelf: "center",
-    width: 160,
-    height: 160,
-    borderRadius: 16,
-    overflow: "hidden",
-    marginBottom: 24,
-  },
-  coverImage: {
-    width: "100%",
-    height: "100%",
-  },
-  coverPlaceholder: {
-    width: "100%",
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.NEUTRAL[500],
-    gap: 8,
-  },
-  coverPlaceholderLabel: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: colors.NEUTRAL[600],
-  },
-  checkbox: {
-    marginBottom: 24,
-  },
-  errorText: {
-    fontSize: 13,
-    color: colors.ERROR[500],
-    textAlign: "center",
-    marginBottom: 16,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    content: {
+      padding: 20,
+    },
+    coverPicker: {
+      alignSelf: "center",
+      width: 160,
+      height: 160,
+      borderRadius: 16,
+      overflow: "hidden",
+      marginBottom: 24,
+    },
+    coverImage: {
+      width: "100%",
+      height: "100%",
+    },
+    coverPlaceholder: {
+      width: "100%",
+      height: "100%",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.NEUTRAL[500],
+      gap: 8,
+    },
+    coverPlaceholderLabel: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.NEUTRAL[600],
+    },
+    checkbox: {
+      marginBottom: 24,
+    },
+    errorText: {
+      fontSize: 13,
+      color: colors.ERROR[500],
+      textAlign: "center",
+      marginBottom: 16,
+    },
+  });

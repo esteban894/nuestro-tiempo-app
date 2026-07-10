@@ -1,4 +1,5 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
+import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { ComponentProps } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -28,6 +29,9 @@ export const ListItem = ({
   rightIcon = "chevron-forward",
   onPress,
 }: ListItemProps) => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
+
   return (
     <TouchableOpacity style={styles.container} activeOpacity={0.7} onPress={onPress}>
       <View style={styles.iconWrapper}>
@@ -39,33 +43,34 @@ export const ListItem = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.NEUTRAL[200],
-    borderRadius: 18,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    elevation: 2,
-    shadowColor: "#fa0000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-  },
-  iconWrapper: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.NEUTRAL[500],
-    marginRight: 14,
-  },
-  label: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "500",
-    color: colors.NEUTRAL[800],
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.NEUTRAL[200],
+      borderRadius: 18,
+      paddingVertical: 16,
+      paddingHorizontal: 16,
+      elevation: 2,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.15,
+      shadowRadius: 3,
+    },
+    iconWrapper: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.NEUTRAL[500],
+      marginRight: 14,
+    },
+    label: {
+      flex: 1,
+      fontSize: 16,
+      fontWeight: "500",
+      color: colors.NEUTRAL[800],
+    },
+  });

@@ -1,5 +1,6 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
 import { Button, Card, Title } from "@/features/common";
+import { useThemeColors } from "@/features/theme";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
@@ -23,6 +24,8 @@ const formatDateTime = (date: Date) =>
   });
 
 export const CreateCoupleCard = () => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [showPicker, setShowPicker] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -117,70 +120,71 @@ export const CreateCoupleCard = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  card: {
-    alignItems: "center",
-  },
-  title: {
-    marginTop: 8,
-    marginBottom: 16,
-    color: colors.PRIMARY[800],
-  },
-  helper: {
-    fontSize: 14,
-    color: colors.NEUTRAL[800],
-    textAlign: "center",
-    marginBottom: 12,
-  },
-  dateField: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    width: "100%",
-    borderWidth: 1.5,
-    borderColor: colors.SECONDARY[200],
-    borderRadius: 25,
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    minHeight: 50,
-    marginBottom: 20,
-  },
-  dateText: {
-    fontSize: 16,
-    color: "#000",
-  },
-  datePlaceholder: {
-    color: "#999",
-  },
-  createButton: {
-    marginTop: 4,
-  },
-  codeSection: {
-    width: "100%",
-    alignItems: "center",
-  },
-  code: {
-    fontSize: 32,
-    fontWeight: "700",
-    letterSpacing: 6,
-    color: colors.PRIMARY[500],
-    marginBottom: 8,
-  },
-  expiresAt: {
-    fontSize: 12,
-    color: colors.NEUTRAL[600],
-    marginBottom: 8,
-  },
-  waitingHint: {
-    fontSize: 13,
-    color: colors.SECONDARY[500],
-    fontStyle: "italic",
-    marginBottom: 20,
-  },
-  errorText: {
-    fontSize: 12,
-    color: colors.ERROR[500],
-    textAlign: "center",
-    marginBottom: 12,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    card: {
+      alignItems: "center",
+    },
+    title: {
+      marginTop: 8,
+      marginBottom: 16,
+      color: colors.PRIMARY[800],
+    },
+    helper: {
+      fontSize: 14,
+      color: colors.NEUTRAL[800],
+      textAlign: "center",
+      marginBottom: 12,
+    },
+    dateField: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      width: "100%",
+      borderWidth: 1.5,
+      borderColor: colors.SECONDARY[200],
+      borderRadius: 25,
+      backgroundColor: colors.NEUTRAL[500],
+      paddingHorizontal: 16,
+      minHeight: 50,
+      marginBottom: 20,
+    },
+    dateText: {
+      fontSize: 16,
+      color: colors.NEUTRAL[800],
+    },
+    datePlaceholder: {
+      color: colors.NEUTRAL[600],
+    },
+    createButton: {
+      marginTop: 4,
+    },
+    codeSection: {
+      width: "100%",
+      alignItems: "center",
+    },
+    code: {
+      fontSize: 32,
+      fontWeight: "700",
+      letterSpacing: 6,
+      color: colors.PRIMARY[500],
+      marginBottom: 8,
+    },
+    expiresAt: {
+      fontSize: 12,
+      color: colors.NEUTRAL[600],
+      marginBottom: 8,
+    },
+    waitingHint: {
+      fontSize: 13,
+      color: colors.SECONDARY[500],
+      fontStyle: "italic",
+      marginBottom: 20,
+    },
+    errorText: {
+      fontSize: 12,
+      color: colors.ERROR[500],
+      textAlign: "center",
+      marginBottom: 12,
+    },
+  });

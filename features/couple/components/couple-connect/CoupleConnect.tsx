@@ -1,4 +1,6 @@
+import { ThemeColors } from "@/constants/colors";
 import { FlipCard, SegmentedControl, Title } from "@/features/common";
+import { useThemeColors } from "@/features/theme";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { CreateCoupleCard } from "../create-couple-card/CreateCoupleCard";
@@ -13,6 +15,8 @@ const OPTIONS = [
 
 export const CoupleConnect = () => {
   const [mode, setMode] = useState<Mode>("create");
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
 
   return (
     <View style={styles.container}>
@@ -40,19 +44,20 @@ export const CoupleConnect = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  subtitle: {
-    color: "#757575",
-    marginBottom: 20,
-  },
-  toggle: {
-    marginBottom: 24,
-  },
-  card: {
-    minHeight: 380,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 20,
+    },
+    subtitle: {
+      color: colors.NEUTRAL[600],
+      marginBottom: 20,
+    },
+    toggle: {
+      marginBottom: 24,
+    },
+    card: {
+      minHeight: 380,
+    },
+  });

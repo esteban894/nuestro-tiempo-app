@@ -1,5 +1,6 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
 import { useCoupleStore } from "@/features/couple";
+import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { useEffect } from "react";
@@ -7,6 +8,8 @@ import { StyleSheet } from "react-native";
 
 export default function TabLayout() {
   const fetchCouple = useCoupleStore((state) => state.fetchCouple);
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
 
   useEffect(() => {
     fetchCouple();
@@ -57,26 +60,27 @@ export default function TabLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: colors.NEUTRAL[200],
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingTop: 10,
-    paddingBottom: 10,
-    borderTopWidth: 0,
-    elevation: 0,
-    shadowOpacity: 0,
-  },
-  header: {
-    backgroundColor: "transparent",
-    shadowColor: "transparent",
-  },
-  headerTitle: {
-    color: colors.PRIMARY[800],
-    fontFamily: "PlaywriteAUQLD_400Regular",
-  },
-  headerRightContainer: {
-    paddingRight: 15,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    tabBar: {
+      backgroundColor: colors.NEUTRAL[200],
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      paddingTop: 10,
+      paddingBottom: 10,
+      borderTopWidth: 0,
+      elevation: 0,
+      shadowOpacity: 0,
+    },
+    header: {
+      backgroundColor: colors.NEUTRAL[200],
+      shadowColor: "transparent",
+    },
+    headerTitle: {
+      color: colors.PRIMARY[800],
+      fontFamily: "PlaywriteAUQLD_400Regular",
+    },
+    headerRightContainer: {
+      paddingRight: 15,
+    },
+  });

@@ -1,4 +1,5 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
+import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { ComponentProps } from "react";
 import {
@@ -79,6 +80,9 @@ export const Button = ({
   style,
   ...rest
 }: ButtonProps) => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
+
   const containerStyle = [
     styles.base,
     styles[variant],
@@ -136,102 +140,103 @@ export const Button = ({
   );
 };
 
-const styles = StyleSheet.create({
-  base: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 30,
-    borderWidth: 0,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    base: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 30,
+      borderWidth: 0,
+    },
 
-  // Variantes
-  primary: {
-    backgroundColor: colors.PRIMARY[500],
-  },
-  secondary: {
-    backgroundColor: "#757575",
-  },
-  outline: {
-    backgroundColor: "transparent",
-    borderWidth: 2,
-    borderColor: colors.PRIMARY[800],
-  },
-  ghost: {
-    backgroundColor: "transparent",
-  },
-  danger: {
-    backgroundColor: "#f44336",
-  },
+    // Variantes
+    primary: {
+      backgroundColor: colors.PRIMARY[500],
+    },
+    secondary: {
+      backgroundColor: "#757575",
+    },
+    outline: {
+      backgroundColor: "transparent",
+      borderWidth: 2,
+      borderColor: colors.PRIMARY[800],
+    },
+    ghost: {
+      backgroundColor: "transparent",
+    },
+    danger: {
+      backgroundColor: "#f44336",
+    },
 
-  // Tamaños
-  size_small: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    minHeight: 36,
-  },
-  size_medium: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    minHeight: 48,
-  },
-  size_large: {
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    minHeight: 56,
-  },
+    // Tamaños
+    size_small: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      minHeight: 36,
+    },
+    size_medium: {
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      minHeight: 48,
+    },
+    size_large: {
+      paddingHorizontal: 32,
+      paddingVertical: 16,
+      minHeight: 56,
+    },
 
-  // Estados
-  disabled: {
-    opacity: 0.5,
-  },
-  fullWidth: {
-    width: "100%",
-  },
+    // Estados
+    disabled: {
+      opacity: 0.5,
+    },
+    fullWidth: {
+      width: "100%",
+    },
 
-  // Contenido
-  content: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  leftIcon: {
-    marginRight: 8,
-  },
-  rightIcon: {
-    marginLeft: 8,
-  },
+    // Contenido
+    content: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    leftIcon: {
+      marginRight: 8,
+    },
+    rightIcon: {
+      marginLeft: 8,
+    },
 
-  // Textos
-  text: {
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  text_primary: {
-    color: "#fff",
-  },
-  text_secondary: {
-    color: "#fff",
-  },
-  text_outline: {
-    color: colors.PRIMARY[800],
-  },
-  text_ghost: {
-    color: colors.PRIMARY[800],
-  },
-  text_danger: {
-    color: "#fff",
-  },
-  textSize_small: {
-    fontSize: 14,
-  },
-  textSize_medium: {
-    fontSize: 16,
-  },
-  textSize_large: {
-    fontSize: 18,
-  },
-  textDisabled: {
-    opacity: 1,
-  },
-});
+    // Textos
+    text: {
+      fontWeight: "600",
+      textAlign: "center",
+    },
+    text_primary: {
+      color: "#fff",
+    },
+    text_secondary: {
+      color: "#fff",
+    },
+    text_outline: {
+      color: colors.PRIMARY[800],
+    },
+    text_ghost: {
+      color: colors.PRIMARY[800],
+    },
+    text_danger: {
+      color: "#fff",
+    },
+    textSize_small: {
+      fontSize: 14,
+    },
+    textSize_medium: {
+      fontSize: 16,
+    },
+    textSize_large: {
+      fontSize: 18,
+    },
+    textDisabled: {
+      opacity: 1,
+    },
+  });

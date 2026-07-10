@@ -1,12 +1,15 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
 import { AlbumFab, AlbumGrid, useAlbumsInfiniteQuery } from "@/features/albums";
 import { Title } from "@/features/common";
+import { useThemeColors } from "@/features/theme";
 import { useRouter } from "expo-router";
 import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 export default function AlbumsScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isRefetching, refetch } =
     useAlbumsInfiniteQuery();
@@ -37,9 +40,10 @@ export default function AlbumsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, position: "relative" },
-  title: { paddingHorizontal: 20, paddingTop: 20, color: "#212121" },
-  loader: { marginTop: 40 },
-  fab: { position: "absolute", bottom: 24, right: 20 },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: { flex: 1, position: "relative", backgroundColor: colors.NEUTRAL[200] },
+    title: { paddingHorizontal: 20, paddingTop: 20 },
+    loader: { marginTop: 40 },
+    fab: { position: "absolute", bottom: 24, right: 20 },
+  });

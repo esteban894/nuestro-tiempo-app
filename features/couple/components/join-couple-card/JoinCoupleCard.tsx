@@ -1,5 +1,6 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
 import { Button, Card, Input, Title } from "@/features/common";
+import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
@@ -10,6 +11,8 @@ import { useCoupleStore } from "../../store/coupleStore";
 import { INVITE_CODE_LENGTH, INVITE_CODE_REGEX } from "../../utils/generateInviteCode";
 
 export const JoinCoupleCard = () => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
   const [code, setCode] = useState("");
   const [formatError, setFormatError] = useState<string | undefined>();
 
@@ -80,36 +83,37 @@ export const JoinCoupleCard = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  card: {
-    alignItems: "center",
-  },
-  title: {
-    marginTop: 8,
-    marginBottom: 16,
-    color: colors.SECONDARY[800],
-  },
-  helper: {
-    fontSize: 14,
-    color: colors.NEUTRAL[800],
-    textAlign: "center",
-    marginBottom: 12,
-  },
-  codeInputWrapper: {
-    width: "100%",
-  },
-  codeInput: {
-    letterSpacing: 4,
-    fontWeight: "600",
-  },
-  successSection: {
-    alignItems: "center",
-    gap: 12,
-    paddingVertical: 12,
-  },
-  successText: {
-    fontSize: 16,
-    color: colors.NEUTRAL[800],
-    textAlign: "center",
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    card: {
+      alignItems: "center",
+    },
+    title: {
+      marginTop: 8,
+      marginBottom: 16,
+      color: colors.SECONDARY[800],
+    },
+    helper: {
+      fontSize: 14,
+      color: colors.NEUTRAL[800],
+      textAlign: "center",
+      marginBottom: 12,
+    },
+    codeInputWrapper: {
+      width: "100%",
+    },
+    codeInput: {
+      letterSpacing: 4,
+      fontWeight: "600",
+    },
+    successSection: {
+      alignItems: "center",
+      gap: 12,
+      paddingVertical: 12,
+    },
+    successText: {
+      fontSize: 16,
+      color: colors.NEUTRAL[800],
+      textAlign: "center",
+    },
+  });

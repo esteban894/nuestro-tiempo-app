@@ -27,6 +27,11 @@ export const AccountMenu = () => {
         label={coupleLabel}
         onPress={partner ? undefined : () => router.navigate("/couple")}
       />
+      <ListItem
+        leftIcon="settings-outline"
+        label="Configuración"
+        onPress={() => router.navigate("/settings")}
+      />
       <ListItem leftIcon="log-out-outline" label="Cerrar sesión" onPress={() => logout()} />
     </View>
   );

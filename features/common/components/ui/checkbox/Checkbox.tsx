@@ -1,4 +1,5 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
+import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
 
@@ -17,6 +18,9 @@ interface CheckboxProps {
  * <Checkbox checked={isPrivate} onChange={setIsPrivate} label="Álbum privado" />
  */
 export const Checkbox = ({ checked, onChange, label, disabled, style }: CheckboxProps) => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
+
   return (
     <TouchableOpacity
       style={[styles.container, style]}
@@ -31,28 +35,29 @@ export const Checkbox = ({ checked, onChange, label, disabled, style }: Checkbox
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  box: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: colors.NEUTRAL[600],
-    backgroundColor: "transparent",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  boxChecked: {
-    backgroundColor: colors.PRIMARY[500],
-    borderColor: colors.PRIMARY[500],
-  },
-  label: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: colors.NEUTRAL[800],
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    box: {
+      width: 24,
+      height: 24,
+      borderRadius: 6,
+      borderWidth: 2,
+      borderColor: colors.NEUTRAL[600],
+      backgroundColor: "transparent",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    boxChecked: {
+      backgroundColor: colors.PRIMARY[500],
+      borderColor: colors.PRIMARY[500],
+    },
+    label: {
+      marginLeft: 10,
+      fontSize: 16,
+      color: colors.NEUTRAL[800],
+    },
+  });

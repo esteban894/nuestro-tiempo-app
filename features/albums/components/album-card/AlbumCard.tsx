@@ -1,4 +1,5 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
+import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Album } from "../../api/album.api";
@@ -10,6 +11,8 @@ interface AlbumCardProps {
 }
 
 export const AlbumCard = ({ album, index, onPress }: AlbumCardProps) => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
   const tilt = index % 2 === 0 ? "-2deg" : "2deg";
 
   return (
@@ -33,45 +36,48 @@ export const AlbumCard = ({ album, index, onPress }: AlbumCardProps) => {
   );
 };
 
-const styles = StyleSheet.create({
-  card: {
-    width: "48%",
-    marginBottom: 24,
-    backgroundColor: colors.NEUTRAL[200],
-    borderRadius: 20,
-    padding: 10,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  image: {
-    width: "100%",
-    aspectRatio: 1,
-    borderRadius: 10,
-  },
-  placeholder: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.NEUTRAL[500],
-  },
-  captionWrapper: {
-    position: "absolute",
-    bottom: 10,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 10,
-    alignItems: "center",
-  },
-  caption: {
-    maxWidth: "100%",
-    fontFamily: "PlaywriteAUQLD_400Regular",
-    fontSize: 15,
-    color: colors.NEUTRAL[200],
-    backgroundColor: "rgba(0,0,0,0.20)",
-    borderRadius: 5,
-    textAlign: "center",
-    paddingHorizontal: 5,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    card: {
+      width: "48%",
+      marginBottom: 24,
+      backgroundColor: colors.NEUTRAL[200],
+      borderRadius: 20,
+      padding: 10,
+      elevation: 4,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+    },
+    image: {
+      width: "100%",
+      aspectRatio: 1,
+      borderRadius: 10,
+    },
+    placeholder: {
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.NEUTRAL[500],
+    },
+    captionWrapper: {
+      position: "absolute",
+      bottom: 10,
+      left: 0,
+      right: 0,
+      paddingHorizontal: 10,
+      alignItems: "center",
+    },
+    caption: {
+      maxWidth: "100%",
+      fontFamily: "PlaywriteAUQLD_400Regular",
+      fontSize: 15,
+      // Rendered over the album cover photo with a dark scrim, not the app
+      // background — stays a fixed near-white regardless of theme.
+      color: "#fff",
+      backgroundColor: "rgba(0,0,0,0.20)",
+      borderRadius: 5,
+      textAlign: "center",
+      paddingHorizontal: 5,
+    },
+  });

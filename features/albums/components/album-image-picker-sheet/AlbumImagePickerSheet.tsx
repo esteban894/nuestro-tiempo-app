@@ -1,4 +1,5 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
+import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -17,6 +18,9 @@ export const AlbumImagePickerSheet = ({
   onPickImages,
   allowsMultipleSelection = false,
 }: AlbumImagePickerSheetProps) => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
+
   const handleTakePhoto = async () => {
     onClose();
     const permission = await ImagePicker.requestCameraPermissionsAsync();
@@ -70,65 +74,66 @@ export const AlbumImagePickerSheet = ({
   );
 };
 
-const styles = StyleSheet.create({
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  sheet: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: colors.NEUTRAL[200],
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 32,
-  },
-  handle: {
-    alignSelf: "center",
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.NEUTRAL[600],
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.NEUTRAL[800],
-    marginBottom: 8,
-  },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 14,
-  },
-  iconWrapper: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.NEUTRAL[500],
-    marginRight: 14,
-  },
-  optionLabel: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: colors.NEUTRAL[800],
-  },
-  cancel: {
-    marginTop: 8,
-    paddingVertical: 14,
-    alignItems: "center",
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.NEUTRAL[600],
-  },
-  cancelLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.PRIMARY[500],
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    sheet: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: colors.NEUTRAL[200],
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      paddingHorizontal: 20,
+      paddingTop: 12,
+      paddingBottom: 32,
+    },
+    handle: {
+      alignSelf: "center",
+      width: 40,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: colors.NEUTRAL[600],
+      marginBottom: 16,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.NEUTRAL[800],
+      marginBottom: 8,
+    },
+    option: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 14,
+    },
+    iconWrapper: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.NEUTRAL[500],
+      marginRight: 14,
+    },
+    optionLabel: {
+      fontSize: 16,
+      fontWeight: "500",
+      color: colors.NEUTRAL[800],
+    },
+    cancel: {
+      marginTop: 8,
+      paddingVertical: 14,
+      alignItems: "center",
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: colors.NEUTRAL[600],
+    },
+    cancelLabel: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.PRIMARY[500],
+    },
+  });

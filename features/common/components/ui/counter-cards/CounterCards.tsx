@@ -1,4 +1,5 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
+import { useThemeColors } from "@/features/theme";
 import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Card } from "../card/Card";
@@ -17,6 +18,8 @@ const counterLabels = {
 };
 
 export const CounterCards = ({ initDate }: Props) => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
   const initialDate = useMemo(() => new Date(initDate), [initDate]);
 
   const [timeDiff, setTimeDiff] = useState({
@@ -77,31 +80,33 @@ export const CounterCards = ({ initDate }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    gap: 15,
-    flexWrap: "wrap",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  card: {
-    flex: 1,
-    alignItems: "center",
-    minWidth: "45%",
-    height: 100,
-    shadowColor: colors.PRIMARY[500],
-  },
-  number: {
-    fontSize: 24,
-    fontFamily: "Inter_700Bold",
-    fontWeight: "700",
-    color: colors.PRIMARY[500],
-  },
-  label: {
-    fontSize: 16,
-    fontFamily: "Inter_400Regular",
-    fontWeight: "400",
-    color: "#666",
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      gap: 15,
+      flexWrap: "wrap",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    card: {
+      flex: 1,
+      alignItems: "center",
+      minWidth: "45%",
+      height: 100,
+      backgroundColor: colors.NEUTRAL[500],
+      shadowColor: colors.PRIMARY[500],
+    },
+    number: {
+      fontSize: 24,
+      fontFamily: "Inter_700Bold",
+      fontWeight: "700",
+      color: colors.PRIMARY[500],
+    },
+    label: {
+      fontSize: 16,
+      fontFamily: "Inter_400Regular",
+      fontWeight: "400",
+      color: colors.NEUTRAL[600],
+    },
+  });

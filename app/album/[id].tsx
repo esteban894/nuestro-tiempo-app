@@ -1,4 +1,4 @@
-import { colors } from "@/constants/colors";
+import { ThemeColors } from "@/constants/colors";
 import {
   AlbumFab,
   AlbumHeader,
@@ -16,6 +16,7 @@ import {
   useCreateImagesBatchMutation,
   useDeleteImageMutation,
 } from "@/features/images";
+import { useThemeColors } from "@/features/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
@@ -25,6 +26,8 @@ export default function AlbumDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
 
   const {
     data: album,
@@ -170,32 +173,33 @@ export default function AlbumDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, position: "relative" },
-  loader: { marginTop: 40 },
-  notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
-  notFoundText: { fontSize: 16, color: colors.NEUTRAL[800] },
-  imageMenuTrigger: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(0,0,0,0.45)",
-  },
-  expandedImageMenuTrigger: {
-    position: "absolute",
-    top: 50,
-    left: 20,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(0,0,0,0.45)",
-  },
-  fab: {
-    position: "absolute",
-    bottom: 24,
-    right: 20,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    screen: { flex: 1, position: "relative", backgroundColor: colors.NEUTRAL[200] },
+    loader: { marginTop: 40 },
+    notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
+    notFoundText: { fontSize: 16, color: colors.NEUTRAL[800] },
+    imageMenuTrigger: {
+      position: "absolute",
+      top: 10,
+      right: 10,
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: "rgba(0,0,0,0.45)",
+    },
+    expandedImageMenuTrigger: {
+      position: "absolute",
+      top: 50,
+      left: 20,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: "rgba(0,0,0,0.45)",
+    },
+    fab: {
+      position: "absolute",
+      bottom: 24,
+      right: 20,
+    },
+  });
