@@ -1,4 +1,6 @@
 import { configureApiAuth } from "@/features/common/api/httpClient";
+import { queryClient } from "@/features/common/api/queryClient";
+import { useCoupleStore } from "@/features/couple/store/coupleStore";
 import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
 import * as authApi from "../api/auth.api";
@@ -73,6 +75,11 @@ async function clearSession() {
     SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
   ]);
   useAuthStore.setState({ user: null, accessToken: null, status: "unauthenticated" });
+  useCoupleStore.setState({ couple: null });
+  // Query keys (albums, images, current album, ...) aren't scoped per user,
+  // so a stale cache would otherwise flash the previous account's data as
+  // soon as the next user logs in on the same device.
+  queryClient.clear();
 }
 
 let refreshPromise: Promise<string | null> | null = null;
