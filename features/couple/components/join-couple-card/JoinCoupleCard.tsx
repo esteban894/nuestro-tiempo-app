@@ -1,12 +1,12 @@
 import { colors } from "@/constants/colors";
 import { Button, Card, Input, Title } from "@/features/common";
-import { useCoupleStore } from "@/features/couple";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { joinCouple } from "../../api/couple.api";
+import { useCoupleStore } from "../../store/coupleStore";
 import { INVITE_CODE_LENGTH, INVITE_CODE_REGEX } from "../../utils/generateInviteCode";
 
 export const JoinCoupleCard = () => {

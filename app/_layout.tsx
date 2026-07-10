@@ -1,11 +1,15 @@
 import { colors } from "@/constants/colors";
 import { useAuthStore } from "@/features/auth";
 import { queryClient } from "@/features/common";
+import { useCoupleStore } from "@/features/couple";
+import { registerForPushNotifications } from "@/features/notifications";
+import "@/features/notifications/notificationHandler";
 import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
 import { PlaywriteAUQLD_400Regular } from "@expo-google-fonts/playwrite-au-qld";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import * as Notifications from "expo-notifications";
+import { router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -14,6 +18,8 @@ import { StyleSheet, View } from "react-native";
 SplashScreen.setOptions({
   fade: true,
 });
+
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -24,6 +30,7 @@ export default function RootLayout() {
 
   const status = useAuthStore((state) => state.status);
   const hydrate = useAuthStore((state) => state.hydrate);
+  const fetchCouple = useCoupleStore((state) => state.fetchCouple);
 
   useEffect(() => {
     hydrate();
@@ -34,6 +41,26 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded, error, status]);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+
+    registerForPushNotifications();
+
+    const receivedSubscription = Notifications.addNotificationReceivedListener(() => {
+      fetchCouple();
+    });
+
+    const responseSubscription = Notifications.addNotificationResponseReceivedListener(() => {
+      fetchCouple();
+      router.replace("/");
+    });
+
+    return () => {
+      receivedSubscription.remove();
+      responseSubscription.remove();
+    };
+  }, [status, fetchCouple]);
 
   if (!loaded && !error) {
     return null;

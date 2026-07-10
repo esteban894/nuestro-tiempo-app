@@ -16,7 +16,6 @@ import {
   useDeleteImageMutation,
 } from "@/features/images";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import * as ImagePicker from "expo-image-picker";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
@@ -76,27 +75,8 @@ export default function AlbumDetailScreen() {
     createImageMutation.mutate({ albumId: id, file: buildImageFilePart(uri) });
   };
 
-  const handleTakePhoto = async () => {
-    setPickerVisible(false);
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) return;
-
-    const result = await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 0.8 });
-    const uri = result.assets?.[0]?.uri;
-    if (!result.canceled && uri) addImage(uri);
-  };
-
-  const handleChooseFromLibrary = async () => {
-    setPickerVisible(false);
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) return;
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      quality: 0.8,
-    });
-    const uri = result.assets?.[0]?.uri;
-    if (!result.canceled && uri) addImage(uri);
+  const handlePickImages = (uris: string[]) => {
+    uris.forEach(addImage);
   };
 
   if (isLoading) {
@@ -176,8 +156,8 @@ export default function AlbumDetailScreen() {
       <AlbumImagePickerSheet
         visible={pickerVisible}
         onClose={() => setPickerVisible(false)}
-        onTakePhoto={handleTakePhoto}
-        onChooseFromLibrary={handleChooseFromLibrary}
+        onPickImages={handlePickImages}
+        allowsMultipleSelection
       />
     </View>
   );

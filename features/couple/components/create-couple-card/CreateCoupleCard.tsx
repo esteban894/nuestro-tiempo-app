@@ -1,6 +1,5 @@
 import { colors } from "@/constants/colors";
 import { Button, Card, Title } from "@/features/common";
-import { useCoupleStore } from "@/features/couple";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
@@ -9,6 +8,7 @@ import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { createCouple } from "../../api/couple.api";
+import { useCoupleStore } from "../../store/coupleStore";
 
 const formatDate = (date: Date) =>
   date.toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" });
@@ -69,6 +69,7 @@ export const CreateCoupleCard = () => {
           <Text style={styles.expiresAt}>
             Válido hasta {formatDateTime(new Date(mutation.data.expiresAt))}
           </Text>
+          <Text style={styles.waitingHint}>Esperando a que tu pareja se una…</Text>
           <Button
             title={copied ? "¡Copiado!" : "Copiar código"}
             leftIcon={copied ? "checkmark" : "copy-outline"}
@@ -168,6 +169,12 @@ const styles = StyleSheet.create({
   expiresAt: {
     fontSize: 12,
     color: colors.NEUTRAL[600],
+    marginBottom: 8,
+  },
+  waitingHint: {
+    fontSize: 13,
+    color: colors.SECONDARY[500],
+    fontStyle: "italic",
     marginBottom: 20,
   },
   errorText: {

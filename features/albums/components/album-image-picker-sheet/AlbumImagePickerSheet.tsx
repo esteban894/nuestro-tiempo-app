@@ -1,20 +1,46 @@
 import { colors } from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface AlbumImagePickerSheetProps {
   visible: boolean;
   onClose: () => void;
-  onTakePhoto: () => void;
-  onChooseFromLibrary: () => void;
+  onPickImages: (uris: string[]) => void;
+  /** Allows picking several images at once from the library. Camera capture is always single. */
+  allowsMultipleSelection?: boolean;
 }
 
 export const AlbumImagePickerSheet = ({
   visible,
   onClose,
-  onTakePhoto,
-  onChooseFromLibrary,
+  onPickImages,
+  allowsMultipleSelection = false,
 }: AlbumImagePickerSheetProps) => {
+  const handleTakePhoto = async () => {
+    onClose();
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) return;
+
+    const result = await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 0.8 });
+    const uri = result.assets?.[0]?.uri;
+    if (!result.canceled && uri) onPickImages([uri]);
+  };
+
+  const handleChooseFromLibrary = async () => {
+    onClose();
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) return;
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      quality: 0.8,
+      allowsMultipleSelection,
+    });
+    const uris = result.assets?.map((asset) => asset.uri) ?? [];
+    if (!result.canceled && uris.length > 0) onPickImages(uris);
+  };
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} />
@@ -22,14 +48,14 @@ export const AlbumImagePickerSheet = ({
         <View style={styles.handle} />
         <Text style={styles.title}>Agregar foto</Text>
 
-        <TouchableOpacity style={styles.option} activeOpacity={0.7} onPress={onTakePhoto}>
+        <TouchableOpacity style={styles.option} activeOpacity={0.7} onPress={handleTakePhoto}>
           <View style={styles.iconWrapper}>
             <Ionicons name="camera-outline" size={22} color={colors.PRIMARY[500]} />
           </View>
           <Text style={styles.optionLabel}>Tomar foto</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.option} activeOpacity={0.7} onPress={onChooseFromLibrary}>
+        <TouchableOpacity style={styles.option} activeOpacity={0.7} onPress={handleChooseFromLibrary}>
           <View style={styles.iconWrapper}>
             <Ionicons name="images-outline" size={22} color={colors.PRIMARY[500]} />
           </View>

@@ -1,7 +1,6 @@
 import { colors } from "@/constants/colors";
 import { Checkbox, Button, Input } from "@/features/common";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AlbumImagePickerSheet } from "../album-image-picker-sheet/AlbumImagePickerSheet";
@@ -35,30 +34,11 @@ export const AlbumForm = ({
   const [isPrivate, setIsPrivate] = useState(initialValues?.isPrivate ?? true);
   const [pickerVisible, setPickerVisible] = useState(false);
 
-  const handleTakePhoto = async () => {
-    setPickerVisible(false);
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) return;
-
-    const result = await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 0.8 });
-    const uri = result.assets?.[0]?.uri;
-    if (!result.canceled && uri) {
-      setCoverImage(uri);
-      setIsNewCoverImage(true);
-    }
-  };
-
-  const handleChooseFromLibrary = async () => {
-    setPickerVisible(false);
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) return;
-
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 0.8 });
-    const uri = result.assets?.[0]?.uri;
-    if (!result.canceled && uri) {
-      setCoverImage(uri);
-      setIsNewCoverImage(true);
-    }
+  const handlePickCoverImage = (uris: string[]) => {
+    const uri = uris[0];
+    if (!uri) return;
+    setCoverImage(uri);
+    setIsNewCoverImage(true);
   };
 
   const handleSubmit = () => {
@@ -122,8 +102,7 @@ export const AlbumForm = ({
       <AlbumImagePickerSheet
         visible={pickerVisible}
         onClose={() => setPickerVisible(false)}
-        onTakePhoto={handleTakePhoto}
-        onChooseFromLibrary={handleChooseFromLibrary}
+        onPickImages={handlePickCoverImage}
       />
     </ScrollView>
   );
