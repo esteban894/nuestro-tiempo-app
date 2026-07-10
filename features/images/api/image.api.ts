@@ -1,4 +1,10 @@
-import { apiFetch, resolveMediaUrl } from "@/features/common/api/httpClient";
+import {
+  ApiError,
+  apiFetch,
+  LocalFilePart,
+  resolveMediaUrl,
+  uploadToPresignedUrl,
+} from "@/features/common/api/httpClient";
 
 export interface AlbumImage {
   id: string;
@@ -21,15 +27,18 @@ export interface PaginatedResponse<T> {
 export type ListImagesParams = { page?: number; pageSize?: number };
 
 /** React Native multipart file part shape (not a real Blob/File). */
-export interface ImageFilePart {
-  uri: string;
-  name: string;
-  type: string;
-}
+export type ImageFilePart = LocalFilePart;
 
 export interface CreatedImage {
   id: string;
   url: string;
+}
+
+export interface PresignedUpload {
+  key: string;
+  uploadUrl: string;
+  fields: Record<string, string>;
+  expiresAt: string;
 }
 
 export async function listImagesByAlbum(
@@ -69,4 +78,53 @@ export async function createImagesBatch(albumId: string, files: ImageFilePart[])
 
 export async function deleteImage(id: string) {
   return apiFetch<{ deleted: boolean }>(`/images/${id}`, { method: "DELETE" });
+}
+
+async function requestImageUploadUrls(
+  albumId: string,
+  files: { filename: string; mimetype: string }[],
+) {
+  return apiFetch<{ albumId: string; uploads: PresignedUpload[] }>("/images/upload-urls", {
+    method: "POST",
+    body: { albumId, files },
+  });
+}
+
+async function confirmImageUploads(albumId: string, keys: string[]) {
+  const response = await apiFetch<CreatedImage[]>("/images/confirm", {
+    method: "POST",
+    body: { albumId, keys },
+  });
+  return response.map((image) => ({ ...image, url: resolveMediaUrl(image.url) }));
+}
+
+/**
+ * Uploads photos to an album, preferring the direct-to-S3 presigned flow.
+ * Falls back to the multipart endpoints only when the API responds 501 (i.e. it's
+ * running in local-disk storage mode, where presigned uploads aren't supported) —
+ * any other failure propagates instead of silently retrying via the fallback.
+ */
+export async function uploadImages(albumId: string, files: ImageFilePart[]) {
+  let uploads: PresignedUpload[];
+  try {
+    const requested = await requestImageUploadUrls(
+      albumId,
+      files.map((file) => ({ filename: file.name, mimetype: file.type })),
+    );
+    uploads = requested.uploads;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 501) {
+      return files.length === 1
+        ? [await createImage(albumId, files[0])]
+        : createImagesBatch(albumId, files);
+    }
+    throw error;
+  }
+
+  await Promise.all(uploads.map((upload, index) => uploadToPresignedUrl(upload.uploadUrl, upload.fields, files[index])));
+
+  return confirmImageUploads(
+    albumId,
+    uploads.map((upload) => upload.key),
+  );
 }

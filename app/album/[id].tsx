@@ -12,9 +12,8 @@ import { ImageGrid, OverflowMenu } from "@/features/common";
 import {
   ImageFilePart,
   useAlbumImagesInfiniteQuery,
-  useCreateImageMutation,
-  useCreateImagesBatchMutation,
   useDeleteImageMutation,
+  useUploadImagesMutation,
 } from "@/features/images";
 import { useThemeColors } from "@/features/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -51,8 +50,7 @@ export default function AlbumDetailScreen() {
   const images = albumImages.map((image) => image.url);
   const imageGridColumns = images.length > 100 ? 3 : undefined;
 
-  const createImageMutation = useCreateImageMutation();
-  const createImagesBatchMutation = useCreateImagesBatchMutation();
+  const uploadImagesMutation = useUploadImagesMutation();
   const deleteImageMutation = useDeleteImageMutation();
   const [pickerVisible, setPickerVisible] = useState(false);
 
@@ -82,11 +80,7 @@ export default function AlbumDetailScreen() {
 
   const handlePickImages = (uris: string[]) => {
     if (uris.length === 0) return;
-    if (uris.length === 1) {
-      createImageMutation.mutate({ albumId: id, file: buildImageFilePart(uris[0]) });
-      return;
-    }
-    createImagesBatchMutation.mutate({ albumId: id, files: uris.map(buildImageFilePart) });
+    uploadImagesMutation.mutate({ albumId: id, files: uris.map(buildImageFilePart) });
   };
 
   if (isLoading) {
@@ -159,7 +153,7 @@ export default function AlbumDetailScreen() {
       <AlbumFab
         icon="camera-outline"
         onPress={() => {
-          if (!createImageMutation.isPending && !createImagesBatchMutation.isPending) setPickerVisible(true);
+          if (!uploadImagesMutation.isPending) setPickerVisible(true);
         }}
         style={styles.fab}
       />

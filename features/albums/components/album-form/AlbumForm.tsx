@@ -4,6 +4,7 @@ import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { prepareCoverImageUpload } from "../../api/album.api";
 import { AlbumImagePickerSheet } from "../album-image-picker-sheet/AlbumImagePickerSheet";
 
 interface AlbumFormInitialValues {
@@ -36,6 +37,7 @@ export const AlbumForm = ({
   const [isNewCoverImage, setIsNewCoverImage] = useState(false);
   const [isPrivate, setIsPrivate] = useState(initialValues?.isPrivate ?? true);
   const [pickerVisible, setPickerVisible] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
 
   const handlePickCoverImage = (uris: string[]) => {
     const uri = uris[0];
@@ -44,7 +46,7 @@ export const AlbumForm = ({
     setIsNewCoverImage(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const formData = new FormData();
     formData.append("name", name.trim());
     // Server's class-transformer accepts the string "true"/"false".
@@ -54,8 +56,19 @@ export const AlbumForm = ({
       const filename = coverImage.split("/").pop() ?? "cover.jpg";
       const ext = filename.split(".").pop()?.toLowerCase();
       const type = ext === "png" ? "image/png" : "image/jpeg";
-      // React Native multipart file part shape (not a real Blob) — the cast is required.
-      formData.append("coverImage", { uri: coverImage, name: filename, type } as unknown as Blob);
+
+      setIsUploadingCover(true);
+      try {
+        const result = await prepareCoverImageUpload({ uri: coverImage, name: filename, type });
+        if (result.kind === "key") {
+          formData.append("coverImageKey", result.coverImageKey);
+        } else {
+          // React Native multipart file part shape (not a real Blob) — the cast is required.
+          formData.append("coverImage", result.coverImage as unknown as Blob);
+        }
+      } finally {
+        setIsUploadingCover(false);
+      }
     }
 
     onSubmit(formData);
@@ -97,8 +110,8 @@ export const AlbumForm = ({
         title={submitLabel}
         variant="primary"
         fullWidth
-        isLoading={isSubmitting}
-        disabled={isSubmitting}
+        isLoading={isSubmitting || isUploadingCover}
+        disabled={isSubmitting || isUploadingCover}
         onPress={handleSubmit}
       />
 

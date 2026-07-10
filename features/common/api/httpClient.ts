@@ -30,7 +30,36 @@ export function resolveMediaUrl(path: string): string;
 export function resolveMediaUrl(path: string | null | undefined): string | null;
 export function resolveMediaUrl(path: string | null | undefined): string | null {
   if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
   return `${API_URL ?? ""}${path}`;
+}
+
+/** React Native multipart file part shape (not a real Blob/File). */
+export interface LocalFilePart {
+  uri: string;
+  name: string;
+  type: string;
+}
+
+/**
+ * Uploads a file directly to a presigned S3 URL (from POST /images/upload-urls or
+ * /albums/cover/upload-url), bypassing this API entirely — no API_URL prefix, no auth
+ * header, since S3 itself is the destination and the presigned fields are the credential.
+ * `fields` must be appended before the file part, per S3's POST policy requirements.
+ */
+export async function uploadToPresignedUrl(
+  uploadUrl: string,
+  fields: Record<string, string>,
+  file: LocalFilePart,
+): Promise<void> {
+  const formData = new FormData();
+  Object.entries(fields).forEach(([key, value]) => formData.append(key, value));
+  formData.append("file", file as unknown as Blob);
+
+  const response = await fetch(uploadUrl, { method: "POST", body: formData });
+  if (!response.ok) {
+    throw new ApiError(response.status, `Failed to upload file to storage (${response.status})`);
+  }
 }
 
 type ApiFetchOptions = Omit<RequestInit, "body"> & {
