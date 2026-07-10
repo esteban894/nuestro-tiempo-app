@@ -25,7 +25,11 @@ export default function AlbumDetailScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const { data: album, isLoading, isError } = useQuery({
+  const {
+    data: album,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: albumKeys.detail(id),
     queryFn: () => getAlbum(id),
     enabled: !!id,
@@ -122,7 +126,7 @@ export default function AlbumDetailScreen() {
             triggerStyle={styles.imageMenuTrigger}
             options={[
               {
-                label: "Eliminar foto",
+                label: "Eliminar",
                 icon: "trash-outline",
                 destructive: true,
                 onPress: () => handleDeleteImage(index),
@@ -137,7 +141,7 @@ export default function AlbumDetailScreen() {
             triggerStyle={styles.expandedImageMenuTrigger}
             options={[
               {
-                label: "Eliminar foto",
+                label: "Eliminar",
                 icon: "trash-outline",
                 destructive: true,
                 onPress: () => handleDeleteImage(index),

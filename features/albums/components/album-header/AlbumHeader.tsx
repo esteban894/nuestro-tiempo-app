@@ -1,5 +1,4 @@
 import { colors } from "@/constants/colors";
-import { Title } from "@/features/common";
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -11,7 +10,6 @@ interface AlbumHeaderProps {
 export const AlbumHeader = ({ title, isPrivate }: AlbumHeaderProps) => {
   return (
     <View style={styles.container}>
-      <Title title={title} variant="h2" style={styles.title} />
       {isPrivate && (
         <View style={styles.badge}>
           <Ionicons name="lock-closed" size={12} color={colors.NEUTRAL[800]} />
