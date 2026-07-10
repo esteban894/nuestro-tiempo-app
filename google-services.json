@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "230123420964",
+    "project_id": "nuestrotiempoapp",
+    "storage_bucket": "nuestrotiempoapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230123420964:android:6bc0841242e1876a6dc7b1",
+        "android_client_info": {
+          "package_name": "dev.esteban894.nuestrotiempoapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAz1IJL5l1JFTX1Y78axD9fCLdR5u4lxcQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

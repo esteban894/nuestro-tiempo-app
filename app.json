@@ -18,7 +18,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.esteban894.nuestrotiempoapp"
+      "package": "dev.esteban894.nuestrotiempoapp",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "static",
