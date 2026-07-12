@@ -12,6 +12,7 @@ export default function NewAlbumScreen() {
       queryClient.invalidateQueries({ queryKey: albumKeys.list() });
       router.replace({ pathname: "/album/[id]", params: { id: album.id } });
     },
+    meta: { suppressErrorToast: true },
   });
 
   return (

@@ -25,6 +25,7 @@ export default function EditAlbumScreen() {
       queryClient.invalidateQueries({ queryKey: albumKeys.detail(id) });
       router.back();
     },
+    meta: { suppressErrorToast: true },
   });
 
   if (isLoading) {

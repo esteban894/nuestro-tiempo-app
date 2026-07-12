@@ -8,6 +8,19 @@ export class ApiError extends Error {
   }
 }
 
+/** Thrown when the request never reached/completed against the server (no connectivity, DNS failure, timeout) — as opposed to `ApiError`, which means a response came back with a non-2xx status. */
+export class NetworkError extends Error {
+  constructor(cause?: unknown) {
+    super("No se pudo conectar. Revisa tu conexión.");
+    this.name = "NetworkError";
+    this.cause = cause;
+  }
+}
+
+export function isNetworkError(error: unknown): error is NetworkError {
+  return error instanceof NetworkError;
+}
+
 type AuthAccessors = {
   getAccessToken: () => string | null;
   /** Called on a 401 from an authenticated request. Returns the new access token, or null if the session could not be refreshed. */
@@ -56,7 +69,12 @@ export async function uploadToPresignedUrl(
   Object.entries(fields).forEach(([key, value]) => formData.append(key, value));
   formData.append("file", file as unknown as Blob);
 
-  const response = await fetch(uploadUrl, { method: "POST", body: formData });
+  let response: Response;
+  try {
+    response = await fetch(uploadUrl, { method: "POST", body: formData });
+  } catch (error) {
+    throw new NetworkError(error);
+  }
   if (!response.ok) {
     throw new ApiError(response.status, `Failed to upload file to storage (${response.status})`);
   }
@@ -96,17 +114,22 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
   const accessToken = authAccessors?.getAccessToken();
   const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...rest,
-    headers: {
-      // Let fetch set the multipart boundary itself for FormData bodies.
-      ...(isFormData ? {} : { "Content-Type": "application/json" }),
-      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      ...headers,
-      "ngrok-skip-browser-warning": "true",
-    },
-    body: isFormData ? (body as FormData) : body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}${path}`, {
+      ...rest,
+      headers: {
+        // Let fetch set the multipart boundary itself for FormData bodies.
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        ...headers,
+        "ngrok-skip-browser-warning": "true",
+      },
+      body: isFormData ? (body as FormData) : body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch (error) {
+    throw new NetworkError(error);
+  }
 
   if (response.status === 401 && !skipAuthRetry && authAccessors) {
     const newAccessToken = await authAccessors.onUnauthorized();

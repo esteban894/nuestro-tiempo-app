@@ -22,6 +22,7 @@ export const LoginForm = () => {
     mutationFn: login,
     onSuccess: ({ user, access_token, refresh_token }) =>
       setSession(user, { access_token, refresh_token }),
+    meta: { suppressErrorToast: true },
   });
 
   const errorMessage = mutation.error?.message;

@@ -12,3 +12,4 @@ export * from "./components/ui/list-item/ListItem";
 export * from "./components/ui/overflow-menu/OverflowMenu";
 export * from "./components/ui/segmented-control/SegmentedControl";
 export * from "./components/ui/title/Title";
+export * from "./components/ui/toast";

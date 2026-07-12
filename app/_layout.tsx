@@ -1,6 +1,6 @@
 import { ThemeColors } from "@/constants/colors";
 import { useAuthStore } from "@/features/auth";
-import { queryClient } from "@/features/common";
+import { AppToast, queryClient } from "@/features/common";
 import {
   handleNotificationReceived,
   handleNotificationResponse,
@@ -149,6 +149,7 @@ export default function RootLayout() {
           />
         </Stack>
       </QueryClientProvider>
+      <AppToast />
     </View>
   );
 }

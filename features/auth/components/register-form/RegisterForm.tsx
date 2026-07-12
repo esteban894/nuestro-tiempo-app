@@ -26,6 +26,7 @@ export const RegisterForm = () => {
     mutationFn: register,
     onSuccess: ({ user, access_token, refresh_token }) =>
       setSession(user, { access_token, refresh_token }),
+    meta: { suppressErrorToast: true },
   });
 
   const passwordMismatch = confirmPassword.length > 0 && password !== confirmPassword;

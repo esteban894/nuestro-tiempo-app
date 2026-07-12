@@ -4,6 +4,7 @@ import {
   AlbumHeader,
   AlbumImagePickerSheet,
   AlbumMeatballsMenu,
+  AlbumUploadStatus,
   albumKeys,
   getAlbum,
   setCurrentAlbum,
@@ -55,6 +56,7 @@ export default function AlbumDetailScreen() {
   const deleteImageMutation = useDeleteImageMutation();
   const deleteAlbumMutation = useDeleteAlbumMutation();
   const [pickerVisible, setPickerVisible] = useState(false);
+  const [uploadCount, setUploadCount] = useState<number | null>(null);
 
   const markAsCurrentMutation = useMutation({
     mutationFn: () => setCurrentAlbum(id),
@@ -99,7 +101,11 @@ export default function AlbumDetailScreen() {
 
   const handlePickImages = (uris: string[]) => {
     if (uris.length === 0) return;
-    uploadImagesMutation.mutate({ albumId: id, files: uris.map(buildImageFilePart) });
+    setUploadCount(uris.length);
+    uploadImagesMutation.mutate(
+      { albumId: id, files: uris.map(buildImageFilePart) },
+      { onSettled: () => setUploadCount(null) },
+    );
   };
 
   if (isLoading) {
@@ -171,6 +177,7 @@ export default function AlbumDetailScreen() {
           />
         )}
       />
+      <AlbumUploadStatus visible={uploadImagesMutation.isPending} count={uploadCount ?? 0} />
       <AlbumFab
         icon="camera-outline"
         onPress={() => {
