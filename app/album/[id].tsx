@@ -7,6 +7,7 @@ import {
   albumKeys,
   getAlbum,
   setCurrentAlbum,
+  useDeleteAlbumMutation,
 } from "@/features/albums";
 import { ImageGrid, OverflowMenu } from "@/features/common";
 import {
@@ -19,7 +20,7 @@ import { useThemeColors } from "@/features/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 
 export default function AlbumDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -52,6 +53,7 @@ export default function AlbumDetailScreen() {
 
   const uploadImagesMutation = useUploadImagesMutation();
   const deleteImageMutation = useDeleteImageMutation();
+  const deleteAlbumMutation = useDeleteAlbumMutation();
   const [pickerVisible, setPickerVisible] = useState(false);
 
   const markAsCurrentMutation = useMutation({
@@ -64,6 +66,23 @@ export default function AlbumDetailScreen() {
   const handleEdit = () => router.push({ pathname: "/album/[id]/edit", params: { id } });
 
   const handleMarkAsCurrent = () => markAsCurrentMutation.mutate();
+
+  const handleDeleteAlbum = () => {
+    Alert.alert(
+      "Eliminar álbum",
+      "Esta acción no se puede deshacer. Se eliminará el álbum y todas sus fotos.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => {
+            deleteAlbumMutation.mutate(id, { onSuccess: () => router.replace("/albums") });
+          },
+        },
+      ],
+    );
+  };
 
   const handleDeleteImage = (index: number) => {
     const image = albumImages[index];
@@ -104,7 +123,9 @@ export default function AlbumDetailScreen() {
             <AlbumMeatballsMenu
               onEdit={handleEdit}
               onMarkAsCurrent={handleMarkAsCurrent}
+              onDelete={handleDeleteAlbum}
               markingAsCurrent={markAsCurrentMutation.isPending}
+              deleting={deleteAlbumMutation.isPending}
             />
           ),
         }}

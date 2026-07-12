@@ -111,3 +111,7 @@ export async function setCurrentAlbum(albumId: string) {
   });
   return withResolvedCover(album);
 }
+
+export async function deleteAlbum(id: string) {
+  return apiFetch<{ deleted: boolean }>(`/albums/${id}`, { method: "DELETE" });
+}

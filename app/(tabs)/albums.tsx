@@ -1,6 +1,7 @@
 import { ThemeColors } from "@/constants/colors";
 import { AlbumFab, AlbumGrid, useAlbumsInfiniteQuery } from "@/features/albums";
 import { Title } from "@/features/common";
+import { NoCoupleBanner, useCoupleStore } from "@/features/couple";
 import { useThemeColors } from "@/features/theme";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -10,11 +11,21 @@ export default function AlbumsScreen() {
   const router = useRouter();
   const colors = useThemeColors();
   const styles = createStyles(colors);
+  const couple = useCoupleStore((state) => state.couple);
+  const isCoupleComplete = !!couple?.user2;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isRefetching, refetch } =
     useAlbumsInfiniteQuery();
 
   const albums = data?.pages.flatMap((page) => page.data) ?? [];
+
+  if (!couple) {
+    return (
+      <View style={[styles.container, styles.emptyContainer]}>
+        <NoCoupleBanner />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -35,7 +46,9 @@ export default function AlbumsScreen() {
           onRefresh={() => refetch()}
         />
       )}
-      <AlbumFab style={styles.fab} onPress={() => router.push("/album/new")} />
+      {isCoupleComplete && (
+        <AlbumFab style={styles.fab} onPress={() => router.push("/album/new")} />
+      )}
     </View>
   );
 }
@@ -43,6 +56,7 @@ export default function AlbumsScreen() {
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     container: { flex: 1, position: "relative", backgroundColor: colors.NEUTRAL[200] },
+    emptyContainer: { justifyContent: "center", padding: 20 },
     title: { paddingHorizontal: 20, paddingTop: 20 },
     loader: { marginTop: 40 },
     fab: { position: "absolute", bottom: 24, right: 20 },

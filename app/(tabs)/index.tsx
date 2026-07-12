@@ -1,5 +1,5 @@
 import { ThemeColors } from "@/constants/colors";
-import { useCurrentAlbumQuery } from "@/features/albums";
+import { NoCurrentAlbumBanner, useCurrentAlbumQuery } from "@/features/albums";
 import { ImageCarousel, Title } from "@/features/common";
 import { CounterCards } from "@/features/common/components/ui/counter-cards/CounterCards";
 import { NoCoupleBanner, useCoupleStore } from "@/features/couple";
@@ -11,7 +11,11 @@ import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 export default function HomeScreen() {
   const couple = useCoupleStore((state) => state.couple);
   const fetchCouple = useCoupleStore((state) => state.fetchCouple);
-  const { data: currentAlbum, refetch: refetchCurrentAlbum } = useCurrentAlbumQuery();
+  const {
+    data: currentAlbum,
+    isLoading: isLoadingCurrentAlbum,
+    refetch: refetchCurrentAlbum,
+  } = useCurrentAlbumQuery();
   const { data: imagesData, refetch: refetchImages } = useAlbumImagesQuery(currentAlbum?.id);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const colors = useThemeColors();
@@ -45,7 +49,11 @@ export default function HomeScreen() {
           colors={[colors.PRIMARY[500]]}
         />
       }>
-      <ImageCarousel data={images} />
+      {currentAlbum || isLoadingCurrentAlbum ? (
+        <ImageCarousel data={images} />
+      ) : (
+        <NoCurrentAlbumBanner />
+      )}
       <Title style={styles.title}>
         {couple.user1.name.charAt(0).toUpperCase()} & {couple.user1.name.charAt(0).toUpperCase()}
       </Title>
