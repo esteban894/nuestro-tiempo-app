@@ -29,7 +29,7 @@ export default function HomeScreen() {
     setIsRefreshing(false);
   };
 
-  if (!couple) {
+  if (!couple || !couple.user2) {
     return (
       <View style={[styles.container, styles.contentContainer, styles.emptyContainer]}>
         <NoCoupleBanner />
@@ -55,7 +55,7 @@ export default function HomeScreen() {
         <NoCurrentAlbumBanner />
       )}
       <Title style={styles.title}>
-        {couple.user1.name.charAt(0).toUpperCase()} & {couple.user1.name.charAt(0).toUpperCase()}
+        {couple.user1.name.charAt(0).toUpperCase()} & {couple.user2?.name.charAt(0).toUpperCase()}
       </Title>
       <CounterCards initDate={couple.startDate} />
     </ScrollView>
