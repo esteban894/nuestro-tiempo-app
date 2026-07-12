@@ -99,13 +99,13 @@ const createStyles = (colors: ThemeColors) =>
     },
     number: {
       fontSize: 24,
-      fontFamily: "Inter_700Bold",
+      fontFamily: "ElmsSans_700Bold",
       fontWeight: "700",
       color: colors.PRIMARY[500],
     },
     label: {
       fontSize: 16,
-      fontFamily: "Inter_400Regular",
+      fontFamily: "ElmsSans_400Regular",
       fontWeight: "400",
       color: colors.NEUTRAL[600],
     },

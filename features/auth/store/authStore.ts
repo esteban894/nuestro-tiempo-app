@@ -3,8 +3,8 @@ import { queryClient } from "@/features/common/api/queryClient";
 import { useCoupleStore } from "@/features/couple/store/coupleStore";
 import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
-import * as authApi from "../api/auth.api";
 import type { UserInfo } from "../api/auth.api";
+import * as authApi from "../api/auth.api";
 
 const ACCESS_TOKEN_KEY = "auth.accessToken";
 const REFRESH_TOKEN_KEY = "auth.refreshToken";
@@ -62,9 +62,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     try {
       await authApi.logout();
-    } catch {
-      // Clear the local session regardless of whether the server call succeeded.
-    }
+    } catch {}
     await clearSession();
   },
 }));
@@ -76,9 +74,6 @@ async function clearSession() {
   ]);
   useAuthStore.setState({ user: null, accessToken: null, status: "unauthenticated" });
   useCoupleStore.setState({ couple: null });
-  // Query keys (albums, images, current album, ...) aren't scoped per user,
-  // so a stale cache would otherwise flash the previous account's data as
-  // soon as the next user logs in on the same device.
   queryClient.clear();
 }
 

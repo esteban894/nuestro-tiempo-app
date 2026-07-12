@@ -8,8 +8,8 @@ import {
 } from "@/features/notifications";
 import "@/features/notifications/notificationHandler";
 import { subscribeToSystemScheme, useThemeColors, useThemeStore } from "@/features/theme";
-import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
-import { PlaywriteAUQLD_400Regular } from "@expo-google-fonts/playwrite-au-qld";
+import { ElmsSans_400Regular, ElmsSans_700Bold } from "@expo-google-fonts/elms-sans";
+import { Parisienne_400Regular } from "@expo-google-fonts/parisienne";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import * as Notifications from "expo-notifications";
@@ -27,9 +27,9 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    Inter_400Regular,
-    Inter_700Bold,
-    PlaywriteAUQLD_400Regular,
+    ElmsSans_400Regular,
+    ElmsSans_700Bold,
+    Parisienne_400Regular,
   });
 
   const status = useAuthStore((state) => state.status);
@@ -65,10 +65,10 @@ export default function RootLayout() {
     registerForPushNotifications();
 
     const receivedSubscription = Notifications.addNotificationReceivedListener(
-      handleNotificationReceived
+      handleNotificationReceived,
     );
     const responseSubscription = Notifications.addNotificationResponseReceivedListener(
-      handleNotificationResponse
+      handleNotificationResponse,
     );
 
     return () => {

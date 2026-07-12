@@ -10,8 +10,8 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@expo-google-fonts/inter": "^0.4.2",
-    "@expo-google-fonts/playwrite-au-qld": "^0.4.1",
+    "@expo-google-fonts/elms-sans": "^0.4.1",
+    "@expo-google-fonts/parisienne": "^0.4.1",
     "@expo/vector-icons": "^15.0.3",
     "@react-native-community/datetimepicker": "8.4.4",
     "@react-navigation/bottom-tabs": "^7.4.0",

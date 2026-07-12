@@ -70,13 +70,11 @@ const createStyles = (colors: ThemeColors) =>
     },
     caption: {
       maxWidth: "100%",
-      fontFamily: "PlaywriteAUQLD_400Regular",
+      fontFamily: "ElmsSans_400Regular",
       fontSize: 15,
-      // Rendered over the album cover photo with a dark scrim, not the app
-      // background — stays a fixed near-white regardless of theme.
       color: "#fff",
       backgroundColor: "rgba(0,0,0,0.20)",
-      borderRadius: 5,
+      borderRadius: 20,
       textAlign: "center",
       paddingHorizontal: 5,
     },

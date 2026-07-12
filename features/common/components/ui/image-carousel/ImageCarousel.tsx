@@ -6,7 +6,7 @@ import { Dimensions, Image, Pressable, StyleSheet, Text, View } from "react-nati
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { ExpandedImageModal } from "./ExpandedImageModal";
-import { PaginationDot } from "./PaginationDot";
+import { PaginationDots } from "./PaginationDots";
 
 const { width } = Dimensions.get("window");
 
@@ -93,11 +93,11 @@ export function ImageCarousel({ data, renderArrows = false, renderOverlay }: Pro
       </View>
 
       <View style={styles.pagination}>
-        {data.map((_, index) => (
-          <Pressable key={index} onPress={() => ref.current?.scrollTo({ index, animated: true })}>
-            <PaginationDot index={index} progress={progress} />
-          </Pressable>
-        ))}
+        <PaginationDots
+          total={data.length}
+          progress={progress}
+          onDotPress={(index) => ref.current?.scrollTo({ index, animated: true })}
+        />
       </View>
 
       <ExpandedImageModal

@@ -78,7 +78,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     headerTitle: {
       color: colors.PRIMARY[800],
-      fontFamily: "PlaywriteAUQLD_400Regular",
+      fontFamily: "Parisienne_400Regular",
     },
     headerRightContainer: {
       paddingRight: 15,

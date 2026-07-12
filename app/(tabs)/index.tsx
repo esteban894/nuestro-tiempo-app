@@ -2,11 +2,11 @@ import { ThemeColors } from "@/constants/colors";
 import { useCurrentAlbumQuery } from "@/features/albums";
 import { ImageCarousel, Title } from "@/features/common";
 import { CounterCards } from "@/features/common/components/ui/counter-cards/CounterCards";
-import { useCoupleStore } from "@/features/couple";
+import { NoCoupleBanner, useCoupleStore } from "@/features/couple";
 import { useAlbumImagesQuery } from "@/features/images";
 import { useThemeColors } from "@/features/theme";
 import React, { useState } from "react";
-import { RefreshControl, ScrollView, StyleSheet } from "react-native";
+import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 
 export default function HomeScreen() {
   const couple = useCoupleStore((state) => state.couple);
@@ -25,6 +25,14 @@ export default function HomeScreen() {
     setIsRefreshing(false);
   };
 
+  if (!couple) {
+    return (
+      <View style={[styles.container, styles.contentContainer, styles.emptyContainer]}>
+        <NoCoupleBanner />
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       style={styles.container}
@@ -38,8 +46,10 @@ export default function HomeScreen() {
         />
       }>
       <ImageCarousel data={images} />
-      <Title style={styles.title}>Juntos hace</Title>
-      {couple && <CounterCards initDate={couple.startDate} />}
+      <Title style={styles.title}>
+        {couple.user1.name.charAt(0).toUpperCase()} & {couple.user1.name.charAt(0).toUpperCase()}
+      </Title>
+      <CounterCards initDate={couple.startDate} />
     </ScrollView>
   );
 }
@@ -54,12 +64,14 @@ const createStyles = (colors: ThemeColors) =>
       padding: 20,
       paddingBottom: 20,
     },
+    emptyContainer: {
+      justifyContent: "center",
+    },
     title: {
       marginVertical: 20,
       textAlign: "center",
-      fontFamily: "PlaywriteAUQLD_400Regular",
+      fontFamily: "Parisienne_400Regular",
       fontWeight: "400",
-      textDecorationLine: "underline",
       color: colors.PRIMARY[500],
     },
   });

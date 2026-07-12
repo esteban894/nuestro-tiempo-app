@@ -1,5 +1,5 @@
 import { ThemeColors } from "@/constants/colors";
-import { Checkbox, Button, Input } from "@/features/common";
+import { Button, Checkbox, Input } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
@@ -32,8 +32,6 @@ export const AlbumForm = ({
   const styles = createStyles(colors);
   const [name, setName] = useState(initialValues?.name ?? "");
   const [coverImage, setCoverImage] = useState(initialValues?.coverImage ?? "");
-  // Tracks whether `coverImage` is a freshly-picked local file (needs upload) vs.
-  // the existing remote signed URL passed in via initialValues (leave untouched).
   const [isNewCoverImage, setIsNewCoverImage] = useState(false);
   const [isPrivate, setIsPrivate] = useState(initialValues?.isPrivate ?? true);
   const [pickerVisible, setPickerVisible] = useState(false);
@@ -49,7 +47,6 @@ export const AlbumForm = ({
   const handleSubmit = async () => {
     const formData = new FormData();
     formData.append("name", name.trim());
-    // Server's class-transformer accepts the string "true"/"false".
     formData.append("isPrivate", String(isPrivate));
 
     if (isNewCoverImage && coverImage) {
@@ -63,7 +60,6 @@ export const AlbumForm = ({
         if (result.kind === "key") {
           formData.append("coverImageKey", result.coverImageKey);
         } else {
-          // React Native multipart file part shape (not a real Blob) — the cast is required.
           formData.append("coverImage", result.coverImage as unknown as Blob);
         }
       } finally {
@@ -90,12 +86,7 @@ export const AlbumForm = ({
         )}
       </TouchableOpacity>
 
-      <Input
-        label="Título"
-        placeholder="Título del álbum"
-        value={name}
-        onChangeText={setName}
-      />
+      <Input label="Título" placeholder="Título del álbum" value={name} onChangeText={setName} />
 
       <Checkbox
         checked={isPrivate}
