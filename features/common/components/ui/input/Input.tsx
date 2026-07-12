@@ -70,7 +70,12 @@ export const Input = ({
   const [isFocused, setIsFocused] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const currentColor = error ? resolvedErrorColor : isFocused ? resolvedFocusColor : defaultColor;
+  const borderColor = error ? resolvedErrorColor : isFocused ? resolvedFocusColor : defaultColor;
+  const currentColor = error
+    ? resolvedErrorColor
+    : isFocused
+      ? resolvedFocusColor
+      : colors.NEUTRAL[800];
   const currentIconColor = iconColor || currentColor;
 
   const togglePasswordVisibility = () => {
@@ -86,7 +91,7 @@ export const Input = ({
       <View
         style={[
           styles.inputContainer,
-          { borderColor: currentColor },
+          { borderColor },
           isFocused && styles.inputContainerFocused,
           error && styles.inputContainerError,
         ]}>
