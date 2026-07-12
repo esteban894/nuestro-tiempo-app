@@ -1,7 +1,7 @@
 import { ThemeColors } from "@/constants/colors";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { ComponentProps, useRef, useState } from "react";
+import { ComponentProps, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Modal,
@@ -13,6 +13,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 type IoniconsName = ComponentProps<typeof Ionicons>["name"];
 
@@ -31,10 +32,18 @@ interface OverflowMenuProps {
   triggerStyle?: StyleProp<ViewStyle>;
 }
 
+type AnchorSide = "left" | "right";
+
 interface Anchor {
   top: number;
-  right: number;
+  side: AnchorSide;
+  offset: number;
+  maxWidth: number;
 }
+
+const EDGE_MARGIN = 12;
+const MENU_MIN_WIDTH = 160;
+const MENU_MAX_WIDTH_CAP = 240;
 
 export const OverflowMenu = ({
   options,
@@ -47,11 +56,30 @@ export const OverflowMenu = ({
   const resolvedTriggerColor = triggerColor ?? colors.NEUTRAL[800];
   const triggerRef = useRef<View>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
+  const progress = useSharedValue(0);
+
+  useEffect(() => {
+    progress.value = withTiming(anchor ? 1 : 0, { duration: 160 });
+  }, [anchor, progress]);
+
+  const animatedMenuStyle = useAnimatedStyle(() => ({
+    opacity: progress.value,
+    transform: [{ scale: 0.9 + progress.value * 0.1 }],
+  }));
 
   const handleOpen = () => {
     triggerRef.current?.measureInWindow((x, y, width, height) => {
       const windowWidth = Dimensions.get("window").width;
-      setAnchor({ top: y + height + 6, right: windowWidth - x - width });
+      const maxWidth = Math.min(MENU_MAX_WIDTH_CAP, windowWidth - EDGE_MARGIN * 2);
+      const top = y + height + 6;
+      const triggerCenterX = x + width / 2;
+      const side: AnchorSide = triggerCenterX >= windowWidth / 2 ? "right" : "left";
+
+      const maxOffset = Math.max(EDGE_MARGIN, windowWidth - maxWidth - EDGE_MARGIN);
+      const rawOffset = side === "right" ? windowWidth - (x + width) : x;
+      const offset = Math.min(Math.max(rawOffset, EDGE_MARGIN), maxOffset);
+
+      setAnchor({ top, side, offset, maxWidth });
     });
   };
 
@@ -77,7 +105,17 @@ export const OverflowMenu = ({
         animationType="fade"
         onRequestClose={() => setAnchor(null)}>
         <Pressable style={styles.backdrop} onPress={() => setAnchor(null)} />
-        <View style={[styles.menu, anchor && { top: anchor.top, right: anchor.right }]}>
+        <Animated.View
+          style={[
+            styles.menu,
+            anchor && {
+              top: anchor.top,
+              maxWidth: anchor.maxWidth,
+              ...(anchor.side === "right" ? { right: anchor.offset } : { left: anchor.offset }),
+              transformOrigin: anchor.side === "right" ? "100% 0%" : "0% 0%",
+            },
+            animatedMenuStyle,
+          ]}>
           {options.map((option) => (
             <TouchableOpacity
               key={option.label}
@@ -98,7 +136,7 @@ export const OverflowMenu = ({
               </Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </Animated.View>
       </Modal>
     </>
   );
@@ -117,7 +155,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     menu: {
       position: "absolute",
-      minWidth: 200,
+      minWidth: MENU_MIN_WIDTH,
       backgroundColor: colors.NEUTRAL[200],
       borderRadius: 14,
       paddingVertical: 6,
