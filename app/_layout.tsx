@@ -18,6 +18,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 SplashScreen.setOptions({
   fade: true,
@@ -90,65 +91,67 @@ export default function RootLayout() {
   return (
     <View style={styles.view}>
       <StatusBar style={resolvedScheme === "dark" ? "light" : "dark"} />
-      <QueryClientProvider client={queryClient}>
-        <Stack screenOptions={{ contentStyle: { backgroundColor: themeColors.NEUTRAL[200] } }}>
-          <Stack.Protected guard={isAuthenticated}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack.Protected>
-          <Stack.Protected guard={!isAuthenticated}>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          </Stack.Protected>
-          <Stack.Screen
-            name="couple"
-            options={{
-              headerTitle: "Vincular pareja",
-              headerBackTitle: "Cuenta",
-              headerTintColor: themeColors.PRIMARY[800],
-              headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-              headerShadowVisible: false,
-            }}
-          />
-          <Stack.Screen
-            name="settings"
-            options={{
-              headerTitle: "Configuración",
-              headerBackTitle: "Cuenta",
-              headerTintColor: themeColors.PRIMARY[800],
-              headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-              headerShadowVisible: false,
-            }}
-          />
-          <Stack.Screen
-            name="album/[id]"
-            options={{
-              headerBackTitle: "Álbumes",
-              headerTintColor: themeColors.PRIMARY[800],
-              headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-              headerShadowVisible: false,
-            }}
-          />
-          <Stack.Screen
-            name="album/new"
-            options={{
-              headerTitle: "Nuevo álbum",
-              headerBackTitle: "Álbumes",
-              headerTintColor: themeColors.PRIMARY[800],
-              headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-              headerShadowVisible: false,
-            }}
-          />
-          <Stack.Screen
-            name="album/[id]/edit"
-            options={{
-              headerTitle: "Editar álbum",
-              headerBackTitle: "Álbum",
-              headerTintColor: themeColors.PRIMARY[800],
-              headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-              headerShadowVisible: false,
-            }}
-          />
-        </Stack>
-      </QueryClientProvider>
+      <KeyboardProvider>
+        <QueryClientProvider client={queryClient}>
+          <Stack screenOptions={{ contentStyle: { backgroundColor: themeColors.NEUTRAL[200] } }}>
+            <Stack.Protected guard={isAuthenticated}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack.Protected>
+            <Stack.Protected guard={!isAuthenticated}>
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            </Stack.Protected>
+            <Stack.Screen
+              name="couple"
+              options={{
+                headerTitle: "Vincular pareja",
+                headerBackTitle: "Cuenta",
+                headerTintColor: themeColors.PRIMARY[800],
+                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
+                headerShadowVisible: false,
+              }}
+            />
+            <Stack.Screen
+              name="settings"
+              options={{
+                headerTitle: "Configuración",
+                headerBackTitle: "Cuenta",
+                headerTintColor: themeColors.PRIMARY[800],
+                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
+                headerShadowVisible: false,
+              }}
+            />
+            <Stack.Screen
+              name="album/[id]"
+              options={{
+                headerBackTitle: "Álbumes",
+                headerTintColor: themeColors.PRIMARY[800],
+                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
+                headerShadowVisible: false,
+              }}
+            />
+            <Stack.Screen
+              name="album/new"
+              options={{
+                headerTitle: "Nuevo álbum",
+                headerBackTitle: "Álbumes",
+                headerTintColor: themeColors.PRIMARY[800],
+                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
+                headerShadowVisible: false,
+              }}
+            />
+            <Stack.Screen
+              name="album/[id]/edit"
+              options={{
+                headerTitle: "Editar álbum",
+                headerBackTitle: "Álbum",
+                headerTintColor: themeColors.PRIMARY[800],
+                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
+                headerShadowVisible: false,
+              }}
+            />
+          </Stack>
+        </QueryClientProvider>
+      </KeyboardProvider>
       <AppToast />
     </View>
   );
