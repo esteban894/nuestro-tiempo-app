@@ -2,15 +2,14 @@ import { ThemeColors } from "@/constants/colors";
 import { NoCurrentAlbumBanner, useCurrentAlbumQuery } from "@/features/albums";
 import { ImageCarousel, Title } from "@/features/common";
 import { CounterCards } from "@/features/common/components/ui/counter-cards/CounterCards";
-import { NoCoupleBanner, useCoupleStore } from "@/features/couple";
+import { NoCoupleBanner, useCoupleQuery } from "@/features/couple";
 import { useAlbumImagesQuery } from "@/features/images";
 import { useThemeColors } from "@/features/theme";
 import React, { useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 
 export default function HomeScreen() {
-  const couple = useCoupleStore((state) => state.couple);
-  const fetchCouple = useCoupleStore((state) => state.fetchCouple);
+  const { data: couple, refetch: refetchCouple } = useCoupleQuery();
   const {
     data: currentAlbum,
     isLoading: isLoadingCurrentAlbum,
@@ -25,7 +24,7 @@ export default function HomeScreen() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await Promise.all([fetchCouple(), refetchCurrentAlbum(), refetchImages()]);
+    await Promise.all([refetchCouple(), refetchCurrentAlbum(), refetchImages()]);
     setIsRefreshing(false);
   };
 

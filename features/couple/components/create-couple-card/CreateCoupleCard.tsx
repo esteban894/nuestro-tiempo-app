@@ -3,13 +3,13 @@ import { Button, Card, Title } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { createCouple } from "../../api/couple.api";
-import { useCoupleStore } from "../../store/coupleStore";
+import { coupleKeys } from "../../api/queryKeys";
 
 const formatDate = (date: Date) =>
   date.toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" });
@@ -30,14 +30,14 @@ export const CreateCoupleCard = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const fetchCouple = useCoupleStore((state) => state.fetchCouple);
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: createCouple,
     onSuccess: () => {
       setCopied(false);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      fetchCouple();
+      queryClient.invalidateQueries({ queryKey: coupleKeys.me() });
     },
   });
 

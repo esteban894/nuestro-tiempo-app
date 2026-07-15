@@ -1,6 +1,6 @@
 import { ThemeColors } from "@/constants/colors";
 import { useAuthStore } from "@/features/auth";
-import { AppToast, queryClient } from "@/features/common";
+import { AppToast, Button, queryClient } from "@/features/common";
 import {
   handleNotificationReceived,
   handleNotificationResponse,
@@ -13,11 +13,11 @@ import { Parisienne_400Regular } from "@expo-google-fonts/parisienne";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import * as Notifications from "expo-notifications";
-import { Stack } from "expo-router";
+import { ErrorBoundaryProps, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
 SplashScreen.setOptions({
@@ -160,4 +160,52 @@ export default function RootLayout() {
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     view: { backgroundColor: colors.NEUTRAL[200], flex: 1 },
+  });
+
+/**
+ * Root error boundary (Expo Router picks up the named `ErrorBoundary` export). Catches render
+ * errors anywhere in the tree so the app shows a themed fallback with a retry instead of a
+ * blank screen. It renders outside the app providers, so it must only depend on the Zustand
+ * theme store (via `useThemeColors`), never on React Query.
+ */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  const colors = useThemeColors();
+  const styles = createBoundaryStyles(colors);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Algo salió mal</Text>
+      <Text style={styles.message}>{error.message}</Text>
+      <Button title="Reintentar" leftIcon="refresh" onPress={retry} style={styles.button} />
+    </View>
+  );
+}
+
+const createBoundaryStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 32,
+      gap: 12,
+      backgroundColor: colors.NEUTRAL[200],
+    },
+    title: {
+      fontSize: 20,
+      fontFamily: "ElmsSans_700Bold",
+      fontWeight: "700",
+      color: colors.PRIMARY[800],
+      textAlign: "center",
+    },
+    message: {
+      fontSize: 14,
+      fontFamily: "ElmsSans_400Regular",
+      color: colors.NEUTRAL[800],
+      textAlign: "center",
+      marginBottom: 8,
+    },
+    button: {
+      marginTop: 4,
+    },
   });

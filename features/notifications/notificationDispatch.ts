@@ -1,6 +1,6 @@
 import { albumKeys } from "@/features/albums";
 import { queryClient } from "@/features/common";
-import { useCoupleStore } from "@/features/couple";
+import { coupleKeys } from "@/features/couple";
 import { imageKeys } from "@/features/images";
 import type * as Notifications from "expo-notifications";
 import { router } from "expo-router";
@@ -25,11 +25,11 @@ type NotificationHandlerRegistry = {
 const notificationHandlers: NotificationHandlerRegistry = {
   [NotificationType.COUPLE_JOINED]: {
     onReceived: () => {
-      useCoupleStore.getState().fetchCouple();
+      queryClient.invalidateQueries({ queryKey: coupleKeys.me() });
       router.replace("/");
     },
     onResponse: () => {
-      useCoupleStore.getState().fetchCouple();
+      queryClient.invalidateQueries({ queryKey: coupleKeys.me() });
       router.replace("/");
     },
   },

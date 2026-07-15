@@ -45,7 +45,14 @@ assets/               # fonts, images
 
 ## State of the codebase
 
-This is an early-stage app: auth screens (`LoginForm`, `RegisterForm`) exist but are **not yet wired to the API** — submit handlers currently just navigate. There is no API client, no env var wiring (`EXPO_PUBLIC_*`), and no auth/session state management yet. When implementing real API integration, check the sibling `nuestro-tiempo-api` README for endpoint shapes (`/api/v1/auth/...`, JWT access + refresh tokens) before inventing a contract.
+The app is wired to the API. Key infrastructure already in place:
+
+- **HTTP client** — `features/common/api/httpClient.ts` (`apiFetch`) reads the API base URL from `features/common/config/env.ts` (which validates `EXPO_PUBLIC_API_URL` at module load, failing fast if unset), attaches the `Authorization: Bearer` header, and on a 401 runs a deduplicated refresh-and-retry flow. Errors are typed as `ApiError` (non-2xx response) or `NetworkError` (request never completed). `resolveMediaUrl` prefixes relative media paths; `uploadToPresignedUrl` posts directly to S3.
+- **Auth/session** — `features/auth/store/authStore.ts` (Zustand) holds the session, persists tokens in `expo-secure-store`, hydrates on launch, and wires the refresh flow into the HTTP client via `configureApiAuth`. The root layout gates routes on `status` with `Stack.Protected`.
+- **Server state — React Query.** Each feature owns an `api/queryKeys.ts` (namespaced key factory) plus `hooks/` wrapping `useQuery`/`useMutation` (e.g. `useCoupleQuery`, `useAlbumsInfiniteQuery`, `useUploadImagesMutation`). Mutations revalidate by invalidating the relevant keys. The global `queryClient` (`features/common/api/queryClient.ts`) surfaces errors as toasts unless a query/mutation sets `meta.suppressErrorToast`. Prefer this pattern over ad-hoc stores for anything server-derived. Zustand is reserved for pure client state (`themeStore`).
+- **Features wired:** auth, couple (create/join + `useCoupleQuery`), albums, images (presigned S3 upload with multipart fallback on a 501), and notifications (`expo-notifications` push, registered post-auth, routed through a type-safe dispatcher in `features/notifications/notificationDispatch.ts`).
+
+When adding endpoints, check the sibling `nuestro-tiempo-api` README/entities for the contract before inventing one.
 
 ## Commands
 

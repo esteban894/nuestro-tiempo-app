@@ -1,6 +1,5 @@
 import { configureApiAuth } from "@/features/common/api/httpClient";
 import { queryClient } from "@/features/common/api/queryClient";
-import { useCoupleStore } from "@/features/couple/store/coupleStore";
 import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
 import type { UserInfo } from "../api/auth.api";
@@ -73,7 +72,7 @@ async function clearSession() {
     SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
   ]);
   useAuthStore.setState({ user: null, accessToken: null, status: "unauthenticated" });
-  useCoupleStore.setState({ couple: null });
+  // queryClient.clear() also wipes the Couple query cache, so no explicit couple reset is needed.
   queryClient.clear();
 }
 

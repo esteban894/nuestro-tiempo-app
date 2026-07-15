@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import { StyleSheet, Text, TextInput } from "react-native";
 import { login } from "../../api/auth.api";
 import { useAuthStore } from "../../store/authStore";
+import { validateLoginForm, type LoginErrors } from "../../validation";
 
 export const LoginForm = () => {
   const setSession = useAuthStore((state) => state.setSession);
@@ -17,6 +18,7 @@ export const LoginForm = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<LoginErrors>({});
 
   const mutation = useMutation({
     mutationFn: login,
@@ -25,9 +27,23 @@ export const LoginForm = () => {
     meta: { suppressErrorToast: true },
   });
 
-  const errorMessage = mutation.error?.message;
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
+  };
 
   const handleSubmit = () => {
+    const validationErrors = validateLoginForm({ email, password });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors({});
     mutation.reset();
     mutation.mutate({ email, password });
   };
@@ -49,8 +65,9 @@ export const LoginForm = () => {
         autoCapitalize="none"
         returnKeyType="next"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={handleEmailChange}
         onSubmitEditing={() => passwordRef.current?.focus()}
+        error={errors.email}
       />
       <Input
         ref={passwordRef}
@@ -60,9 +77,9 @@ export const LoginForm = () => {
         leftIcon="lock-closed-outline"
         returnKeyType="done"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={handlePasswordChange}
         onSubmitEditing={handleSubmit}
-        error={errorMessage}
+        error={errors.password ?? mutation.error?.message}
       />
 
       <Button

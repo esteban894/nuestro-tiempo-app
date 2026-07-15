@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import { StyleSheet, Text, TextInput } from "react-native";
 import { register } from "../../api/auth.api";
 import { useAuthStore } from "../../store/authStore";
+import { validateRegisterForm, type RegisterErrors } from "../../validation";
 
 export const RegisterForm = () => {
   const setSession = useAuthStore((state) => state.setSession);
@@ -21,6 +22,7 @@ export const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<RegisterErrors>({});
 
   const mutation = useMutation({
     mutationFn: register,
@@ -31,8 +33,33 @@ export const RegisterForm = () => {
 
   const passwordMismatch = confirmPassword.length > 0 && password !== confirmPassword;
 
+  const handleNameChange = (value: string) => {
+    setName(value);
+    if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
+  };
+
+  const handleConfirmPasswordChange = (value: string) => {
+    setConfirmPassword(value);
+    if (errors.confirmPassword) setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+  };
+
   const handleSubmit = () => {
-    if (passwordMismatch) return;
+    const validationErrors = validateRegisterForm({ name, email, password, confirmPassword });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors({});
     mutation.reset();
     mutation.mutate({ name, email, password });
   };
@@ -52,8 +79,9 @@ export const RegisterForm = () => {
         leftIcon="person-outline"
         returnKeyType="next"
         value={name}
-        onChangeText={setName}
+        onChangeText={handleNameChange}
         onSubmitEditing={() => emailRef.current?.focus()}
+        error={errors.name}
       />
       <Input
         ref={emailRef}
@@ -64,8 +92,9 @@ export const RegisterForm = () => {
         autoCapitalize="none"
         returnKeyType="next"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={handleEmailChange}
         onSubmitEditing={() => passwordRef.current?.focus()}
+        error={errors.email}
       />
       <Input
         ref={passwordRef}
@@ -75,8 +104,9 @@ export const RegisterForm = () => {
         leftIcon="lock-closed-outline"
         returnKeyType="done"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={handlePasswordChange}
         onSubmitEditing={() => password2Ref.current?.focus()}
+        error={errors.password}
       />
       <Input
         ref={password2Ref}
@@ -86,9 +116,12 @@ export const RegisterForm = () => {
         leftIcon="lock-closed-outline"
         returnKeyType="done"
         value={confirmPassword}
-        onChangeText={setConfirmPassword}
+        onChangeText={handleConfirmPasswordChange}
         onSubmitEditing={handleSubmit}
-        error={passwordMismatch ? "Las contraseñas no coinciden" : mutation.error?.message}
+        error={
+          errors.confirmPassword ??
+          (passwordMismatch ? "Las contraseñas no coinciden." : mutation.error?.message)
+        }
       />
 
       <Button

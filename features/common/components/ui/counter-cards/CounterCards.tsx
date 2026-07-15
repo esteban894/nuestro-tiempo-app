@@ -3,6 +3,7 @@ import { useThemeColors } from "@/features/theme";
 import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Card } from "../card/Card";
+import { getElapsedTime } from "./getElapsedTime";
 
 interface Props {
   initDate: string;
@@ -32,30 +33,7 @@ export const CounterCards = ({ initDate }: Props) => {
   });
 
   useEffect(() => {
-    const updateCounter = () => {
-      const now = new Date();
-      const diff = now.getTime() - initialDate.getTime();
-
-      if (diff > 0) {
-        setTimeDiff({
-          years: Math.floor(diff / (1000 * 60 * 60 * 24 * 365)),
-          months: Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30)),
-          days: Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((diff % (1000 * 60)) / 1000),
-        });
-      } else {
-        setTimeDiff({
-          years: 0,
-          months: 0,
-          days: 0,
-          hours: 0,
-          minutes: 0,
-          seconds: 0,
-        });
-      }
-    };
+    const updateCounter = () => setTimeDiff(getElapsedTime(initialDate, new Date()));
 
     updateCounter();
 

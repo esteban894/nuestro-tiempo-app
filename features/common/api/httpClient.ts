@@ -1,3 +1,5 @@
+import { env } from "../config/env";
+
 export class ApiError extends Error {
   status: number;
 
@@ -33,8 +35,6 @@ export function configureApiAuth(accessors: AuthAccessors) {
   authAccessors = accessors;
 }
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
-
 /**
  * Media endpoints (e.g. signed cover image URLs) come back as a path relative to the API,
  * not an absolute URL — prepend EXPO_PUBLIC_API_URL to build a URL the device can reach.
@@ -44,7 +44,7 @@ export function resolveMediaUrl(path: string | null | undefined): string | null;
 export function resolveMediaUrl(path: string | null | undefined): string | null {
   if (!path) return null;
   if (/^https?:\/\//i.test(path)) return path;
-  return `${API_URL ?? ""}${path}`;
+  return `${env.API_URL}${path}`;
 }
 
 /** React Native multipart file part shape (not a real Blob/File). */
@@ -106,24 +106,19 @@ async function parseResponseBody(response: Response): Promise<unknown> {
 }
 
 export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
-  if (!API_URL) {
-    throw new Error("EXPO_PUBLIC_API_URL is not set. Add it to your .env file.");
-  }
-
   const { body, skipAuthRetry, headers, ...rest } = options;
   const accessToken = authAccessors?.getAccessToken();
   const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
 
   let response: Response;
   try {
-    response = await fetch(`${API_URL}${path}`, {
+    response = await fetch(`${env.API_URL}${path}`, {
       ...rest,
       headers: {
         // Let fetch set the multipart boundary itself for FormData bodies.
         ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         ...headers,
-        "ngrok-skip-browser-warning": "true",
       },
       body: isFormData ? (body as FormData) : body !== undefined ? JSON.stringify(body) : undefined,
     });

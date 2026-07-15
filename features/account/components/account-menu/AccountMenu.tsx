@@ -1,6 +1,6 @@
 import { useAuthStore } from "@/features/auth";
 import { ListItem } from "@/features/common";
-import { useCoupleStore } from "@/features/couple";
+import { useCoupleQuery } from "@/features/couple";
 import { useRouter } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
@@ -8,7 +8,7 @@ export const AccountMenu = () => {
   const router = useRouter();
   const logout = useAuthStore((state) => state.logout);
   const currentUserId = useAuthStore((state) => state.user?.id);
-  const couple = useCoupleStore((state) => state.couple);
+  const { data: couple } = useCoupleQuery();
 
   const partner =
     couple && couple.user2

@@ -1,7 +1,7 @@
 import { ThemeColors } from "@/constants/colors";
 import { AlbumFab, AlbumGrid, useAlbumsInfiniteQuery } from "@/features/albums";
 import { Title } from "@/features/common";
-import { NoCoupleBanner, useCoupleStore } from "@/features/couple";
+import { NoCoupleBanner, useCoupleQuery } from "@/features/couple";
 import { useThemeColors } from "@/features/theme";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -11,7 +11,7 @@ export default function AlbumsScreen() {
   const router = useRouter();
   const colors = useThemeColors();
   const styles = createStyles(colors);
-  const couple = useCoupleStore((state) => state.couple);
+  const { data: couple } = useCoupleQuery();
   const isCoupleComplete = !!couple?.user2;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isRefetching, refetch } =

@@ -1,19 +1,15 @@
 import { ThemeColors } from "@/constants/colors";
-import { useCoupleStore } from "@/features/couple";
+import { useCoupleQuery } from "@/features/couple";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { useEffect } from "react";
 import { StyleSheet } from "react-native";
 
 export default function TabLayout() {
-  const fetchCouple = useCoupleStore((state) => state.fetchCouple);
+  // Prime the Couple query as soon as the tabs mount; the cache is shared with every screen.
+  useCoupleQuery();
   const colors = useThemeColors();
   const styles = createStyles(colors);
-
-  useEffect(() => {
-    fetchCouple();
-  }, [fetchCouple]);
 
   return (
     <Tabs

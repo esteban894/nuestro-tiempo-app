@@ -2,12 +2,12 @@ import { ThemeColors } from "@/constants/colors";
 import { Button, Card, Input, Title } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { joinCouple } from "../../api/couple.api";
-import { useCoupleStore } from "../../store/coupleStore";
+import { coupleKeys } from "../../api/queryKeys";
 import { INVITE_CODE_LENGTH, INVITE_CODE_REGEX } from "../../utils/generateInviteCode";
 
 export const JoinCoupleCard = () => {
@@ -16,13 +16,13 @@ export const JoinCoupleCard = () => {
   const [code, setCode] = useState("");
   const [formatError, setFormatError] = useState<string | undefined>();
 
-  const fetchCouple = useCoupleStore((state) => state.fetchCouple);
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: joinCouple,
     onSuccess: () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      fetchCouple();
+      queryClient.invalidateQueries({ queryKey: coupleKeys.me() });
     },
     onError: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error),
   });
