@@ -177,7 +177,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     waitingHint: {
       fontSize: 13,
-      color: colors.SECONDARY[500],
+      color: colors.SECONDARY[800],
       fontStyle: "italic",
       marginBottom: 20,
     },

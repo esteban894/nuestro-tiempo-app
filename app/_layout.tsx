@@ -19,6 +19,9 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { enableFreeze } from "react-native-screens";
+
+enableFreeze(true);
 
 SplashScreen.setOptions({
   fade: true,

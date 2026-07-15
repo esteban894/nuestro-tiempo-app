@@ -12,10 +12,10 @@ export const NoCoupleBanner = () => {
 
   return (
     <Card cardStyles={styles.card}>
-      <Ionicons name="heart-dislike-outline" size={40} color={colors.PRIMARY[500]} />
-      <Title title="Todavía no tenés pareja vinculada" variant="h3" align="center" style={styles.title} />
+      <Ionicons name="people-outline" size={40} color={colors.PRIMARY[500]} />
+      <Title title="Empiecen a contar su tiempo juntos" variant="h3" align="center" style={styles.title} />
       <Text style={styles.description}>
-        Para ver la información de tu pareja primero tenés que vincularte con ella.
+        Vinculá tu cuenta con la de tu pareja para compartir álbumes y ver cuánto tiempo llevan juntos.
       </Text>
       <Button
         title="Vincular con mi pareja"

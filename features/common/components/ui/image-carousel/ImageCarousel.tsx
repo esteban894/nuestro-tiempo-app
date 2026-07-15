@@ -28,7 +28,7 @@ export function ImageCarousel({ data, renderArrows = false, renderOverlay }: Pro
       <View style={styles.wrapper}>
         <View style={[styles.carouselContainer, styles.emptyContainer]}>
           <Ionicons name="images-outline" size={32} color={colors.NEUTRAL[600]} />
-          <Text style={styles.emptyText}>No hay imágenes</Text>
+          <Text style={styles.emptyText}>Aún no hay fotos aquí — suban la primera juntos</Text>
         </View>
       </View>
     );
@@ -140,7 +140,11 @@ const createStyles = (colors: ThemeColors) =>
     image: {
       width: "100%",
       height: "100%",
-      borderRadius: 16,
+      borderRadius: 12,
+      shadowColor: colors.SHADOW,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 12,
     },
     arrowButton: {
       position: "absolute",

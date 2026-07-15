@@ -9,51 +9,55 @@ interface Props {
   initDate: string;
 }
 
-const counterLabels = {
+const bigUnitLabels = {
   years: { singular: "Año", plural: "Años" },
   months: { singular: "Mes", plural: "Meses" },
   days: { singular: "Día", plural: "Días" },
-  hours: { singular: "Hora", plural: "Horas" },
-  minutes: { singular: "Minuto", plural: "Minutos" },
-  seconds: { singular: "Segundo", plural: "Segundos" },
 };
+
+const pad = (n: number) => String(n).padStart(2, "0");
 
 export const CounterCards = ({ initDate }: Props) => {
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const initialDate = useMemo(() => new Date(initDate), [initDate]);
 
-  const [timeDiff, setTimeDiff] = useState({
-    years: 0,
-    months: 0,
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+  const [elapsed, setElapsed] = useState(() => getElapsedTime(initialDate, new Date()));
 
   useEffect(() => {
-    const updateCounter = () => setTimeDiff(getElapsedTime(initialDate, new Date()));
-
-    updateCounter();
-
-    const interval = setInterval(updateCounter, 1000);
-
+    const update = () => setElapsed(getElapsedTime(initialDate, new Date()));
+    update();
+    const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
   }, [initialDate]);
 
+  // Trim leading zero units: años se ocultan en 0, y meses también si aún no hay años ni meses.
+  const showYears = elapsed.years > 0;
+  const showMonths = showYears || elapsed.months > 0;
+  const bigUnits = [
+    ...(showYears ? [{ key: "years", value: elapsed.years, label: bigUnitLabels.years }] : []),
+    ...(showMonths ? [{ key: "months", value: elapsed.months, label: bigUnitLabels.months }] : []),
+    { key: "days", value: elapsed.days, label: bigUnitLabels.days },
+  ];
+
   return (
     <View style={styles.container}>
-      {Object.entries(timeDiff).map(([key, value]) => {
-        if (key === "years" && value === 0) return null;
-        const label = counterLabels[key as keyof typeof counterLabels];
-        return (
-          <Card key={key} cardStyles={styles.card}>
-            <Text style={styles.number}>{String(value).padStart(2, "0")}</Text>
-            <Text style={styles.label}>{value !== 1 ? label.plural : label.singular}</Text>
+      <View style={styles.bigRow}>
+        {bigUnits.map(({ key, value, label }) => (
+          <Card key={key} cardStyles={styles.bigCard}>
+            <Text style={styles.bigNumber}>{value}</Text>
+            <Text style={styles.bigLabel}>{value !== 1 ? label.plural : label.singular}</Text>
           </Card>
-        );
-      })}
+        ))}
+      </View>
+
+      <View style={styles.tickRow}>
+        <Text style={styles.tick}>{pad(elapsed.hours)}</Text>
+        <Text style={styles.tickSep}>:</Text>
+        <Text style={styles.tick}>{pad(elapsed.minutes)}</Text>
+        <Text style={styles.tickSep}>:</Text>
+        <Text style={styles.tick}>{pad(elapsed.seconds)}</Text>
+      </View>
     </View>
   );
 };
@@ -61,30 +65,44 @@ export const CounterCards = ({ initDate }: Props) => {
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     container: {
-      gap: 15,
-      flexWrap: "wrap",
-      flexDirection: "row",
-      justifyContent: "space-between",
+      gap: 16,
       alignItems: "center",
     },
-    card: {
+    bigRow: {
+      flexDirection: "row",
+      gap: 12,
+      width: "100%",
+    },
+    bigCard: {
       flex: 1,
       alignItems: "center",
-      minWidth: "45%",
-      height: 100,
+      paddingVertical: 18,
       backgroundColor: colors.NEUTRAL[500],
-      shadowColor: colors.PRIMARY[500],
     },
-    number: {
-      fontSize: 24,
+    bigNumber: {
       fontFamily: "ElmsSans_700Bold",
-      fontWeight: "700",
+      fontSize: 36,
       color: colors.PRIMARY[500],
     },
-    label: {
-      fontSize: 16,
+    bigLabel: {
       fontFamily: "ElmsSans_400Regular",
-      fontWeight: "400",
+      fontSize: 14,
+      color: colors.NEUTRAL[600],
+      marginTop: 2,
+    },
+    tickRow: {
+      flexDirection: "row",
+      alignItems: "baseline",
+      gap: 6,
+    },
+    tick: {
+      fontFamily: "ElmsSans_700Bold",
+      fontSize: 16,
+      letterSpacing: 1,
+      color: colors.NEUTRAL[600],
+    },
+    tickSep: {
+      fontSize: 16,
       color: colors.NEUTRAL[600],
     },
   });

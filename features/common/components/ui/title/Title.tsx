@@ -74,23 +74,25 @@ export const Title = ({
 
 const styles = StyleSheet.create({
   h1: {
+    fontFamily: "ElmsSans_700Bold",
     fontSize: 32,
-    fontWeight: "bold",
+    letterSpacing: -0.5,
   },
   h2: {
+    fontFamily: "ElmsSans_700Bold",
     fontSize: 28,
-    fontWeight: "bold",
+    letterSpacing: -0.3,
   },
   h3: {
+    fontFamily: "ElmsSans_700Bold",
     fontSize: 24,
-    fontWeight: "600",
   },
   h4: {
+    fontFamily: "ElmsSans_700Bold",
     fontSize: 20,
-    fontWeight: "600",
   },
   subtitle: {
+    fontFamily: "ElmsSans_400Regular",
     fontSize: 16,
-    fontWeight: "500",
   },
 });

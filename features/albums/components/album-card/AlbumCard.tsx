@@ -24,14 +24,16 @@ export const AlbumCard = ({ album, index, onPress }: AlbumCardProps) => {
         <Image source={{ uri: album.coverImage }} style={styles.image} resizeMode="cover" />
       ) : (
         <View style={[styles.image, styles.placeholder]}>
-          <Ionicons name="image-outline" size={40} color={colors.NEUTRAL[600]} />
+          <Ionicons name="images-outline" size={40} color={colors.NEUTRAL[600]} />
         </View>
       )}
-      <View style={styles.captionWrapper}>
-        <Text style={styles.caption} numberOfLines={1}>
-          {album.name}
-        </Text>
-      </View>
+      {album.name && (
+        <View style={styles.captionWrapper}>
+          <Text style={styles.caption} numberOfLines={1}>
+            {album.name}
+          </Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 };
@@ -45,7 +47,7 @@ const createStyles = (colors: ThemeColors) =>
       borderRadius: 20,
       padding: 10,
       elevation: 4,
-      shadowColor: "#000",
+      shadowColor: colors.SHADOW,
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.3,
       shadowRadius: 4,

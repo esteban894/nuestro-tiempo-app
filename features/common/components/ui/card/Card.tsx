@@ -21,9 +21,9 @@ const createStyles = (colors: ThemeColors) =>
       padding: 20,
       borderRadius: 20,
       elevation: 3,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
+      shadowColor: colors.SHADOW,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 12,
     },
   });

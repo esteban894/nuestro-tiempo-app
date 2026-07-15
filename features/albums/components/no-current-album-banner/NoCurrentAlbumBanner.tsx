@@ -12,15 +12,15 @@ export const NoCurrentAlbumBanner = () => {
 
   return (
     <Card cardStyles={styles.card}>
-      <Ionicons name="star-outline" size={40} color={colors.PRIMARY[500]} />
+      <Ionicons name="bookmark-outline" size={40} color={colors.PRIMARY[500]} />
       <Title
-        title="Todavía no elegiste un álbum actual"
+        title="Elegí el álbum de su momento"
         variant="h3"
         align="center"
         style={styles.title}
       />
       <Text style={styles.description}>
-        Marcá un álbum como actual desde su menú para verlo acá.
+        Marcá un álbum como actual desde su menú y sus fotos aparecerán acá, en la pantalla principal.
       </Text>
       <Button
         title="Ver mis álbumes"
