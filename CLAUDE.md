@@ -11,6 +11,7 @@ Guidance for Claude Code when working in this repository.
 - Expo SDK 54, React Native 0.81, React 19, TypeScript 5.9 (`strict: true`)
 - Expo Router 6 — file-based routing under `app/`, `typedRoutes` enabled
 - React Compiler enabled (`experiments.reactCompiler` in `app.json`) — avoid manual `useMemo`/`useCallback` unless there's a proven need, the compiler handles most memoization
+- Zod for form/schema validation
 - EAS Build for cloud builds (`eas.json`: `development`, `preview`, `production` profiles)
 - Package manager: **npm** (`package-lock.json` is the lockfile — don't introduce yarn/pnpm files here even though the sibling API uses pnpm)
 
@@ -35,13 +36,7 @@ assets/               # fonts, images
 
 ## Domain model
 
-- **User** — starts with no Couple. Becomes part of one by either creating a `CoupleInvite` (from the account page) or entering another user's invite code.
-- **Couple** — made up of exactly 2 users. Formed when one user creates a `CoupleInvite`, which generates an 8-character hexadecimal code; a second user joins the Couple by entering that code.
-- **Album** — belongs to a creator (`User`). Has no direct relation to a `Couple`, but a user must belong to a Couple to create one.
-  - Can be marked `private` at creation. A private album is visible only to its creator, not to the creator's partner.
-  - The creator can toggle an album's private state at any time.
-  - Related to `AlbumMember`s — the creator and their Couple partner.
-- **Image** — belongs to an `Album`. Deleted in cascade when its Album is deleted.
+Entities and business rules (Couple/invite codes, private Albums, cascade deletes) live in the `domain-model` skill — load it for domain or endpoint work.
 
 ## State of the codebase
 
@@ -66,5 +61,8 @@ When adding endpoints, check the sibling `nuestro-tiempo-api` README/entities fo
 
 - TypeScript strict mode — don't loosen `tsconfig.json` to work around a type error; fix the type.
 - Match the existing component style: functional components, `StyleSheet.create` at the bottom of the file, props typed inline or via a local `type`/`interface`.
+- **Theming:** colors come from `constants/colors.ts` via `useThemeColors()` — never hardcode hex. Shadows use the `SHADOW` token (`shadowColor: colors.SHADOW`), not `#000`.
+- **Typography:** `Title` (`features/common`) renders in the ElmsSans brand font; Parisienne is reserved for emotional accents (couple initials, brand header), not general UI.
+- **Form validation:** Zod, in `features/<feature>/validation.ts` (pure `validate*` functions returning a field→message record). Validate client-side before firing the mutation; the server stays the source of truth (its errors surface via `mutation.error`).
 - Don't add native modules unsupported by Expo Go without flagging it — doing so forces every contributor onto a development build (see README's Expo Go vs. development build section).
 - No test suite exists yet — don't assume `npm test` works.
