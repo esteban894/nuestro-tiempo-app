@@ -19,6 +19,8 @@ export default function TabLayout() {
     <Tabs
       initialRouteName="index"
       screenOptions={{
+        animation: "shift",
+        sceneStyle: styles.scene,
         tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: colors.PRIMARY[500],
         tabBarInactiveTintColor: colors.NEUTRAL[800],
@@ -62,6 +64,9 @@ export default function TabLayout() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
+    scene: {
+      backgroundColor: colors.NEUTRAL[200],
+    },
     tabBar: {
       backgroundColor: colors.NEUTRAL[200],
       borderTopLeftRadius: 20,
