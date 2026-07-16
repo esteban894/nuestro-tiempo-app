@@ -48,6 +48,40 @@ EXPO_PUBLIC_API_URL=http://localhost:3000/api/v1
 - Para un dispositivo físico en la misma red, usa la IP local de tu máquina (ej. `http://192.168.1.50:3000/api/v1`) y asegúrate de que el firewall permite conexiones entrantes al puerto `3000`.
 - Alternativa con Android + cable USB: `adb reverse tcp:3000 tcp:3000` y usa `http://localhost:3000/api/v1`.
 
+### ⚙️ Variables de entorno en deploy (builds y updates OTA)
+
+Las variables `EXPO_PUBLIC_*` **no se leen en runtime ni viajan como archivo**: se **hornean (inline)** dentro del bundle de JS en el momento de compilar/publicar. El `.env` no se sube; lo que queda congelado es su **valor** en ese instante. Esto tiene tres consecuencias importantes al hacer deploy:
+
+1. **El valor baked sale de la máquina que corre el comando.** Tanto `eas build` como `eas update` toman `EXPO_PUBLIC_API_URL` del `.env` presente en la máquina (o CI) desde la que publicás. Si al publicar tenías activa una URL de LAN/localhost (dev), esa queda embebida y los dispositivos de los usuarios no podrán alcanzarla.
+
+2. **Metro cachea el valor horneado.** Como el inline ocurre durante la transformación del bundle, un valor viejo puede quedar pegado en la caché aunque ya hayas corregido el `.env`. **Cada vez que cambies un `EXPO_PUBLIC_*`, limpiá la caché al publicar:**
+
+   ```bash
+   # Publicar un update OTA (solo cambios de JS/assets) forzando bundle limpio
+   eas update --branch preview --message "descripción" --clear-cache
+
+   # En dev / export local, el equivalente:
+   npx expo start --clear
+   npx expo export --clear
+   ```
+
+3. **Recomendado: fuente de verdad única en EAS.** Para que build y update nunca dependan de qué tenías en tu `.env`/caché local, definí las variables como **environment variables de EAS** por ambiente y publicá con el flag `--environment`, que **ignora el `.env` local** y usa el de los servidores de EAS:
+
+   ```bash
+   eas env:create --environment production --name EXPO_PUBLIC_API_URL --value https://tu-api.com/api/v1
+   eas update --branch preview --environment production
+   ```
+
+**Verificar qué URL quedó horneada** (sin publicar nada), útil si una request falla tras un update:
+
+```bash
+npx expo export --platform web --clear
+grep -ro 'API_URL:"[^"]*"' dist/   # muestra el valor embebido en el bundle
+rm -rf dist                         # limpiar el artefacto de verificación
+```
+
+> 🐛 Síntoma típico: *"desde que actualicé la app (OTA) no toma la request al servidor"* → casi siempre es un `EXPO_PUBLIC_API_URL` de dev horneado por caché de Metro. Republicá con `--clear-cache`.
+
 ## 🚀 Puesta en marcha
 
 ```bash
