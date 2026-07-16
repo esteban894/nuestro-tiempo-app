@@ -1,4 +1,5 @@
 import { ThemeColors } from "@/constants/colors";
+import { MAX_IMAGES_PER_BATCH } from "@/constants/upload";
 import {
   AlbumFab,
   AlbumHeader,
@@ -22,6 +23,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function AlbumDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -101,9 +103,20 @@ export default function AlbumDetailScreen() {
 
   const handlePickImages = (uris: string[]) => {
     if (uris.length === 0) return;
-    setUploadCount(uris.length);
+
+    let files = uris;
+    if (files.length > MAX_IMAGES_PER_BATCH) {
+      files = files.slice(0, MAX_IMAGES_PER_BATCH);
+      Toast.show({
+        type: "info",
+        text1: "Demasiadas fotos",
+        text2: `Se subirán las primeras ${MAX_IMAGES_PER_BATCH} de esta selección.`,
+      });
+    }
+
+    setUploadCount(files.length);
     uploadImagesMutation.mutate(
-      { albumId: id, files: uris.map(buildImageFilePart) },
+      { albumId: id, files: files.map(buildImageFilePart) },
       { onSettled: () => setUploadCount(null) },
     );
   };

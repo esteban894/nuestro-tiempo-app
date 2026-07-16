@@ -1,4 +1,5 @@
 import { ThemeColors } from "@/constants/colors";
+import { MAX_IMAGES_PER_BATCH } from "@/constants/upload";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -40,6 +41,7 @@ export const AlbumImagePickerSheet = ({
       mediaTypes: ["images"],
       quality: 0.8,
       allowsMultipleSelection,
+      selectionLimit: allowsMultipleSelection ? MAX_IMAGES_PER_BATCH : 1,
     });
     const uris = result.assets?.map((asset) => asset.uri) ?? [];
     if (!result.canceled && uris.length > 0) onPickImages(uris);
