@@ -1,5 +1,6 @@
 import { configureApiAuth } from "@/features/common/api/httpClient";
 import { queryClient } from "@/features/common/api/queryClient";
+import { unregisterForPushNotifications } from "@/features/notifications/utils/registerForPushNotifications";
 import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
 import type { UserInfo } from "../api/auth.api";
@@ -59,6 +60,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
+    // Remove this device's push token first, while the session is still
+    // authenticated — otherwise the token lingers in the DB and keeps
+    // accumulating across logins/reinstalls.
+    await unregisterForPushNotifications();
     try {
       await authApi.logout();
     } catch {}

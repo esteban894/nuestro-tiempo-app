@@ -77,10 +77,16 @@ export default function RootLayout() {
     const responseSubscription = Notifications.addNotificationResponseReceivedListener(
       handleNotificationResponse,
     );
+    // When the underlying push token rolls, re-register so the backend always
+    // has this device's current Expo token (stale ones are cleaned up server-side).
+    const pushTokenSubscription = Notifications.addPushTokenListener(() => {
+      registerForPushNotifications();
+    });
 
     return () => {
       receivedSubscription.remove();
       responseSubscription.remove();
+      pushTokenSubscription.remove();
     };
   }, [status]);
 
