@@ -8,6 +8,7 @@ import {
 } from "@/features/notifications";
 import "@/features/notifications/notificationHandler";
 import { subscribeToSystemScheme, useThemeColors, useThemeStore } from "@/features/theme";
+import { useOtaUpdates } from "@/features/updates";
 import { ElmsSans_400Regular, ElmsSans_700Bold } from "@expo-google-fonts/elms-sans";
 import { Parisienne_400Regular } from "@expo-google-fonts/parisienne";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -44,6 +45,8 @@ export default function RootLayout() {
   const resolvedScheme = useThemeStore((state) => state.resolvedScheme);
   const themeColors = useThemeColors();
   const styles = createStyles(themeColors);
+
+  useOtaUpdates();
 
   useEffect(() => {
     hydrate();
