@@ -1,11 +1,11 @@
 import { ThemeColors } from "@/constants/colors";
-import { AlbumFab, AlbumGrid, useAlbumsInfiniteQuery } from "@/features/albums";
+import { AlbumFab, AlbumGrid, AlbumGridSkeleton, useAlbumsInfiniteQuery } from "@/features/albums";
 import { Title } from "@/features/common";
 import { NoCoupleBanner, useCoupleQuery } from "@/features/couple";
 import { useThemeColors } from "@/features/theme";
 import { useRouter } from "expo-router";
 import React from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 export default function AlbumsScreen() {
   const router = useRouter();
@@ -31,7 +31,7 @@ export default function AlbumsScreen() {
     <View style={styles.container}>
       <Title title="Nuestros Álbumes" variant="h2" style={styles.title} />
       {isLoading ? (
-        <ActivityIndicator style={styles.loader} color={colors.PRIMARY[500]} />
+        <AlbumGridSkeleton />
       ) : (
         <AlbumGrid
           albums={albums}
@@ -58,6 +58,5 @@ const createStyles = (colors: ThemeColors) =>
     container: { flex: 1, position: "relative", backgroundColor: colors.NEUTRAL[200] },
     emptyContainer: { justifyContent: "center", padding: 20 },
     title: { paddingHorizontal: 20, paddingTop: 20 },
-    loader: { marginTop: 40 },
     fab: { position: "absolute", bottom: 24, right: 20 },
   });

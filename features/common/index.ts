@@ -12,5 +12,6 @@ export * from "./components/ui/input/Input";
 export * from "./components/ui/list-item/ListItem";
 export * from "./components/ui/overflow-menu/OverflowMenu";
 export * from "./components/ui/segmented-control/SegmentedControl";
+export * from "./components/ui/skeleton/Skeleton";
 export * from "./components/ui/title/Title";
 export * from "./components/ui/toast";

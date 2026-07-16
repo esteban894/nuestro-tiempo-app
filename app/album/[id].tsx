@@ -1,6 +1,7 @@
 import { ThemeColors } from "@/constants/colors";
 import { MAX_IMAGES_PER_BATCH } from "@/constants/upload";
 import {
+  AlbumDetailSkeleton,
   AlbumFab,
   AlbumHeader,
   AlbumImagePickerSheet,
@@ -22,7 +23,7 @@ import { useThemeColors } from "@/features/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
 export default function AlbumDetailScreen() {
@@ -122,12 +123,18 @@ export default function AlbumDetailScreen() {
   };
 
   if (isLoading) {
-    return <ActivityIndicator style={styles.loader} color={colors.PRIMARY[500]} />;
+    return (
+      <>
+        <Stack.Screen options={{ headerTitle: "" }} />
+        <AlbumDetailSkeleton />
+      </>
+    );
   }
 
   if (isError || !album) {
     return (
       <View style={styles.notFound}>
+        <Stack.Screen options={{ headerTitle: "" }} />
         <Text style={styles.notFoundText}>Álbum no encontrado</Text>
       </View>
     );
@@ -211,7 +218,6 @@ export default function AlbumDetailScreen() {
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     screen: { flex: 1, position: "relative", backgroundColor: colors.NEUTRAL[200] },
-    loader: { marginTop: 40 },
     notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
     notFoundText: { fontSize: 16, color: colors.NEUTRAL[800] },
     imageMenuTrigger: {

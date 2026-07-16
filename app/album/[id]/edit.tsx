@@ -1,9 +1,9 @@
 import { ThemeColors } from "@/constants/colors";
-import { AlbumForm, albumKeys, getAlbum, updateAlbum } from "@/features/albums";
+import { AlbumForm, AlbumFormSkeleton, albumKeys, getAlbum, updateAlbum } from "@/features/albums";
 import { useThemeColors } from "@/features/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function EditAlbumScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -29,7 +29,7 @@ export default function EditAlbumScreen() {
   });
 
   if (isLoading) {
-    return <ActivityIndicator style={styles.loader} color={colors.PRIMARY[500]} />;
+    return <AlbumFormSkeleton />;
   }
 
   if (isError || !album) {
@@ -53,7 +53,6 @@ export default function EditAlbumScreen() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    loader: { marginTop: 40 },
     notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
     notFoundText: { fontSize: 16, color: colors.NEUTRAL[800] },
   });

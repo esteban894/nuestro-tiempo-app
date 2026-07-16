@@ -3,13 +3,14 @@ import { NoCurrentAlbumBanner, useCurrentAlbumQuery } from "@/features/albums";
 import { ImageCarousel, Title } from "@/features/common";
 import { CounterCards } from "@/features/common/components/ui/counter-cards/CounterCards";
 import { NoCoupleBanner, useCoupleQuery } from "@/features/couple";
+import { HomeSkeleton } from "@/features/home";
 import { useAlbumImagesQuery } from "@/features/images";
 import { useThemeColors } from "@/features/theme";
 import React, { useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 
 export default function HomeScreen() {
-  const { data: couple, refetch: refetchCouple } = useCoupleQuery();
+  const { data: couple, isLoading: isLoadingCouple, refetch: refetchCouple } = useCoupleQuery();
   const {
     data: currentAlbum,
     isLoading: isLoadingCurrentAlbum,
@@ -27,6 +28,14 @@ export default function HomeScreen() {
     await Promise.all([refetchCouple(), refetchCurrentAlbum(), refetchImages()]);
     setIsRefreshing(false);
   };
+
+  if (isLoadingCouple) {
+    return (
+      <View style={styles.container}>
+        <HomeSkeleton />
+      </View>
+    );
+  }
 
   if (!couple || !couple.user2) {
     return (
