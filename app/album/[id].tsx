@@ -22,7 +22,7 @@ import {
 import { useThemeColors } from "@/features/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -60,6 +60,22 @@ export default function AlbumDetailScreen() {
   const deleteAlbumMutation = useDeleteAlbumMutation();
   const [pickerVisible, setPickerVisible] = useState(false);
   const [uploadCount, setUploadCount] = useState<number | null>(null);
+  const hasAutoRetriedRef = useRef(false);
+
+  useEffect(() => {
+    hasAutoRetriedRef.current = false;
+  }, [id]);
+
+  const handleImageError = () => {
+    if (hasAutoRetriedRef.current) return;
+    hasAutoRetriedRef.current = true;
+    refetchImages();
+  };
+
+  const handleRefreshImages = () => {
+    hasAutoRetriedRef.current = false;
+    refetchImages();
+  };
 
   const markAsCurrentMutation = useMutation({
     mutationFn: () => setCurrentAlbum(id),
@@ -165,7 +181,8 @@ export default function AlbumDetailScreen() {
         }}
         isFetchingNextPage={isFetchingNextPage}
         refreshing={isRefetchingImages}
-        onRefresh={() => refetchImages()}
+        onRefresh={handleRefreshImages}
+        onImageError={handleImageError}
         renderOverlay={(_, index) => (
           <OverflowMenu
             triggerIcon="ellipsis-vertical"

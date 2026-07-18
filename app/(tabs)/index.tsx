@@ -6,7 +6,7 @@ import { NoCoupleBanner, useCoupleQuery } from "@/features/couple";
 import { HomeSkeleton } from "@/features/home";
 import { useAlbumImagesQuery } from "@/features/images";
 import { useThemeColors } from "@/features/theme";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 
 export default function HomeScreen() {
@@ -18,6 +18,7 @@ export default function HomeScreen() {
   } = useCurrentAlbumQuery();
   const { data: imagesData, refetch: refetchImages } = useAlbumImagesQuery(currentAlbum?.id);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const hasAutoRetriedRef = useRef(false);
   const colors = useThemeColors();
   const styles = createStyles(colors);
 
@@ -25,8 +26,15 @@ export default function HomeScreen() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
+    hasAutoRetriedRef.current = false;
     await Promise.all([refetchCouple(), refetchCurrentAlbum(), refetchImages()]);
     setIsRefreshing(false);
+  };
+
+  const handleImageError = () => {
+    if (hasAutoRetriedRef.current) return;
+    hasAutoRetriedRef.current = true;
+    refetchImages();
   };
 
   if (isLoadingCouple) {
@@ -58,7 +66,7 @@ export default function HomeScreen() {
         />
       }>
       {currentAlbum || isLoadingCurrentAlbum ? (
-        <ImageCarousel data={images} />
+        <ImageCarousel data={images} onImageError={handleImageError} />
       ) : (
         <NoCurrentAlbumBanner />
       )}

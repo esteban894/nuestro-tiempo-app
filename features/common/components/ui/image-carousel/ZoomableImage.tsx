@@ -19,9 +19,10 @@ const DOUBLE_TAP_SCALE = 3;
 interface Props {
   uri: string;
   onZoomChange?: (zoomed: boolean) => void;
+  onError?: () => void;
 }
 
-export function ZoomableImage({ uri, onZoomChange }: Props) {
+export function ZoomableImage({ uri, onZoomChange, onError }: Props) {
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
   const translateX = useSharedValue(0);
@@ -113,6 +114,7 @@ export function ZoomableImage({ uri, onZoomChange }: Props) {
         source={{ uri }}
         style={[styles.image, animatedStyle]}
         resizeMode="contain"
+        onError={onError}
       />
     </GestureDetector>
   );

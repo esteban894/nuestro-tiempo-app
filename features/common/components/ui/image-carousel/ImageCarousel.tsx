@@ -14,9 +14,15 @@ interface Props {
   data: string[];
   renderArrows?: boolean;
   renderOverlay?: (item: string, index: number) => ReactNode;
+  onImageError?: (uri: string) => void;
 }
 
-export function ImageCarousel({ data, renderArrows = false, renderOverlay }: Props) {
+export function ImageCarousel({
+  data,
+  renderArrows = false,
+  renderOverlay,
+  onImageError,
+}: Props) {
   const ref = useRef<ICarouselInstance>(null);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const progress = useSharedValue(0);
@@ -58,7 +64,12 @@ export function ImageCarousel({ data, renderArrows = false, renderOverlay }: Pro
           renderItem={({ item, index }) => (
             <View style={styles.itemWrapper}>
               <Pressable onPress={() => setExpandedIndex(index)}>
-                <Image source={{ uri: item }} style={styles.image} resizeMode="cover" />
+                <Image
+                  source={{ uri: item }}
+                  style={styles.image}
+                  resizeMode="cover"
+                  onError={() => onImageError?.(item)}
+                />
               </Pressable>
               {renderOverlay?.(item, index)}
             </View>
@@ -105,6 +116,7 @@ export function ImageCarousel({ data, renderArrows = false, renderOverlay }: Pro
         index={expandedIndex}
         onClose={() => setExpandedIndex(null)}
         onIndexChange={handleExpandedIndexChange}
+        onImageError={onImageError}
       />
     </View>
   );

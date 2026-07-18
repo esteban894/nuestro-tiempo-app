@@ -25,6 +25,7 @@ interface Props {
   isFetchingNextPage?: boolean;
   refreshing?: boolean;
   onRefresh?: () => void;
+  onImageError?: (uri: string) => void;
 }
 
 export function ImageGrid({
@@ -36,6 +37,7 @@ export function ImageGrid({
   isFetchingNextPage,
   refreshing,
   onRefresh,
+  onImageError,
 }: Props) {
   const colors = useThemeColors();
   const styles = createStyles(colors);
@@ -85,7 +87,12 @@ export function ImageGrid({
         renderItem={({ item, index }) => (
           <View style={[styles.tile, { width: tileWidth }]}>
             <Pressable onPress={() => setExpandedIndex(index)}>
-              <Image source={{ uri: item }} style={styles.image} resizeMode="cover" />
+              <Image
+                source={{ uri: item }}
+                style={styles.image}
+                resizeMode="cover"
+                onError={() => onImageError?.(item)}
+              />
             </Pressable>
             {renderOverlay?.(item, index)}
           </View>
@@ -98,6 +105,7 @@ export function ImageGrid({
         onClose={() => setExpandedIndex(null)}
         onIndexChange={setExpandedIndex}
         renderOverlay={renderExpandedOverlay ?? renderOverlay}
+        onImageError={onImageError}
       />
     </View>
   );

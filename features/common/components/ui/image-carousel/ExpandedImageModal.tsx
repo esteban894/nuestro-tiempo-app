@@ -13,6 +13,7 @@ interface Props {
   onClose: () => void;
   onIndexChange: (index: number) => void;
   renderOverlay?: (item: string, index: number) => ReactNode;
+  onImageError?: (uri: string) => void;
 }
 
 export function ExpandedImageModal({
@@ -21,6 +22,7 @@ export function ExpandedImageModal({
   onClose,
   onIndexChange,
   renderOverlay,
+  onImageError,
 }: Props) {
   const [isZoomed, setIsZoomed] = useState(false);
   const isSingleImage = data.length <= 1;
@@ -47,7 +49,12 @@ export function ExpandedImageModal({
             onSnapToItem={onIndexChange}
             renderItem={({ item, index: itemIndex }) => (
               <View style={styles.itemWrapper}>
-                <ZoomableImage key={item} uri={item} onZoomChange={setIsZoomed} />
+                <ZoomableImage
+                  key={item}
+                  uri={item}
+                  onZoomChange={setIsZoomed}
+                  onError={() => onImageError?.(item)}
+                />
                 {renderOverlay?.(item, itemIndex)}
               </View>
             )}
