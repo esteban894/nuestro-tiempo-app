@@ -1,10 +1,10 @@
 import { ThemeColors } from "@/constants/colors";
 import { NoCurrentAlbumBanner, useCurrentAlbumQuery } from "@/features/albums";
-import { ImageCarousel, Title } from "@/features/common";
+import { ImageCarousel, MediaItem, Title } from "@/features/common";
 import { CounterCards } from "@/features/common/components/ui/counter-cards/CounterCards";
 import { NoCoupleBanner, useCoupleQuery } from "@/features/couple";
 import { HomeSkeleton } from "@/features/home";
-import { useAlbumImagesQuery } from "@/features/images";
+import { useCurrentAlbumImagesQuery } from "@/features/images";
 import { useThemeColors } from "@/features/theme";
 import React, { useRef, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
@@ -16,25 +16,41 @@ export default function HomeScreen() {
     isLoading: isLoadingCurrentAlbum,
     refetch: refetchCurrentAlbum,
   } = useCurrentAlbumQuery();
-  const { data: imagesData, refetch: refetchImages } = useAlbumImagesQuery(currentAlbum?.id);
+  const {
+    data: imagesData,
+    refetch: refetchImages,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useCurrentAlbumImagesQuery(currentAlbum?.id);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const hasAutoRetriedRef = useRef(false);
+  // Ids already retried once — bounds retries to one refetch per image (not one for the
+  // whole screen) so a fresh failure later on can still recover, without looping forever
+  // on an image that's genuinely broken.
+  const retriedImageIdsRef = useRef<Set<string>>(new Set());
   const colors = useThemeColors();
   const styles = createStyles(colors);
 
-  const images = imagesData?.data.map((image) => image.url) ?? [];
+  const images =
+    imagesData?.pages.flatMap((page) =>
+      page.data.map((image) => ({ id: image.id, url: image.url })),
+    ) ?? [];
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    hasAutoRetriedRef.current = false;
+    retriedImageIdsRef.current = new Set();
     await Promise.all([refetchCouple(), refetchCurrentAlbum(), refetchImages()]);
     setIsRefreshing(false);
   };
 
-  const handleImageError = () => {
-    if (hasAutoRetriedRef.current) return;
-    hasAutoRetriedRef.current = true;
+  const handleImageError = (item: MediaItem) => {
+    if (retriedImageIdsRef.current.has(item.id)) return;
+    retriedImageIdsRef.current.add(item.id);
     refetchImages();
+  };
+
+  const handleReachEnd = () => {
+    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   };
 
   if (isLoadingCouple) {
@@ -66,7 +82,11 @@ export default function HomeScreen() {
         />
       }>
       {currentAlbum || isLoadingCurrentAlbum ? (
-        <ImageCarousel data={images} onImageError={handleImageError} />
+        <ImageCarousel
+          data={images}
+          onImageError={handleImageError}
+          onReachEnd={handleReachEnd}
+        />
       ) : (
         <NoCurrentAlbumBanner />
       )}

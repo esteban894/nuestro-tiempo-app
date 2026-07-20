@@ -1,7 +1,8 @@
 import { ThemeColors } from "@/constants/colors";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image } from "expo-image";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Album } from "../../api/album.api";
 
 interface AlbumCardProps {
@@ -21,7 +22,13 @@ export const AlbumCard = ({ album, index, onPress }: AlbumCardProps) => {
       activeOpacity={0.85}
       onPress={() => onPress?.(album)}>
       {album.coverImage ? (
-        <Image source={{ uri: album.coverImage }} style={styles.image} resizeMode="cover" />
+        <Image
+          source={{ uri: album.coverImage }}
+          style={styles.image}
+          contentFit="cover"
+          cachePolicy="memory-disk"
+          recyclingKey={album.id}
+        />
       ) : (
         <View style={[styles.image, styles.placeholder]}>
           <Ionicons name="images-outline" size={40} color={colors.NEUTRAL[600]} />

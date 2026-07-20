@@ -1,3 +1,4 @@
+import { Image } from "expo-image";
 import { useState } from "react";
 import { Dimensions, StyleSheet } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -16,13 +17,17 @@ const MIN_SCALE = 1;
 const MAX_SCALE = 5;
 const DOUBLE_TAP_SCALE = 3;
 
+const AnimatedImage = Animated.createAnimatedComponent(Image);
+
 interface Props {
   uri: string;
+  /** Passed through to expo-image so the recycled view swaps its bitmap by identity, not by URL. */
+  recyclingKey?: string;
   onZoomChange?: (zoomed: boolean) => void;
   onError?: () => void;
 }
 
-export function ZoomableImage({ uri, onZoomChange, onError }: Props) {
+export function ZoomableImage({ uri, recyclingKey, onZoomChange, onError }: Props) {
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
   const translateX = useSharedValue(0);
@@ -110,10 +115,12 @@ export function ZoomableImage({ uri, onZoomChange, onError }: Props) {
 
   return (
     <GestureDetector gesture={composedGesture}>
-      <Animated.Image
+      <AnimatedImage
         source={{ uri }}
         style={[styles.image, animatedStyle]}
-        resizeMode="contain"
+        contentFit="contain"
+        cachePolicy="memory-disk"
+        recyclingKey={recyclingKey}
         onError={onError}
       />
     </GestureDetector>

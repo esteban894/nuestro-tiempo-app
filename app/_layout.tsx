@@ -1,6 +1,6 @@
 import { ThemeColors } from "@/constants/colors";
 import { useAuthStore } from "@/features/auth";
-import { AppToast, Button, queryClient } from "@/features/common";
+import { AppToast, Button, queryClient, useReactQueryAppState } from "@/features/common";
 import {
   handleNotificationReceived,
   handleNotificationResponse,
@@ -47,6 +47,7 @@ export default function RootLayout() {
   const styles = createStyles(themeColors);
 
   useOtaUpdates();
+  useReactQueryAppState();
 
   useEffect(() => {
     hydrate();

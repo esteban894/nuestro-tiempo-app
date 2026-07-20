@@ -3,17 +3,18 @@ import { ReactNode, useState } from "react";
 import { Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Carousel from "react-native-reanimated-carousel";
+import { MediaItem } from "../image-grid/ImageGrid";
 import { ZoomableImage } from "./ZoomableImage";
 
 const { width, height } = Dimensions.get("window");
 
 interface Props {
-  data: string[];
+  data: MediaItem[];
   index: number | null;
   onClose: () => void;
   onIndexChange: (index: number) => void;
-  renderOverlay?: (item: string, index: number) => ReactNode;
-  onImageError?: (uri: string) => void;
+  renderOverlay?: (item: MediaItem, index: number) => ReactNode;
+  onImageError?: (item: MediaItem) => void;
 }
 
 export function ExpandedImageModal({
@@ -50,8 +51,9 @@ export function ExpandedImageModal({
             renderItem={({ item, index: itemIndex }) => (
               <View style={styles.itemWrapper}>
                 <ZoomableImage
-                  key={item}
-                  uri={item}
+                  key={item.id}
+                  uri={item.url}
+                  recyclingKey={item.id}
                   onZoomChange={setIsZoomed}
                   onError={() => onImageError?.(item)}
                 />

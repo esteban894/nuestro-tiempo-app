@@ -1,20 +1,32 @@
 import { ThemeColors } from "@/constants/colors";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { ReactNode, useRef, useState } from "react";
-import { Dimensions, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
+import { MediaItem } from "../image-grid/ImageGrid";
 import { ExpandedImageModal } from "./ExpandedImageModal";
 import { PaginationDots } from "./PaginationDots";
 
 const { width } = Dimensions.get("window");
 
+/** How many items before the end of the currently loaded `data` to trigger `onReachEnd`. */
+const REACH_END_BUFFER = 3;
+
 interface Props {
-  data: string[];
+  data: MediaItem[];
   renderArrows?: boolean;
-  renderOverlay?: (item: string, index: number) => ReactNode;
-  onImageError?: (uri: string) => void;
+  renderOverlay?: (item: MediaItem, index: number) => ReactNode;
+  onImageError?: (item: MediaItem) => void;
+  /**
+   * Called (on manual swipe or autoplay alike, since both drive `onSnapToItem`) once the
+   * carousel is within `REACH_END_BUFFER` items of the end of `data`. Intended to fetch
+   * the next page of a paginated `data` source — safe to call repeatedly/past the actual
+   * end, the caller is expected to no-op once there's nothing left to fetch.
+   */
+  onReachEnd?: () => void;
 }
 
 export function ImageCarousel({
@@ -22,6 +34,7 @@ export function ImageCarousel({
   renderArrows = false,
   renderOverlay,
   onImageError,
+  onReachEnd,
 }: Props) {
   const ref = useRef<ICarouselInstance>(null);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -47,6 +60,10 @@ export function ImageCarousel({
     ref.current?.scrollTo({ index, animated: false });
   };
 
+  const handleSnapToItem = (index: number) => {
+    if (data.length - index <= REACH_END_BUFFER) onReachEnd?.();
+  };
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.carouselContainer}>
@@ -61,13 +78,16 @@ export function ImageCarousel({
           loop
           enabled={!isSingleImage}
           onProgressChange={progress}
+          onSnapToItem={handleSnapToItem}
           renderItem={({ item, index }) => (
             <View style={styles.itemWrapper}>
               <Pressable onPress={() => setExpandedIndex(index)}>
                 <Image
-                  source={{ uri: item }}
+                  source={{ uri: item.url }}
                   style={styles.image}
-                  resizeMode="cover"
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
+                  recyclingKey={item.id}
                   onError={() => onImageError?.(item)}
                 />
               </Pressable>

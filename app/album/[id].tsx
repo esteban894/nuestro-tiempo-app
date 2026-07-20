@@ -12,7 +12,7 @@ import {
   setCurrentAlbum,
   useDeleteAlbumMutation,
 } from "@/features/albums";
-import { ImageGrid, OverflowMenu } from "@/features/common";
+import { ImageGrid, MediaItem, OverflowMenu } from "@/features/common";
 import {
   ImageFilePart,
   useAlbumImagesInfiniteQuery,
@@ -52,7 +52,7 @@ export default function AlbumDetailScreen() {
     refetch: refetchImages,
   } = useAlbumImagesInfiniteQuery(id);
   const albumImages = imagesData?.pages.flatMap((page) => page.data) ?? [];
-  const images = albumImages.map((image) => image.url);
+  const images = albumImages.map((image) => ({ id: image.id, url: image.url }));
   const imageGridColumns = images.length > 100 ? 3 : undefined;
 
   const uploadImagesMutation = useUploadImagesMutation();
@@ -60,20 +60,23 @@ export default function AlbumDetailScreen() {
   const deleteAlbumMutation = useDeleteAlbumMutation();
   const [pickerVisible, setPickerVisible] = useState(false);
   const [uploadCount, setUploadCount] = useState<number | null>(null);
-  const hasAutoRetriedRef = useRef(false);
+  // Ids already retried once — bounds retries to one refetch per image (not one for the
+  // whole screen) so a fresh failure later on can still recover, without looping forever
+  // on an image that's genuinely broken.
+  const retriedImageIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    hasAutoRetriedRef.current = false;
+    retriedImageIdsRef.current = new Set();
   }, [id]);
 
-  const handleImageError = () => {
-    if (hasAutoRetriedRef.current) return;
-    hasAutoRetriedRef.current = true;
+  const handleImageError = (item: MediaItem) => {
+    if (retriedImageIdsRef.current.has(item.id)) return;
+    retriedImageIdsRef.current.add(item.id);
     refetchImages();
   };
 
   const handleRefreshImages = () => {
-    hasAutoRetriedRef.current = false;
+    retriedImageIdsRef.current = new Set();
     refetchImages();
   };
 

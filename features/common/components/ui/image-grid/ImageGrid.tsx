@@ -1,11 +1,11 @@
 import { ThemeColors } from "@/constants/colors";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { ReactNode, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -16,16 +16,27 @@ import { ExpandedImageModal } from "../image-carousel/ExpandedImageModal";
 
 const GAP_PERCENT = 4;
 
+/**
+ * Shape shared by every image-displaying list in the app. Identity lives in `id`
+ * (stable across refetches) rather than `url` (which, even with the API's deterministic
+ * S3 signing, is still a distinct string per resource) — this is what lets FlatList/
+ * Carousel keys and expo-image's `recyclingKey` avoid remounting on every refetch.
+ */
+export interface MediaItem {
+  id: string;
+  url: string;
+}
+
 interface Props {
-  data: string[];
+  data: MediaItem[];
   numColumns?: number;
-  renderOverlay?: (item: string, index: number) => ReactNode;
-  renderExpandedOverlay?: (item: string, index: number) => ReactNode;
+  renderOverlay?: (item: MediaItem, index: number) => ReactNode;
+  renderExpandedOverlay?: (item: MediaItem, index: number) => ReactNode;
   onEndReached?: () => void;
   isFetchingNextPage?: boolean;
   refreshing?: boolean;
   onRefresh?: () => void;
-  onImageError?: (uri: string) => void;
+  onImageError?: (item: MediaItem) => void;
 }
 
 export function ImageGrid({
@@ -63,7 +74,7 @@ export function ImageGrid({
     <View style={styles.wrapper}>
       <FlatList
         data={data}
-        keyExtractor={(item, index) => `${item}-${index}`}
+        keyExtractor={(item) => item.id}
         numColumns={numColumns}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.content}
@@ -88,9 +99,11 @@ export function ImageGrid({
           <View style={[styles.tile, { width: tileWidth }]}>
             <Pressable onPress={() => setExpandedIndex(index)}>
               <Image
-                source={{ uri: item }}
+                source={{ uri: item.url }}
                 style={styles.image}
-                resizeMode="cover"
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                recyclingKey={item.id}
                 onError={() => onImageError?.(item)}
               />
             </Pressable>
