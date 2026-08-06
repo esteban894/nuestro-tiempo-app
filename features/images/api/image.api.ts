@@ -6,6 +6,13 @@ import {
   uploadToPresignedUrl,
 } from "@/features/common/api/httpClient";
 
+export interface Favoriter {
+  userId: string;
+  name: string;
+}
+
+export type FavoritedByFilter = "me" | "partner" | "both";
+
 export interface AlbumImage {
   id: string;
   filename: string;
@@ -13,6 +20,8 @@ export interface AlbumImage {
   size: number;
   albumId: string;
   createdAt: string;
+  favoritedBy: Favoriter[];
+  favoritedByMe: boolean;
 }
 
 export interface PaginatedResponse<T> {
@@ -24,7 +33,11 @@ export interface PaginatedResponse<T> {
   count: number;
 }
 
-export type ListImagesParams = { page?: number; pageSize?: number };
+export type ListImagesParams = {
+  page?: number;
+  pageSize?: number;
+  favoritedBy?: FavoritedByFilter;
+};
 
 /** React Native multipart file part shape (not a real Blob/File). */
 export type ImageFilePart = LocalFilePart;
@@ -43,15 +56,42 @@ export interface PresignedUpload {
 
 export async function listImagesByAlbum(
   albumId: string,
-  { page = 1, pageSize = 50 }: ListImagesParams = {},
+  { page = 1, pageSize = 50, favoritedBy }: ListImagesParams = {},
 ) {
+  const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+  if (favoritedBy) query.set("favoritedBy", favoritedBy);
+
   const response = await apiFetch<PaginatedResponse<AlbumImage>>(
-    `/images/album/${albumId}?page=${page}&pageSize=${pageSize}`,
+    `/images/album/${albumId}?${query.toString()}`,
   );
   return {
     ...response,
     data: response.data.map((image) => ({ ...image, url: resolveMediaUrl(image.url) })),
   };
+}
+
+/** Cross-album favorites (GET /images?favoritedBy=...), used by the global Favoritos screen. */
+export async function listFavoriteImages({
+  favoritedBy,
+  page = 1,
+  pageSize = 50,
+}: ListImagesParams = {}) {
+  const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+  if (favoritedBy) query.set("favoritedBy", favoritedBy);
+
+  const response = await apiFetch<PaginatedResponse<AlbumImage>>(`/images?${query.toString()}`);
+  return {
+    ...response,
+    data: response.data.map((image) => ({ ...image, url: resolveMediaUrl(image.url) })),
+  };
+}
+
+export async function setImageFavorite(id: string, favorite: boolean) {
+  const response = await apiFetch<AlbumImage>(`/images/${id}/favorite`, {
+    method: "PATCH",
+    body: { favorite },
+  });
+  return { ...response, url: resolveMediaUrl(response.url) };
 }
 
 export async function createImage(albumId: string, file: ImageFilePart) {

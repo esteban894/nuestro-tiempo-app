@@ -3,4 +3,7 @@ export * from "./api/queryKeys";
 export * from "./hooks/useAlbumImagesInfiniteQuery";
 export * from "./hooks/useCurrentAlbumImagesQuery";
 export * from "./hooks/useDeleteImageMutation";
+export * from "./hooks/useDownloadImageMutation";
+export * from "./hooks/useFavoriteImagesInfiniteQuery";
+export * from "./hooks/useSetImageFavoriteMutation";
 export * from "./hooks/useUploadImagesMutation";

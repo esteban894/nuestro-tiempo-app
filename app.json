@@ -65,7 +65,14 @@
           "color": "#F06292"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Permitir que Nuestro Tiempo acceda a tus fotos.",
+          "savePhotosPermission": "Permitir que Nuestro Tiempo guarde fotos en tu galería."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

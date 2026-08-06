@@ -12,19 +12,51 @@ import {
   setCurrentAlbum,
   useDeleteAlbumMutation,
 } from "@/features/albums";
-import { ImageGrid, MediaItem, OverflowMenu } from "@/features/common";
+import { useAuthStore } from "@/features/auth";
 import {
+  ExpandedFavoriteOverlay,
+  FavoriteCluster,
+  FavoriterBubble,
+  ImageGrid,
+  MediaItem,
+  OverflowMenu,
+  SegmentedControl,
+} from "@/features/common";
+import { useCoupleQuery } from "@/features/couple";
+import {
+  AlbumImage,
   ImageFilePart,
+  MediaLibraryPermissionError,
   useAlbumImagesInfiniteQuery,
   useDeleteImageMutation,
+  useDownloadImageMutation,
+  useSetImageFavoriteMutation,
   useUploadImagesMutation,
 } from "@/features/images";
 import { useThemeColors } from "@/features/theme";
+import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
+
+type FavoriteFilter = "all" | "me" | "partner" | "both";
+
+/** Client-side filter over already-loaded pages (see useSetImageFavoriteMutation notes). */
+function filterByFavorite(
+  images: AlbumImage[],
+  filter: FavoriteFilter,
+  partnerId: string | undefined,
+): AlbumImage[] {
+  if (filter === "all") return images;
+  const favoritedByPartner = (image: AlbumImage) =>
+    !!partnerId && image.favoritedBy.some((f) => f.userId === partnerId);
+
+  if (filter === "me") return images.filter((image) => image.favoritedByMe);
+  if (filter === "partner") return images.filter(favoritedByPartner);
+  return images.filter((image) => image.favoritedByMe && favoritedByPartner(image)); // "both"
+}
 
 export default function AlbumDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -52,11 +84,31 @@ export default function AlbumDetailScreen() {
     refetch: refetchImages,
   } = useAlbumImagesInfiniteQuery(id);
   const albumImages = imagesData?.pages.flatMap((page) => page.data) ?? [];
-  const images = albumImages.map((image) => ({ id: image.id, url: image.url }));
+
+  const currentUser = useAuthStore((state) => state.user);
+  const { data: couple } = useCoupleQuery();
+  const partner =
+    couple && currentUser
+      ? couple.user1.id === currentUser.id
+        ? couple.user2
+        : couple.user1
+      : null;
+
+  const [favoriteFilter, setFavoriteFilter] = useState<FavoriteFilter>("all");
+  const filteredAlbumImages = filterByFavorite(albumImages, favoriteFilter, partner?.id);
+  const images = filteredAlbumImages.map((image) => ({ id: image.id, url: image.url }));
   const imageGridColumns = images.length > 100 ? 3 : undefined;
+
+  const getFavoriters = (image: AlbumImage): FavoriterBubble[] =>
+    image.favoritedBy.map((favoriter) => ({
+      name: favoriter.name,
+      tone: favoriter.userId === currentUser?.id ? "me" : "partner",
+    }));
 
   const uploadImagesMutation = useUploadImagesMutation();
   const deleteImageMutation = useDeleteImageMutation();
+  const downloadImageMutation = useDownloadImageMutation();
+  const setFavoriteMutation = useSetImageFavoriteMutation();
   const deleteAlbumMutation = useDeleteAlbumMutation();
   const [pickerVisible, setPickerVisible] = useState(false);
   const [uploadCount, setUploadCount] = useState<number | null>(null);
@@ -109,9 +161,38 @@ export default function AlbumDetailScreen() {
   };
 
   const handleDeleteImage = (index: number) => {
-    const image = albumImages[index];
+    const image = filteredAlbumImages[index];
     if (!image) return;
     deleteImageMutation.mutate({ id: image.id, albumId: id });
+  };
+
+  const handleToggleFavorite = (index: number) => {
+    const image = filteredAlbumImages[index];
+    if (!image) return;
+    setFavoriteMutation.mutate({ id: image.id, favorite: !image.favoritedByMe, albumId: id });
+  };
+
+  const handleDownloadImage = (index: number) => {
+    const image = filteredAlbumImages[index];
+    if (!image) return;
+    downloadImageMutation.mutate(
+      { url: image.url, filename: image.filename },
+      {
+        onSuccess: () => {
+          Toast.show({ type: "success", text1: "Imagen guardada en tu galería" });
+        },
+        onError: (error) => {
+          Toast.show({
+            type: "error",
+            text1: "No se pudo descargar la imagen",
+            text2:
+              error instanceof MediaLibraryPermissionError
+                ? "Activa el acceso a tus fotos en los ajustes del dispositivo."
+                : undefined,
+          });
+        },
+      },
+    );
   };
 
   const buildImageFilePart = (uri: string): ImageFilePart => {
@@ -176,6 +257,24 @@ export default function AlbumDetailScreen() {
         }}
       />
       <AlbumHeader title={album.name ?? ""} isPrivate={album.isPrivate} />
+      {partner && (
+        <View style={styles.favoriteFilterSection}>
+          <View style={styles.favoriteFilterLabel}>
+            <Ionicons name="heart" size={12} color={colors.NEUTRAL[800]} />
+            <Text style={styles.favoriteFilterLabelText}>Favoritas</Text>
+          </View>
+          <SegmentedControl
+            value={favoriteFilter}
+            onChange={(value) => setFavoriteFilter(value as FavoriteFilter)}
+            options={[
+              { label: "Todas", value: "all" },
+              { label: "Mías", value: "me" },
+              { label: `De ${partner.name.split(" ")[0]}`, value: "partner" },
+              { label: "Nuestras", value: "both" },
+            ]}
+          />
+        </View>
+      )}
       <ImageGrid
         data={images}
         numColumns={imageGridColumns}
@@ -186,36 +285,70 @@ export default function AlbumDetailScreen() {
         refreshing={isRefetchingImages}
         onRefresh={handleRefreshImages}
         onImageError={handleImageError}
-        renderOverlay={(_, index) => (
-          <OverflowMenu
-            triggerIcon="ellipsis-vertical"
-            triggerColor="#fff"
-            triggerStyle={styles.imageMenuTrigger}
-            options={[
-              {
-                label: "Eliminar",
-                icon: "trash-outline",
-                destructive: true,
-                onPress: () => handleDeleteImage(index),
-              },
-            ]}
-          />
-        )}
-        renderExpandedOverlay={(_, index) => (
-          <OverflowMenu
-            triggerIcon="ellipsis-vertical"
-            triggerColor="#fff"
-            triggerStyle={styles.expandedImageMenuTrigger}
-            options={[
-              {
-                label: "Eliminar",
-                icon: "trash-outline",
-                destructive: true,
-                onPress: () => handleDeleteImage(index),
-              },
-            ]}
-          />
-        )}
+        renderOverlay={(_, index) => {
+          const image = filteredAlbumImages[index];
+          if (!image) return null;
+          return (
+            <>
+              <FavoriteCluster
+                favoritedByMe={image.favoritedByMe}
+                favoriters={getFavoriters(image)}
+                onToggle={() => handleToggleFavorite(index)}
+                style={styles.favoriteCluster}
+              />
+              <OverflowMenu
+                triggerIcon="ellipsis-vertical"
+                triggerColor="#fff"
+                triggerStyle={styles.imageMenuTrigger}
+                options={[
+                  {
+                    label: "Descargar",
+                    icon: "download-outline",
+                    onPress: () => handleDownloadImage(index),
+                  },
+                  {
+                    label: "Eliminar",
+                    icon: "trash-outline",
+                    destructive: true,
+                    onPress: () => handleDeleteImage(index),
+                  },
+                ]}
+              />
+            </>
+          );
+        }}
+        renderExpandedOverlay={(_, index) => {
+          const image = filteredAlbumImages[index];
+          if (!image) return null;
+          return (
+            <>
+              <ExpandedFavoriteOverlay
+                favoritedByMe={image.favoritedByMe}
+                favoriters={getFavoriters(image)}
+                onToggle={() => handleToggleFavorite(index)}
+                style={styles.expandedFavoriteCluster}
+              />
+              <OverflowMenu
+                triggerIcon="ellipsis-vertical"
+                triggerColor="#fff"
+                triggerStyle={styles.expandedImageMenuTrigger}
+                options={[
+                  {
+                    label: "Descargar",
+                    icon: "download-outline",
+                    onPress: () => handleDownloadImage(index),
+                  },
+                  {
+                    label: "Eliminar",
+                    icon: "trash-outline",
+                    destructive: true,
+                    onPress: () => handleDeleteImage(index),
+                  },
+                ]}
+              />
+            </>
+          );
+        }}
       />
       <AlbumUploadStatus visible={uploadImagesMutation.isPending} count={uploadCount ?? 0} />
       <AlbumFab
@@ -240,6 +373,33 @@ const createStyles = (colors: ThemeColors) =>
     screen: { flex: 1, position: "relative", backgroundColor: colors.NEUTRAL[200] },
     notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
     notFoundText: { fontSize: 16, color: colors.NEUTRAL[800] },
+    favoriteFilterSection: {
+      marginHorizontal: 20,
+      marginBottom: 12,
+      gap: 6,
+    },
+    favoriteFilterLabel: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    favoriteFilterLabelText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.NEUTRAL[800],
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+    },
+    favoriteCluster: {
+      position: "absolute",
+      top: 10,
+      left: 10,
+    },
+    expandedFavoriteCluster: {
+      position: "absolute",
+      top: 50,
+      right: 20,
+    },
     imageMenuTrigger: {
       position: "absolute",
       top: 10,

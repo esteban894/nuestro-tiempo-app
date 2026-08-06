@@ -2,12 +2,13 @@ import { ThemeColors } from "@/constants/colors";
 import { useCoupleQuery } from "@/features/couple";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
-import { StyleSheet } from "react-native";
+import { Tabs, useRouter } from "expo-router";
+import { Pressable, StyleSheet } from "react-native";
 
 export default function TabLayout() {
   // Prime the Couple query as soon as the tabs mount; the cache is shared with every screen.
   useCoupleQuery();
+  const router = useRouter();
   const colors = useThemeColors();
   const styles = createStyles(colors);
 
@@ -24,7 +25,15 @@ export default function TabLayout() {
         headerStyle: styles.header,
         headerTitle: "Nuestro Tiempo",
         headerTitleStyle: styles.headerTitle,
-        headerRight: () => <Ionicons name="heart" size={24} color={colors.PRIMARY[800]} />,
+        headerRight: () => (
+          <Pressable
+            onPress={() => router.push("/favorites")}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel="Ver favoritos">
+            <Ionicons name="heart" size={24} color={colors.PRIMARY[800]} />
+          </Pressable>
+        ),
         headerRightContainerStyle: styles.headerRightContainer,
       }}>
       <Tabs.Screen

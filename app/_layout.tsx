@@ -134,6 +134,15 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
+              name="favorites"
+              options={{
+                headerBackTitle: "Inicio",
+                headerTintColor: themeColors.PRIMARY[800],
+                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
+                headerShadowVisible: false,
+              }}
+            />
+            <Stack.Screen
               name="album/[id]"
               options={{
                 headerBackTitle: "Álbumes",
