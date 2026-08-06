@@ -152,12 +152,13 @@ export default function FavoritesScreen() {
             const image = favoriteImages[index];
             if (!image) return null;
             return (
-              <ExpandedFavoriteOverlay
-                favoritedByMe={image.favoritedByMe}
-                favoriters={getFavoriters(image)}
-                onToggle={() => handleToggleFavorite(index)}
-                style={styles.expandedFavoriteCluster}
-              />
+              <View style={styles.expandedFavoriteBar}>
+                <ExpandedFavoriteOverlay
+                  favoritedByMe={image.favoritedByMe}
+                  favoriters={getFavoriters(image)}
+                  onToggle={() => handleToggleFavorite(index)}
+                />
+              </View>
             );
           }}
         />
@@ -187,5 +188,13 @@ const createStyles = (colors: ThemeColors) =>
     emptyTitle: { marginTop: 12, marginBottom: 8, color: colors.PRIMARY[800] },
     emptyDescription: { fontSize: 14, color: colors.NEUTRAL[800], textAlign: "center" },
     favoriteCluster: { position: "absolute", top: 10, left: 10 },
-    expandedFavoriteCluster: { position: "absolute", top: 50, right: 20 },
+    expandedFavoriteBar: {
+      position: "absolute",
+      bottom: 50,
+      left: 0,
+      right: 0,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+    },
   });
