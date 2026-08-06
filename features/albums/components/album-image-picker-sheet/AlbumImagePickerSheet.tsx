@@ -61,7 +61,10 @@ export const AlbumImagePickerSheet = ({
           <Text style={styles.optionLabel}>Tomar foto</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.option} activeOpacity={0.7} onPress={handleChooseFromLibrary}>
+        <TouchableOpacity
+          style={styles.option}
+          activeOpacity={0.7}
+          onPress={handleChooseFromLibrary}>
           <View style={styles.iconWrapper}>
             <Ionicons name="images-outline" size={22} color={colors.PRIMARY[500]} />
           </View>

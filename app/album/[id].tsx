@@ -38,7 +38,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
 type FavoriteFilter = "all" | "me" | "partner" | "both";
@@ -321,32 +321,27 @@ export default function AlbumDetailScreen() {
           const image = filteredAlbumImages[index];
           if (!image) return null;
           return (
-            <>
+            <View style={styles.expandedActionBar}>
+              <Pressable
+                style={styles.expandedActionButton}
+                onPress={() => handleDownloadImage(index)}
+                accessibilityRole="button"
+                accessibilityLabel="Descargar imagen">
+                <Ionicons name="download-outline" size={22} color="#fff" />
+              </Pressable>
+              <Pressable
+                style={styles.expandedActionButton}
+                onPress={() => handleDeleteImage(index)}
+                accessibilityRole="button"
+                accessibilityLabel="Eliminar imagen">
+                <Ionicons name="trash-outline" size={22} color={colors.ERROR[500]} />
+              </Pressable>
               <ExpandedFavoriteOverlay
                 favoritedByMe={image.favoritedByMe}
                 favoriters={getFavoriters(image)}
                 onToggle={() => handleToggleFavorite(index)}
-                style={styles.expandedFavoriteCluster}
               />
-              <OverflowMenu
-                triggerIcon="ellipsis-vertical"
-                triggerColor="#fff"
-                triggerStyle={styles.expandedImageMenuTrigger}
-                options={[
-                  {
-                    label: "Descargar",
-                    icon: "download-outline",
-                    onPress: () => handleDownloadImage(index),
-                  },
-                  {
-                    label: "Eliminar",
-                    icon: "trash-outline",
-                    destructive: true,
-                    onPress: () => handleDeleteImage(index),
-                  },
-                ]}
-              />
-            </>
+            </View>
           );
         }}
       />
@@ -395,11 +390,6 @@ const createStyles = (colors: ThemeColors) =>
       top: 10,
       left: 10,
     },
-    expandedFavoriteCluster: {
-      position: "absolute",
-      top: 50,
-      right: 20,
-    },
     imageMenuTrigger: {
       position: "absolute",
       top: 10,
@@ -409,13 +399,22 @@ const createStyles = (colors: ThemeColors) =>
       borderRadius: 16,
       backgroundColor: "rgba(0,0,0,0.45)",
     },
-    expandedImageMenuTrigger: {
+    expandedActionBar: {
       position: "absolute",
-      top: 50,
-      left: 20,
+      bottom: 50,
+      left: 0,
+      right: 0,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-around",
+      paddingHorizontal: 40,
+    },
+    expandedActionButton: {
       width: 44,
       height: 44,
       borderRadius: 22,
+      alignItems: "center",
+      justifyContent: "center",
       backgroundColor: "rgba(0,0,0,0.45)",
     },
     fab: {
