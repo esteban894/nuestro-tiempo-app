@@ -5,7 +5,6 @@ import { StyleSheet, View } from "react-native";
 
 const TILE_COUNT = 6;
 
-/** Placeholder que replica el layout del álbum mientras se cargan sus datos. */
 export const AlbumDetailSkeleton = () => {
   const colors = useThemeColors();
   const styles = createStyles(colors);

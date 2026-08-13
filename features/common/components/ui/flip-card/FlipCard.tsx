@@ -8,36 +8,15 @@ import Animated, {
 } from "react-native-reanimated";
 
 interface FlipCardProps {
-  /** Cuando es `true` muestra la cara `back`, si no la cara `front`. */
   isFlipped: boolean;
-  /** Cara frontal de la tarjeta. */
   front: ReactNode;
-  /** Cara trasera de la tarjeta. */
   back: ReactNode;
-  /** Estilos del contenedor. Usar para fijar una altura (`minHeight`). */
   style?: StyleProp<ViewStyle>;
-  /** Duración de la animación de giro en ms. */
   duration?: number;
 }
 
-/**
- * Tarjeta con animación de giro 3D (flip) entre dos caras.
- *
- * Ambas caras se apilan de forma absoluta, por lo que el contenedor debe
- * tener una altura definida (`minHeight`) mediante la prop `style`.
- *
- * @example
- * <FlipCard
- *   isFlipped={mode === "join"}
- *   front={<CreateCard />}
- *   back={<JoinCard />}
- *   style={{ minHeight: 420 }}
- * />
- */
 export const FlipCard = ({ isFlipped, front, back, style, duration = 500 }: FlipCardProps) => {
-  const rotation = useDerivedValue(() =>
-    withTiming(isFlipped ? 180 : 0, { duration })
-  );
+  const rotation = useDerivedValue(() => withTiming(isFlipped ? 180 : 0, { duration }));
 
   const frontStyle = useAnimatedStyle(() => ({
     transform: [{ perspective: 1000 }, { rotateY: `${rotation.value}deg` }],

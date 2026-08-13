@@ -31,7 +31,6 @@ export const CounterCards = ({ initDate }: Props) => {
     return () => clearInterval(interval);
   }, [initialDate]);
 
-  // Trim leading zero units: años se ocultan en 0, y meses también si aún no hay años ni meses.
   const showYears = elapsed.years > 0;
   const showMonths = showYears || elapsed.months > 0;
   const bigUnits = [

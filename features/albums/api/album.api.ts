@@ -13,7 +13,6 @@ export interface Album {
   isPrivate: boolean;
   coverImage?: string | null;
   createdAt: string;
-  /** Present on GET /albums/:id, absent on create/update responses. */
   updatedAt?: string;
 }
 
@@ -81,12 +80,9 @@ async function requestCoverUploadUrl(filename: string, mimetype: string) {
   });
 }
 
-/**
- * Uploads an album cover directly to S3, preferring the presigned flow. Falls back to
- * returning the raw file part (for the caller to attach as a multipart `coverImage`
- * field) only when the API responds 501 — i.e. it's running in local-disk storage mode.
- */
-export async function prepareCoverImageUpload(file: LocalFilePart): Promise<CoverImageUploadResult> {
+export async function prepareCoverImageUpload(
+  file: LocalFilePart,
+): Promise<CoverImageUploadResult> {
   try {
     const presigned = await requestCoverUploadUrl(file.name, file.type);
     await uploadToPresignedUrl(presigned.uploadUrl, presigned.fields, file);

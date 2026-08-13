@@ -9,11 +9,6 @@ export type ElapsedTime = {
 
 const ZERO: ElapsedTime = { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
 
-/**
- * Calendar-accurate elapsed time between two dates. Subtracts each date field and borrows
- * from the next larger unit when negative, using the real length of the preceding month —
- * so it respects variable month lengths and leap years (unlike a fixed 30-day / 365-day split).
- */
 export function getElapsedTime(from: Date, to: Date): ElapsedTime {
   if (to.getTime() <= from.getTime()) return ZERO;
 

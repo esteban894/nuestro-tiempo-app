@@ -21,7 +21,6 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 interface Props {
   uri: string;
-  /** Passed through to expo-image so the recycled view swaps its bitmap by identity, not by URL. */
   recyclingKey?: string;
   onZoomChange?: (zoomed: boolean) => void;
   onError?: () => void;
@@ -42,7 +41,7 @@ export function ZoomableImage({ uri, recyclingKey, onZoomChange, onError }: Prop
       if (zoomed === previouslyZoomed) return;
       runOnJS(setIsZoomed)(zoomed);
       if (onZoomChange) runOnJS(onZoomChange)(zoomed);
-    }
+    },
   );
 
   const resetZoom = () => {
@@ -76,12 +75,12 @@ export function ZoomableImage({ uri, recyclingKey, onZoomChange, onError }: Prop
       translateX.value = clamp(
         savedTranslateX.value + event.translationX,
         -maxTranslateX,
-        maxTranslateX
+        maxTranslateX,
       );
       translateY.value = clamp(
         savedTranslateY.value + event.translationY,
         -maxTranslateY,
-        maxTranslateY
+        maxTranslateY,
       );
     })
     .onEnd(() => {
@@ -102,7 +101,7 @@ export function ZoomableImage({ uri, recyclingKey, onZoomChange, onError }: Prop
 
   const composedGesture = Gesture.Race(
     doubleTapGesture,
-    Gesture.Simultaneous(pinchGesture, panGesture)
+    Gesture.Simultaneous(pinchGesture, panGesture),
   );
 
   const animatedStyle = useAnimatedStyle(() => ({

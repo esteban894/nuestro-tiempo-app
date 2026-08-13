@@ -3,7 +3,6 @@ export type ThemeColors = {
   SECONDARY: { 200: string; 500: string; 800: string };
   NEUTRAL: { 200: string; 500: string; 600: string; 800: string };
   ERROR: { 500: string };
-  /** Sombra temeada: marrón cálido en light, negro en dark (una sombra clara brillaría mal sobre fondo oscuro). */
   SHADOW: string;
 };
 

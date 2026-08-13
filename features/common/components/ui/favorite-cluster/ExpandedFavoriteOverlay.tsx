@@ -18,13 +18,6 @@ interface Props {
 
 const BLOOM_SIZE = 120;
 
-/**
- * The expanded photo's favorite control: the heart-plus-bubbles cluster, plus a one-shot
- * gold heart "bloom" that scales up and fades over the photo when *marking* it as a
- * favorite (not when un-favoriting — that shouldn't feel like a celebration). Lives
- * entirely inside the overlay slot `ExpandedImageModal` already renders per photo, so no
- * changes are needed to the carousel/zoom machinery itself.
- */
 export function ExpandedFavoriteOverlay({ favoritedByMe, favoriters, onToggle, style }: Props) {
   const colors = useThemeColors();
   const reducedMotion = useReducedMotion();

@@ -28,7 +28,6 @@ export const registerSchema = z
 export type LoginErrors = { email?: string; password?: string };
 export type RegisterErrors = LoginErrors & { name?: string; confirmPassword?: string };
 
-/** Collapses a ZodError into the first message per top-level field, matching the forms' error shape. */
 function fieldErrors<T extends Record<string, string | undefined>>(error: z.ZodError): T {
   const result = {} as Record<string, string>;
   for (const issue of error.issues) {
@@ -40,13 +39,11 @@ function fieldErrors<T extends Record<string, string | undefined>>(error: z.ZodE
   return result as T;
 }
 
-/** Validación client-side de login (vacíos + formato de email); el servidor sigue siendo la fuente de verdad. */
 export function validateLoginForm(values: { email: string; password: string }): LoginErrors {
   const result = loginSchema.safeParse(values);
   return result.success ? {} : fieldErrors<LoginErrors>(result.error);
 }
 
-/** Validación client-side de registro (vacíos, formato de email y coincidencia de contraseñas). */
 export function validateRegisterForm(values: {
   name: string;
   email: string;

@@ -6,7 +6,6 @@ if (!API_URL) {
   );
 }
 
-/** Configuración de entorno validada al cargar el módulo (falla temprano si falta algo). */
 export const env = {
   API_URL,
 } as const;

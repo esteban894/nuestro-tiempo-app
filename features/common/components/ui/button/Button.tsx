@@ -16,56 +16,16 @@ type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
 type ButtonSize = "small" | "medium" | "large";
 
 interface ButtonProps extends TouchableOpacityProps {
-  /** Texto del botón (alternativa a children) */
   title?: string;
-  /** Variante visual del botón */
   variant?: ButtonVariant;
-  /** Tamaño del botón */
   size?: ButtonSize;
-  /** Ícono a la izquierda del texto */
   leftIcon?: IoniconsName;
-  /** Ícono a la derecha del texto */
   rightIcon?: IoniconsName;
-  /** Tamaño de los íconos */
   iconSize?: number;
-  /** Estado de carga (muestra spinner) */
   isLoading?: boolean;
-  /** Ancho completo */
   fullWidth?: boolean;
 }
 
-/**
- * Componente de botón reutilizable con soporte para variantes, tamaños, íconos y estados.
- *
- * @example
- * // Botón básico
- * <Button title="Aceptar" onPress={handlePress} />
- *
- * @example
- * // Botón con variante y tamaño
- * <Button
- *   title="Eliminar"
- *   variant="danger"
- *   size="large"
- *   onPress={handleDelete}
- * />
- *
- * @example
- * // Botón con íconos
- * <Button
- *   title="Guardar"
- *   leftIcon="save-outline"
- *   variant="primary"
- * />
- *
- * @example
- * // Botón en estado de carga
- * <Button
- *   title="Enviando..."
- *   isLoading
- *   disabled
- * />
- */
 export const Button = ({
   title,
   children,
@@ -150,7 +110,6 @@ const createStyles = (colors: ThemeColors) =>
       borderWidth: 0,
     },
 
-    // Variantes
     primary: {
       backgroundColor: colors.PRIMARY[500],
     },
@@ -169,7 +128,6 @@ const createStyles = (colors: ThemeColors) =>
       backgroundColor: "#f44336",
     },
 
-    // Tamaños
     size_small: {
       paddingHorizontal: 16,
       paddingVertical: 8,
@@ -186,7 +144,6 @@ const createStyles = (colors: ThemeColors) =>
       minHeight: 56,
     },
 
-    // Estados
     disabled: {
       opacity: 0.5,
     },
@@ -194,7 +151,6 @@ const createStyles = (colors: ThemeColors) =>
       width: "100%",
     },
 
-    // Contenido
     content: {
       flexDirection: "row",
       alignItems: "center",
@@ -207,7 +163,6 @@ const createStyles = (colors: ThemeColors) =>
       marginLeft: 8,
     },
 
-    // Textos
     text: {
       fontWeight: "600",
       textAlign: "center",

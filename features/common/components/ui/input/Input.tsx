@@ -19,37 +19,6 @@ interface InputProps extends TextInputProps {
   ref?: React.Ref<TextInput>;
 }
 
-/**
- * Componente de Input reutilizable con soporte para label, iconos, contraseñas y validación.
- *
- * @example
- * // Input básico
- * <Input placeholder="Ingresa tu nombre" />
- *
- * @example
- * // Input con label e ícono
- * <Input
- *   label="Email"
- *   placeholder="ejemplo@mail.com"
- *   leftIcon="mail-outline"
- * />
- *
- * @example
- * // Input de contraseña con toggle
- * <Input
- *   label="Contraseña"
- *   isPassword
- *   leftIcon="lock-closed-outline"
- * />
- *
- * @example
- * // Input con error
- * <Input
- *   label="Email"
- *   error="Email inválido"
- *   leftIcon="mail-outline"
- * />
- */
 export const Input = ({
   label,
   error,
@@ -84,10 +53,8 @@ export const Input = ({
 
   return (
     <View style={styles.container}>
-      {/* Label */}
       {label && <Text style={[styles.label, { color: currentColor }]}>{label}</Text>}
 
-      {/* Input Container */}
       <View
         style={[
           styles.inputContainer,
@@ -95,7 +62,6 @@ export const Input = ({
           isFocused && styles.inputContainerFocused,
           error && styles.inputContainerError,
         ]}>
-        {/* Left Icon */}
         {leftIcon && (
           <Ionicons
             name={leftIcon}
@@ -105,7 +71,6 @@ export const Input = ({
           />
         )}
 
-        {/* TextInput */}
         <TextInput
           style={[styles.input, style]}
           placeholderTextColor={colors.NEUTRAL[600]}
@@ -115,7 +80,6 @@ export const Input = ({
           {...rest}
         />
 
-        {/* Password Toggle */}
         {isPassword && (
           <TouchableOpacity
             onPress={togglePasswordVisibility}
@@ -130,7 +94,6 @@ export const Input = ({
         )}
       </View>
 
-      {/* Error Message */}
       {error && <Text style={[styles.errorText, { color: resolvedErrorColor }]}>{error}</Text>}
     </View>
   );

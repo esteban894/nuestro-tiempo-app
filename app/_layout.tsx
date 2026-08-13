@@ -184,12 +184,6 @@ const createStyles = (colors: ThemeColors) =>
     view: { backgroundColor: colors.NEUTRAL[200], flex: 1 },
   });
 
-/**
- * Root error boundary (Expo Router picks up the named `ErrorBoundary` export). Catches render
- * errors anywhere in the tree so the app shows a themed fallback with a retry instead of a
- * blank screen. It renders outside the app providers, so it must only depend on the Zustand
- * theme store (via `useThemeColors`), never on React Query.
- */
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   const colors = useThemeColors();
   const styles = createBoundaryStyles(colors);

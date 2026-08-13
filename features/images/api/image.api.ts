@@ -39,7 +39,6 @@ export type ListImagesParams = {
   favoritedBy?: FavoritedByFilter;
 };
 
-/** React Native multipart file part shape (not a real Blob/File). */
 export type ImageFilePart = LocalFilePart;
 
 export interface CreatedImage {
@@ -70,7 +69,6 @@ export async function listImagesByAlbum(
   };
 }
 
-/** Cross-album favorites (GET /images?favoritedBy=...), used by the global Favoritos screen. */
 export async function listFavoriteImages({
   favoritedBy,
   page = 1,
@@ -112,7 +110,10 @@ export async function createImagesBatch(albumId: string, files: ImageFilePart[])
   // files under any field name (AnyFilesInterceptor), so this is safe server-side.
   files.forEach((file, index) => formData.append(`files_${index}`, file as unknown as Blob));
 
-  const response = await apiFetch<CreatedImage[]>("/images/batch", { method: "POST", body: formData });
+  const response = await apiFetch<CreatedImage[]>("/images/batch", {
+    method: "POST",
+    body: formData,
+  });
   return response.map((image) => ({ ...image, url: resolveMediaUrl(image.url) }));
 }
 
@@ -138,12 +139,6 @@ async function confirmImageUploads(albumId: string, keys: string[]) {
   return response.map((image) => ({ ...image, url: resolveMediaUrl(image.url) }));
 }
 
-/**
- * Uploads photos to an album, preferring the direct-to-S3 presigned flow.
- * Falls back to the multipart endpoints only when the API responds 501 (i.e. it's
- * running in local-disk storage mode, where presigned uploads aren't supported) —
- * any other failure propagates instead of silently retrying via the fallback.
- */
 export async function uploadImages(albumId: string, files: ImageFilePart[]) {
   let uploads: PresignedUpload[];
   try {
@@ -161,7 +156,11 @@ export async function uploadImages(albumId: string, files: ImageFilePart[]) {
     throw error;
   }
 
-  await Promise.all(uploads.map((upload, index) => uploadToPresignedUrl(upload.uploadUrl, upload.fields, files[index])));
+  await Promise.all(
+    uploads.map((upload, index) =>
+      uploadToPresignedUrl(upload.uploadUrl, upload.fields, files[index]),
+    ),
+  );
 
   return confirmImageUploads(
     albumId,

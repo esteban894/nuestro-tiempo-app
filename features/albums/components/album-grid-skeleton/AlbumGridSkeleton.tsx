@@ -3,7 +3,6 @@ import { StyleSheet, View } from "react-native";
 
 const CARD_COUNT = 6;
 
-/** Placeholder con forma de grilla de álbumes mientras se cargan los datos. */
 export const AlbumGridSkeleton = () => {
   return (
     <View style={styles.grid}>

@@ -39,7 +39,6 @@ const EMPTY_STATE_COPY: Record<FavoritedByFilter, { title: string; description: 
   },
 };
 
-/** Cross-album keepsake view: every photo either partner has hearted, filterable by who. */
 export default function FavoritesScreen() {
   const colors = useThemeColors();
   const styles = createStyles(colors);

@@ -4,7 +4,6 @@ import { Dimensions, StyleSheet, View } from "react-native";
 const { width } = Dimensions.get("window");
 const CAROUSEL_WIDTH = width - 40;
 
-/** Placeholder del dashboard de inicio (carrusel, iniciales y contadores) mientras carga la pareja. */
 export const HomeSkeleton = () => {
   return (
     <View style={styles.container}>

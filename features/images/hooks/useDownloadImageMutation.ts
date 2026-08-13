@@ -9,7 +9,6 @@ export class MediaLibraryPermissionError extends Error {
   }
 }
 
-/** Downloads a remote image to a temp file and saves it to the device's photo library. */
 export function useDownloadImageMutation() {
   return useMutation({
     mutationFn: async ({ url, filename }: { url: string; filename: string }) => {

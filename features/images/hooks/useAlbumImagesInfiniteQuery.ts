@@ -4,7 +4,6 @@ import { imageKeys } from "../api/queryKeys";
 
 const PAGE_SIZE = 24;
 
-/** Paginated images for a given album (GET /images/album/:albumId), loaded page by page. */
 export function useAlbumImagesInfiniteQuery(albumId: string | undefined) {
   return useInfiniteQuery({
     queryKey: imageKeys.byAlbumInfinite(albumId ?? ""),

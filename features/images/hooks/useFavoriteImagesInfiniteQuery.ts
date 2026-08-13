@@ -4,7 +4,6 @@ import { imageKeys } from "../api/queryKeys";
 
 const PAGE_SIZE = 24;
 
-/** Cross-album favorites for the global Favoritos screen (GET /images?favoritedBy=...). */
 export function useFavoriteImagesInfiniteQuery(favoritedBy: FavoritedByFilter) {
   return useInfiniteQuery({
     queryKey: imageKeys.favorites(favoritedBy),

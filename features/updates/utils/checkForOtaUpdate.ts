@@ -1,13 +1,5 @@
 import * as Updates from "expo-updates";
 
-/**
- * Comprueba si hay un update OTA disponible y, de haberlo, lo descarga en segundo plano.
- *
- * Best-effort: nunca lanza. Devuelve `true` solo cuando un nuevo update quedó descargado y
- * listo para aplicarse (vía `Updates.reloadAsync()` o en el próximo cold start). En Expo Go,
- * dev client o `expo start` (`Updates.isEnabled === false`) sale temprano y devuelve `false`,
- * así el flujo de updates nunca corre en desarrollo.
- */
 export async function checkForOtaUpdate(): Promise<boolean> {
   if (!Updates.isEnabled) return false;
 

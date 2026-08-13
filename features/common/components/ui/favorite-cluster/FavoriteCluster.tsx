@@ -17,10 +17,8 @@ export interface FavoriterBubble {
 
 interface Props {
   favoritedByMe: boolean;
-  /** Who favorited this photo, already resolved to "me"/"partner" by the caller. */
   favoriters: FavoriterBubble[];
   onToggle: () => void;
-  /** `compact` for grid tiles, `large` for the expanded photo view. */
   size?: "compact" | "large";
   style?: StyleProp<ViewStyle>;
 }
@@ -30,12 +28,6 @@ const DIMENSIONS = {
   large: { trigger: 44, heart: 24, bubble: 20 },
 };
 
-/**
- * The heart-plus-bubbles unit: a tappable heart (my favorite toggle) followed by a small
- * overlapping stack of initial bubbles for whoever favorited the photo — the same "who
- * reacted" idea as a chat's stacked-avatar likes, but with initials since we have no
- * profile pictures yet.
- */
 export function FavoriteCluster({
   favoritedByMe,
   favoriters,

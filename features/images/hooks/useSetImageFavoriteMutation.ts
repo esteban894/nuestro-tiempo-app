@@ -11,7 +11,11 @@ interface ToggleFavoriteInput {
   albumId: string;
 }
 
-function withToggledFavorite(image: AlbumImage, favorite: boolean, me: { id: string; name: string }): AlbumImage {
+function withToggledFavorite(
+  image: AlbumImage,
+  favorite: boolean,
+  me: { id: string; name: string },
+): AlbumImage {
   if (image.favoritedByMe === favorite) return image;
   const favoritedBy = favorite
     ? [...image.favoritedBy, { userId: me.id, name: me.name }]
@@ -19,12 +23,6 @@ function withToggledFavorite(image: AlbumImage, favorite: boolean, me: { id: str
   return { ...image, favoritedBy, favoritedByMe: favorite };
 }
 
-/**
- * Toggles the current user's favorite on an image (PATCH /images/:id/favorite).
- * Optimistically flips the heart and my initial bubble everywhere the image might be
- * cached — album views and every favorites-filter variant — then reconciles with the
- * server response (or rolls back on error) so the UI never waits on the round trip.
- */
 export function useSetImageFavoriteMutation() {
   const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);

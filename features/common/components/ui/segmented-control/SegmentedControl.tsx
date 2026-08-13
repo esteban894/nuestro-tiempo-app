@@ -8,29 +8,12 @@ interface SegmentedOption {
 }
 
 interface SegmentedControlProps {
-  /** Opciones a mostrar como segmentos. */
   options: SegmentedOption[];
-  /** Valor actualmente seleccionado. */
   value: string;
-  /** Se dispara con el nuevo valor al tocar un segmento. */
   onChange: (value: string) => void;
-  /** Estilos del contenedor. */
   style?: StyleProp<ViewStyle>;
 }
 
-/**
- * Control segmentado (pills) para alternar entre opciones mutuamente excluyentes.
- *
- * @example
- * <SegmentedControl
- *   options={[
- *     { label: "Crear", value: "create" },
- *     { label: "Unirse", value: "join" },
- *   ]}
- *   value={mode}
- *   onChange={setMode}
- * />
- */
 export const SegmentedControl = ({ options, value, onChange, style }: SegmentedControlProps) => {
   const colors = useThemeColors();
   const styles = createStyles(colors);

@@ -9,7 +9,6 @@ interface AlbumImagePickerSheetProps {
   visible: boolean;
   onClose: () => void;
   onPickImages: (uris: string[]) => void;
-  /** Allows picking several images at once from the library. Camera capture is always single. */
   allowsMultipleSelection?: boolean;
 }
 

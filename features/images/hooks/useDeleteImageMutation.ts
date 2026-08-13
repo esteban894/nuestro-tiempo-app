@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteImage } from "../api/image.api";
 import { imageKeys } from "../api/queryKeys";
 
-/** Deletes an image (DELETE /images/:id) and revalidates its album's image list. */
 export function useDeleteImageMutation() {
   const queryClient = useQueryClient();
 

@@ -23,29 +23,6 @@ interface TitleProps extends TextProps {
   align?: "left" | "center" | "right" | "justify";
 }
 
-/**
- * Componente de título reutilizable con soporte para diferentes variantes y estilos.
- *
- * @example
- * // Uso básico
- * <Title title="Hola Mundo" />
- *
- * @example
- * // Con variante
- * <Title variant="h2" title="Subtítulo" />
- *
- * @example
- * // Con props personalizadas
- * <Title variant="h3" color="#D32F2F" align="center">
- *   Texto personalizado
- * </Title>
- *
- * @example
- * // Con todas las props de Text
- * <Title variant="h4" numberOfLines={2} ellipsizeMode="tail">
- *   Texto muy largo que será truncado...
- * </Title>
- */
 export const Title = ({
   title,
   children,

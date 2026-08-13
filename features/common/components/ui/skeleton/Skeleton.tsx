@@ -9,7 +9,6 @@ interface SkeletonProps {
   style?: StyleProp<ViewStyle>;
 }
 
-/** Bloque con pulso suave que actúa como placeholder mientras se cargan datos. */
 export const Skeleton = ({ width, height = 16, borderRadius = 8, style }: SkeletonProps) => {
   const colors = useThemeColors();
   const opacity = useRef(new Animated.Value(0.5)).current;

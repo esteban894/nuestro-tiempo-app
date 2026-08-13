@@ -3,7 +3,6 @@ import { ApiError, isNetworkError } from "../../../api/httpClient";
 
 const FALLBACK_MESSAGE = "Ocurrió un error inesperado.";
 
-/** Classifies an error thrown by the API layer and surfaces it as a themed toast. */
 export function showErrorToast(error: unknown) {
   if (isNetworkError(error)) {
     Toast.show({ type: "error", text1: "Sin conexión", text2: error.message });

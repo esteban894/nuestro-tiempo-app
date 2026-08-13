@@ -11,12 +11,6 @@ interface CheckboxProps {
   style?: StyleProp<ViewStyle>;
 }
 
-/**
- * Checkbox controlado con soporte para label.
- *
- * @example
- * <Checkbox checked={isPrivate} onChange={setIsPrivate} label="Álbum privado" />
- */
 export const Checkbox = ({ checked, onChange, label, disabled, style }: CheckboxProps) => {
   const colors = useThemeColors();
   const styles = createStyles(colors);

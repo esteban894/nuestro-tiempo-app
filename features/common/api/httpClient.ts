@@ -10,7 +10,6 @@ export class ApiError extends Error {
   }
 }
 
-/** Thrown when the request never reached/completed against the server (no connectivity, DNS failure, timeout) — as opposed to `ApiError`, which means a response came back with a non-2xx status. */
 export class NetworkError extends Error {
   constructor(cause?: unknown) {
     super("No se pudo conectar. Revisa tu conexión.");
@@ -25,7 +24,6 @@ export function isNetworkError(error: unknown): error is NetworkError {
 
 type AuthAccessors = {
   getAccessToken: () => string | null;
-  /** Called on a 401 from an authenticated request. Returns the new access token, or null if the session could not be refreshed. */
   onUnauthorized: () => Promise<string | null>;
 };
 
@@ -35,10 +33,6 @@ export function configureApiAuth(accessors: AuthAccessors) {
   authAccessors = accessors;
 }
 
-/**
- * Media endpoints (e.g. signed cover image URLs) come back as a path relative to the API,
- * not an absolute URL — prepend EXPO_PUBLIC_API_URL to build a URL the device can reach.
- */
 export function resolveMediaUrl(path: string): string;
 export function resolveMediaUrl(path: string | null | undefined): string | null;
 export function resolveMediaUrl(path: string | null | undefined): string | null {
@@ -47,19 +41,12 @@ export function resolveMediaUrl(path: string | null | undefined): string | null 
   return `${env.API_URL}${path}`;
 }
 
-/** React Native multipart file part shape (not a real Blob/File). */
 export interface LocalFilePart {
   uri: string;
   name: string;
   type: string;
 }
 
-/**
- * Uploads a file directly to a presigned S3 URL (from POST /images/upload-urls or
- * /albums/cover/upload-url), bypassing this API entirely — no API_URL prefix, no auth
- * header, since S3 itself is the destination and the presigned fields are the credential.
- * `fields` must be appended before the file part, per S3's POST policy requirements.
- */
 export async function uploadToPresignedUrl(
   uploadUrl: string,
   fields: Record<string, string>,
@@ -82,7 +69,6 @@ export async function uploadToPresignedUrl(
 
 type ApiFetchOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
-  /** Skip the 401 refresh-and-retry flow (used for public/auth endpoints). */
   skipAuthRetry?: boolean;
 };
 

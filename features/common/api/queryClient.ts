@@ -1,11 +1,6 @@
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { showErrorToast } from "../components/ui/toast/showErrorToast";
 
-/**
- * Queries/mutations that already render their error inline (e.g. via the `Input` component's
- * `error` prop) should set `meta: { suppressErrorToast: true }` so the same failure doesn't
- * also show up as a toast.
- */
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

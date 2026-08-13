@@ -16,12 +16,6 @@ import { ExpandedImageModal } from "../image-carousel/ExpandedImageModal";
 
 const GAP_PERCENT = 4;
 
-/**
- * Shape shared by every image-displaying list in the app. Identity lives in `id`
- * (stable across refetches) rather than `url` (which, even with the API's deterministic
- * S3 signing, is still a distinct string per resource) — this is what lets FlatList/
- * Carousel keys and expo-image's `recyclingKey` avoid remounting on every refetch.
- */
 export interface MediaItem {
   id: string;
   url: string;

@@ -1,7 +1,6 @@
 import { Skeleton } from "@/features/common";
 import { StyleSheet, View } from "react-native";
 
-/** Placeholder que replica el layout del formulario de álbum mientras se precargan sus datos. */
 export const AlbumFormSkeleton = () => {
   return (
     <View style={styles.content}>

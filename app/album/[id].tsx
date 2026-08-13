@@ -43,7 +43,6 @@ import Toast from "react-native-toast-message";
 
 type FavoriteFilter = "all" | "me" | "partner" | "both";
 
-/** Client-side filter over already-loaded pages (see useSetImageFavoriteMutation notes). */
 function filterByFavorite(
   images: AlbumImage[],
   filter: FavoriteFilter,
@@ -55,7 +54,7 @@ function filterByFavorite(
 
   if (filter === "me") return images.filter((image) => image.favoritedByMe);
   if (filter === "partner") return images.filter(favoritedByPartner);
-  return images.filter((image) => image.favoritedByMe && favoritedByPartner(image)); // "both"
+  return images.filter((image) => image.favoritedByMe && favoritedByPartner(image));
 }
 
 export default function AlbumDetailScreen() {
@@ -112,9 +111,6 @@ export default function AlbumDetailScreen() {
   const deleteAlbumMutation = useDeleteAlbumMutation();
   const [pickerVisible, setPickerVisible] = useState(false);
   const [uploadCount, setUploadCount] = useState<number | null>(null);
-  // Ids already retried once — bounds retries to one refetch per image (not one for the
-  // whole screen) so a fresh failure later on can still recover, without looping forever
-  // on an image that's genuinely broken.
   const retriedImageIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {

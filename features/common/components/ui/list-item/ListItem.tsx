@@ -7,22 +7,12 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 type IoniconsName = ComponentProps<typeof Ionicons>["name"];
 
 interface ListItemProps {
-  /** Ícono a la izquierda. */
   leftIcon: IoniconsName;
-  /** Texto de la fila. */
   label: string;
-  /** Ícono a la derecha (por defecto un chevron). */
   rightIcon?: IoniconsName;
-  /** Acción al tocar la fila. */
   onPress?: () => void;
 }
 
-/**
- * Fila de lista/menú reutilizable con ícono, texto y acción.
- *
- * @example
- * <ListItem leftIcon="people-outline" label="Vincular con tu pareja" onPress={goToCouple} />
- */
 export const ListItem = ({
   leftIcon,
   label,

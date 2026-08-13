@@ -12,7 +12,6 @@ import { PaginationDots } from "./PaginationDots";
 
 const { width } = Dimensions.get("window");
 
-/** How many items before the end of the currently loaded `data` to trigger `onReachEnd`. */
 const REACH_END_BUFFER = 3;
 
 interface Props {
@@ -20,12 +19,6 @@ interface Props {
   renderArrows?: boolean;
   renderOverlay?: (item: MediaItem, index: number) => ReactNode;
   onImageError?: (item: MediaItem) => void;
-  /**
-   * Called (on manual swipe or autoplay alike, since both drive `onSnapToItem`) once the
-   * carousel is within `REACH_END_BUFFER` items of the end of `data`. Intended to fetch
-   * the next page of a paginated `data` source — safe to call repeatedly/past the actual
-   * end, the caller is expected to no-op once there's nothing left to fetch.
-   */
   onReachEnd?: () => void;
 }
 
