@@ -5,9 +5,11 @@ import { NoCoupleBanner, useCoupleQuery } from "@/features/couple";
 import { useThemeColors } from "@/features/theme";
 import { useRouter } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
 export default function AlbumsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const colors = useThemeColors();
   const styles = createStyles(colors);
@@ -29,7 +31,7 @@ export default function AlbumsScreen() {
 
   return (
     <View style={styles.container}>
-      <Title title="Nuestros Álbumes" variant="h2" style={styles.title} />
+      <Title title={t("albums.screenTitle")} variant="h2" style={styles.title} />
       {isLoading ? (
         <AlbumGridSkeleton />
       ) : (

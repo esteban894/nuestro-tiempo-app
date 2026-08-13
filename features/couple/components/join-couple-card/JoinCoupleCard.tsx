@@ -1,16 +1,18 @@
 import { ThemeColors } from "@/constants/colors";
-import { Button, Card, Input, Title } from "@/features/common";
+import { Button, Card, getErrorMessage, Input, Title } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import { joinCouple } from "../../api/couple.api";
 import { coupleKeys } from "../../api/queryKeys";
 import { INVITE_CODE_LENGTH, INVITE_CODE_REGEX } from "../../utils/generateInviteCode";
 
 export const JoinCoupleCard = () => {
+  const { t } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const [code, setCode] = useState("");
@@ -35,7 +37,7 @@ export const JoinCoupleCard = () => {
 
   const handleJoin = () => {
     if (!INVITE_CODE_REGEX.test(code)) {
-      setFormatError("El código debe tener 8 dígitos hexadecimales.");
+      setFormatError(t("couple.join.codeFormatError"));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
@@ -46,31 +48,31 @@ export const JoinCoupleCard = () => {
   return (
     <Card cardStyles={styles.card}>
       <Ionicons name="people-circle" size={44} color={colors.SECONDARY[500]} />
-      <Title title="Unirse a una pareja" variant="h3" align="center" style={styles.title} />
+      <Title title={t("couple.join.title")} variant="h3" align="center" style={styles.title} />
 
       {mutation.isSuccess ? (
         <View style={styles.successSection}>
           <Ionicons name="checkmark-circle" size={56} color={colors.PRIMARY[500]} />
-          <Text style={styles.successText}>¡Te uniste a la pareja con el código {code}!</Text>
+          <Text style={styles.successText}>{t("couple.join.success", { code })}</Text>
         </View>
       ) : (
         <>
-          <Text style={styles.helper}>Ingresa el código que te compartió tu pareja:</Text>
+          <Text style={styles.helper}>{t("couple.join.helper")}</Text>
           <View style={styles.codeInputWrapper}>
             <Input
               value={code}
               onChangeText={handleChange}
-              placeholder="A1B2C3D4"
+              placeholder={t("couple.join.codePlaceholder")}
               leftIcon="key-outline"
               autoCapitalize="characters"
               autoCorrect={false}
               maxLength={INVITE_CODE_LENGTH}
-              error={formatError ?? mutation.error?.message}
+              error={formatError ?? getErrorMessage(mutation.error, t)}
               style={styles.codeInput}
             />
           </View>
           <Button
-            title="Unirse"
+            title={t("couple.join.submit")}
             leftIcon="heart"
             fullWidth
             isLoading={mutation.isPending}

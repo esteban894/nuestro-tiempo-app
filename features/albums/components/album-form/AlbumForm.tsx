@@ -3,6 +3,7 @@ import { Button, Checkbox, Input } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { prepareCoverImageUpload } from "../../api/album.api";
 import { AlbumImagePickerSheet } from "../album-image-picker-sheet/AlbumImagePickerSheet";
@@ -24,10 +25,11 @@ interface AlbumFormProps {
 export const AlbumForm = ({
   initialValues,
   onSubmit,
-  submitLabel = "Guardar",
+  submitLabel,
   isSubmitting = false,
   error,
 }: AlbumFormProps) => {
+  const { t } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const [name, setName] = useState(initialValues?.name ?? "");
@@ -81,24 +83,29 @@ export const AlbumForm = ({
         ) : (
           <View style={styles.coverPlaceholder}>
             <Ionicons name="image-outline" size={32} color={colors.NEUTRAL[600]} />
-            <Text style={styles.coverPlaceholderLabel}>Agregar portada</Text>
+            <Text style={styles.coverPlaceholderLabel}>{t("albums.form.addCover")}</Text>
           </View>
         )}
       </TouchableOpacity>
 
-      <Input label="Título" placeholder="Título del álbum" value={name} onChangeText={setName} />
+      <Input
+        label={t("albums.form.titleLabel")}
+        placeholder={t("albums.form.titlePlaceholder")}
+        value={name}
+        onChangeText={setName}
+      />
 
       <Checkbox
         checked={isPrivate}
         onChange={setIsPrivate}
-        label="Álbum privado"
+        label={t("albums.form.privateLabel")}
         style={styles.checkbox}
       />
 
       {error && <Text style={styles.errorText}>{error}</Text>}
 
       <Button
-        title={submitLabel}
+        title={submitLabel ?? t("albums.form.defaultSubmit")}
         variant="primary"
         fullWidth
         isLoading={isSubmitting || isUploadingCover}

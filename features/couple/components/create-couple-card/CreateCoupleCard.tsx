@@ -1,5 +1,5 @@
 import { ThemeColors } from "@/constants/colors";
-import { Button, Card, Title } from "@/features/common";
+import { Button, Card, getErrorMessage, Title } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
@@ -7,15 +7,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { createCouple } from "../../api/couple.api";
 import { coupleKeys } from "../../api/queryKeys";
 
-const formatDate = (date: Date) =>
-  date.toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" });
+// The active i18n language ("es" | "en") doubles as a valid BCP 47 locale tag for
+// toLocaleDateString/toLocaleString, so it's used directly rather than mapping to
+// region-specific tags (es-ES, en-US) we don't otherwise need.
+const formatDate = (date: Date, locale: string) =>
+  date.toLocaleDateString(locale, { day: "2-digit", month: "long", year: "numeric" });
 
-const formatDateTime = (date: Date) =>
-  date.toLocaleString("es-ES", {
+const formatDateTime = (date: Date, locale: string) =>
+  date.toLocaleString(locale, {
     day: "2-digit",
     month: "long",
     year: "numeric",
@@ -24,6 +28,7 @@ const formatDateTime = (date: Date) =>
   });
 
 export const CreateCoupleCard = () => {
+  const { t, i18n } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -42,7 +47,7 @@ export const CreateCoupleCard = () => {
   });
 
   const handleDateChange = (event: DateTimePickerEvent, selected?: Date) => {
-    // En Android el picker es un modal que hay que cerrar manualmente.
+    // On Android the picker is a modal that has to be closed manually.
     if (Platform.OS !== "ios") setShowPicker(false);
     if (event.type === "set" && selected) setStartDate(selected);
   };
@@ -63,18 +68,20 @@ export const CreateCoupleCard = () => {
   return (
     <Card cardStyles={styles.card}>
       <Ionicons name="heart-circle" size={44} color={colors.PRIMARY[500]} />
-      <Title title="Crear pareja" variant="h3" align="center" style={styles.title} />
+      <Title title={t("couple.create.title")} variant="h3" align="center" style={styles.title} />
 
       {mutation.data ? (
         <View style={styles.codeSection}>
-          <Text style={styles.helper}>Comparte este código con tu pareja:</Text>
+          <Text style={styles.helper}>{t("couple.create.shareHint")}</Text>
           <Text style={styles.code}>{mutation.data.code}</Text>
           <Text style={styles.expiresAt}>
-            Válido hasta {formatDateTime(new Date(mutation.data.expiresAt))}
+            {t("couple.create.validUntil", {
+              date: formatDateTime(new Date(mutation.data.expiresAt), i18n.language),
+            })}
           </Text>
-          <Text style={styles.waitingHint}>Esperando a que tu pareja se una…</Text>
+          <Text style={styles.waitingHint}>{t("couple.create.waitingHint")}</Text>
           <Button
-            title={copied ? "¡Copiado!" : "Copiar código"}
+            title={copied ? t("couple.create.copied") : t("couple.create.copy")}
             leftIcon={copied ? "checkmark" : "copy-outline"}
             variant={copied ? "outline" : "primary"}
             fullWidth
@@ -83,14 +90,14 @@ export const CreateCoupleCard = () => {
         </View>
       ) : (
         <>
-          <Text style={styles.helper}>¿Cuándo empezó su historia juntos?</Text>
+          <Text style={styles.helper}>{t("couple.create.whenStarted")}</Text>
           <TouchableOpacity
             style={styles.dateField}
             activeOpacity={0.7}
             onPress={() => setShowPicker(true)}>
             <Ionicons name="calendar-outline" size={20} color={colors.SECONDARY[500]} />
             <Text style={[styles.dateText, !startDate && styles.datePlaceholder]}>
-              {startDate ? formatDate(startDate) : "Selecciona una fecha"}
+              {startDate ? formatDate(startDate, i18n.language) : t("couple.create.selectDate")}
             </Text>
           </TouchableOpacity>
 
@@ -103,10 +110,12 @@ export const CreateCoupleCard = () => {
             />
           )}
 
-          {mutation.error && <Text style={styles.errorText}>{mutation.error.message}</Text>}
+          {mutation.error && (
+            <Text style={styles.errorText}>{getErrorMessage(mutation.error, t)}</Text>
+          )}
 
           <Button
-            title="Crear vínculo"
+            title={t("couple.create.submit")}
             leftIcon="link"
             fullWidth
             isLoading={mutation.isPending}

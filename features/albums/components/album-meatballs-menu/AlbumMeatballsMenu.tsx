@@ -1,4 +1,5 @@
 import { OverflowMenu } from "@/features/common";
+import { useTranslation } from "react-i18next";
 
 interface AlbumMeatballsMenuProps {
   onEdit: () => void;
@@ -15,18 +16,20 @@ export const AlbumMeatballsMenu = ({
   markingAsCurrent = false,
   deleting = false,
 }: AlbumMeatballsMenuProps) => {
+  const { t } = useTranslation();
+
   return (
     <OverflowMenu
       options={[
-        { label: "Editar álbum", icon: "create-outline", onPress: onEdit },
+        { label: t("albums.meatballsMenu.edit"), icon: "create-outline", onPress: onEdit },
         {
-          label: "Marcar como actual",
+          label: t("albums.meatballsMenu.markAsCurrent"),
           icon: "star-outline",
           onPress: onMarkAsCurrent,
           disabled: markingAsCurrent,
         },
         {
-          label: "Eliminar álbum",
+          label: t("albums.meatballsMenu.delete"),
           icon: "trash-outline",
           destructive: true,
           onPress: onDelete,

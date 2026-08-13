@@ -1,6 +1,7 @@
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -35,6 +36,7 @@ export function FavoriteCluster({
   size = "compact",
   style,
 }: Props) {
+  const { t } = useTranslation();
   const colors = useThemeColors();
   const dims = DIMENSIONS[size];
   const scale = useSharedValue(1);
@@ -62,7 +64,9 @@ export function FavoriteCluster({
         hitSlop={8}
         onPress={handlePress}
         accessibilityRole="button"
-        accessibilityLabel={favoritedByMe ? "Quitar de favoritos" : "Marcar como favorita"}>
+        accessibilityLabel={
+          favoritedByMe ? t("common.removeFromFavorites") : t("common.markAsFavorite")
+        }>
         <Animated.View style={animatedHeartStyle}>
           <Ionicons
             name={favoritedByMe ? "heart" : "heart-outline"}

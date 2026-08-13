@@ -3,6 +3,7 @@ import { MAX_IMAGES_PER_BATCH } from "@/constants/upload";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { useTranslation } from "react-i18next";
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface AlbumImagePickerSheetProps {
@@ -18,6 +19,7 @@ export const AlbumImagePickerSheet = ({
   onPickImages,
   allowsMultipleSelection = false,
 }: AlbumImagePickerSheetProps) => {
+  const { t } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);
 
@@ -51,13 +53,13 @@ export const AlbumImagePickerSheet = ({
       <Pressable style={styles.backdrop} onPress={onClose} />
       <View style={styles.sheet}>
         <View style={styles.handle} />
-        <Text style={styles.title}>Agregar foto</Text>
+        <Text style={styles.title}>{t("albums.imagePicker.title")}</Text>
 
         <TouchableOpacity style={styles.option} activeOpacity={0.7} onPress={handleTakePhoto}>
           <View style={styles.iconWrapper}>
             <Ionicons name="camera-outline" size={22} color={colors.PRIMARY[500]} />
           </View>
-          <Text style={styles.optionLabel}>Tomar foto</Text>
+          <Text style={styles.optionLabel}>{t("albums.imagePicker.takePhoto")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -67,11 +69,11 @@ export const AlbumImagePickerSheet = ({
           <View style={styles.iconWrapper}>
             <Ionicons name="images-outline" size={22} color={colors.PRIMARY[500]} />
           </View>
-          <Text style={styles.optionLabel}>Elegir de la galería</Text>
+          <Text style={styles.optionLabel}>{t("albums.imagePicker.chooseFromLibrary")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.cancel} activeOpacity={0.7} onPress={onClose}>
-          <Text style={styles.cancelLabel}>Cancelar</Text>
+          <Text style={styles.cancelLabel}>{t("albums.imagePicker.cancel")}</Text>
         </TouchableOpacity>
       </View>
     </Modal>

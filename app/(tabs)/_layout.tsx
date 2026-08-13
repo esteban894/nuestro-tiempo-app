@@ -3,11 +3,13 @@ import { useCoupleQuery } from "@/features/couple";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs, useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet } from "react-native";
 
 export default function TabLayout() {
   // Prime the Couple query as soon as the tabs mount; the cache is shared with every screen.
   useCoupleQuery();
+  const { t } = useTranslation();
   const router = useRouter();
   const colors = useThemeColors();
   const styles = createStyles(colors);
@@ -30,7 +32,7 @@ export default function TabLayout() {
             onPress={() => router.push("/favorites")}
             hitSlop={12}
             accessibilityRole="button"
-            accessibilityLabel="Ver favoritos">
+            accessibilityLabel={t("favorites.viewFavoritesA11y")}>
             <Ionicons name="heart" size={24} color={colors.PRIMARY[800]} />
           </Pressable>
         ),

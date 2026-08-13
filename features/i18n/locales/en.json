@@ -1,0 +1,243 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "retry": "Retry",
+    "years_one": "Year",
+    "years_other": "Years",
+    "months_one": "Month",
+    "months_other": "Months",
+    "days_one": "Day",
+    "days_other": "Days",
+    "removeFromFavorites": "Remove from favorites",
+    "markAsFavorite": "Mark as favorite"
+  },
+  "nav": {
+    "account": "Account",
+    "linkCouple": "Link couple",
+    "settings": "Settings",
+    "newAlbum": "New album",
+    "editAlbum": "Edit album",
+    "album": "Album",
+    "albums": "Albums",
+    "home": "Home"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign In",
+      "subtitle": "Back to your special corner",
+      "emailLabel": "Email",
+      "emailPlaceholder": "john.doe@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "********",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account yet?",
+      "goToRegister": "Start your journey here"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Start your journey with us",
+      "nameLabel": "Name",
+      "namePlaceholder": "John Doe",
+      "emailLabel": "Email",
+      "emailPlaceholder": "john.doe@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "********",
+      "confirmPasswordLabel": "Confirm Password",
+      "submit": "Create Account",
+      "hasAccount": "Already have an account?",
+      "goToLogin": "Sign in here"
+    },
+    "validation": {
+      "emailRequired": "Enter your email.",
+      "emailInvalid": "Invalid email address.",
+      "passwordRequired": "Enter your password.",
+      "passwordRequiredRegister": "Enter a password.",
+      "nameRequired": "Enter your name.",
+      "passwordMismatch": "Passwords don't match."
+    }
+  },
+  "couple": {
+    "connect": {
+      "subtitle": "Link your account with your partner's",
+      "createTab": "Create",
+      "joinTab": "Join"
+    },
+    "create": {
+      "title": "Create couple",
+      "shareHint": "Share this code with your partner:",
+      "validUntil": "Valid until {{date}}",
+      "waitingHint": "Waiting for your partner to join…",
+      "copy": "Copy code",
+      "copied": "Copied!",
+      "whenStarted": "When did your story together begin?",
+      "selectDate": "Select a date",
+      "submit": "Create link"
+    },
+    "join": {
+      "title": "Join a couple",
+      "helper": "Enter the code your partner shared with you:",
+      "codePlaceholder": "A1B2C3D4",
+      "submit": "Join",
+      "success": "You joined the couple with code {{code}}!",
+      "codeFormatError": "The code must have 8 hexadecimal digits."
+    },
+    "noCoupleBanner": {
+      "title": "Start counting your time together",
+      "description": "Link your account with your partner's to share albums and see how long you've been together.",
+      "cta": "Link with my partner"
+    }
+  },
+  "albums": {
+    "screenTitle": "Our Albums",
+    "form": {
+      "addCover": "Add cover",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Album title",
+      "privateLabel": "Private album",
+      "createSubmit": "Create album",
+      "editSubmit": "Save changes",
+      "defaultSubmit": "Save"
+    },
+    "notFound": "Album not found",
+    "privateBadge": "Private",
+    "meatballsMenu": {
+      "edit": "Edit album",
+      "markAsCurrent": "Mark as current",
+      "delete": "Delete album"
+    },
+    "deleteConfirm": {
+      "title": "Delete album",
+      "message": "This action cannot be undone. The album and all its photos will be deleted."
+    },
+    "uploadStatus_one": "Uploading 1 photo…",
+    "uploadStatus_other": "Uploading {{count}} photos…",
+    "imagePicker": {
+      "title": "Add photo",
+      "takePhoto": "Take photo",
+      "chooseFromLibrary": "Choose from library",
+      "cancel": "Cancel"
+    },
+    "tooManyPhotos": {
+      "title": "Too many photos",
+      "message": "Only the first {{max}} from this selection will be uploaded."
+    },
+    "favoriteFilter": {
+      "label": "Favorites",
+      "all": "All",
+      "me": "Mine",
+      "partner": "{{name}}'s",
+      "both": "Ours"
+    },
+    "imageMenu": {
+      "download": "Download",
+      "delete": "Delete",
+      "downloadA11y": "Download image",
+      "deleteA11y": "Delete image"
+    },
+    "downloadToast": {
+      "success": "Image saved to your gallery",
+      "errorTitle": "Couldn't download the image",
+      "permissionMessage": "Enable photo access in your device settings."
+    },
+    "noCurrentAlbumBanner": {
+      "title": "Pick the album for the moment",
+      "description": "Mark an album as current from its menu and its photos will show up here, on the home screen.",
+      "cta": "View my albums"
+    }
+  },
+  "account": {
+    "title": "My account",
+    "coupleWith": "In a couple with {{name}}",
+    "linkCouple": "Link with your partner",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "settings": {
+    "appearance": "Appearance",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "language": "Language",
+    "languageEs": "Español",
+    "languageEn": "English"
+  },
+  "favorites": {
+    "title": "Favorites",
+    "viewFavoritesA11y": "View favorites",
+    "noneYet": "No saved moments yet",
+    "count_one": "{{count}} saved moment",
+    "count_other": "{{count}} saved moments",
+    "filterMe": "Mine",
+    "filterPartner": "{{name}}'s",
+    "filterBoth": "Ours",
+    "emptyMe": {
+      "title": "You haven't marked any favorites yet",
+      "description": "Tap the heart on a photo to save it here."
+    },
+    "emptyPartner": {
+      "title": "Your partner hasn't marked favorites",
+      "description": "When they do, their favorite photos will show up here."
+    },
+    "emptyBoth": {
+      "title": "No shared favorites... yet",
+      "description": "When you both mark the same photo, it'll show up here."
+    }
+  },
+  "updates": {
+    "title": "Update available",
+    "message": "Tap to restart and apply it"
+  },
+  "errors": {
+    "offlineTitle": "No connection",
+    "offlineMessage": "Couldn't connect. Check your connection.",
+    "genericTitle": "Error",
+    "fallback": "An unexpected error occurred.",
+    "ALBUM_NOT_FOUND": "Album not found",
+    "ALBUM_ACCESS_DENIED": "You do not have access to this album",
+    "ALBUM_MEMBERSHIP_REQUIRED": "You must be a member of the album",
+    "ALBUM_NOT_CREATOR": "Only the album creator can perform this action",
+    "ALBUM_COUPLE_REQUIRED": "You must be in a couple to create an album",
+    "ALBUM_COUPLE_INCOMPLETE": "Both users must be in a couple to create an album",
+    "ALBUM_NO_CURRENT_ALBUM": "No current album set",
+    "ALBUM_COVER_IMAGE_REQUIRED": "Cover image is required",
+    "ALBUM_COVER_IMAGE_NOT_FOUND": "Cover image not found",
+    "IMAGE_NOT_FOUND": "Image not found",
+    "IMAGE_ACCESS_DENIED": "You do not have access to this image",
+    "IMAGE_FILE_REQUIRED": "Image file is required",
+    "IMAGE_FILES_REQUIRED": "At least one image file is required",
+    "IMAGE_UPLOAD_FAILED": "Failed to upload image",
+    "IMAGE_DELETE_FAILED": "Failed to delete image",
+    "USER_NOT_FOUND": "User not found",
+    "USER_ALREADY_EXISTS": "User already exists",
+    "USER_EMAIL_DELETED_ACCOUNT": "Email associated with a deleted account",
+    "USER_INVALID_CREDENTIALS": "Invalid credentials",
+    "USER_UNAUTHORIZED": "Unauthorized access",
+    "AUTH_TOKEN_MISSING": "Authentication token not provided",
+    "AUTH_INVALID_TOKEN": "Invalid authentication token",
+    "AUTH_TOKEN_EXPIRED": "Authentication token has expired",
+    "AUTH_INVALID_CREDENTIALS": "Invalid email or password",
+    "AUTH_EMAIL_ALREADY_EXISTS": "Email already registered",
+    "AUTH_REFRESH_TOKEN_INVALID": "Invalid or expired refresh token",
+    "COUPLE_NOT_FOUND": "Couple not found",
+    "COUPLE_INVALID_REFERENCE": "Your couple reference is invalid",
+    "COUPLE_COMPLETE": "Couple is already complete",
+    "COUPLE_ALREADY_IN_COUPLE": "You are already in a couple",
+    "COUPLE_INVITE_NOT_FOUND": "Couple invite not found",
+    "COUPLE_INVITE_EXPIRED": "Couple invite has expired",
+    "COUPLE_INVITE_ALREADY_USED": "Invite has already been used",
+    "COUPLE_SELF_INVITE": "You cannot invite yourself",
+    "COUPLE_NOT_IN_COUPLE": "You are not part of a couple",
+    "NOTIFICATIONS_INVALID_PUSH_TOKEN": "Invalid push notification token",
+    "VALIDATION_FAILED": "Validation failed",
+    "INTERNAL_ERROR": "An internal error occurred",
+    "FORBIDDEN": "Access forbidden",
+    "UNAUTHORIZED": "Unauthorized",
+    "BAD_REQUEST": "Bad request",
+    "PAGE_OUT_OF_RANGE": "Page exceeds total number of pages"
+  }
+}

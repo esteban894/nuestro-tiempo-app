@@ -1,15 +1,17 @@
 import { ThemeColors } from "@/constants/colors";
-import { Button, Input, Title } from "@/features/common";
+import { Button, getErrorMessage, Input, Title } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TextInput } from "react-native";
 import { login } from "../../api/auth.api";
 import { useAuthStore } from "../../store/authStore";
 import { validateLoginForm, type LoginErrors } from "../../validation";
 
 export const LoginForm = () => {
+  const { t } = useTranslation();
   const setSession = useAuthStore((state) => state.setSession);
   const colors = useThemeColors();
   const styles = createStyles(colors);
@@ -50,16 +52,16 @@ export const LoginForm = () => {
 
   return (
     <>
-      <Title title="Iniciar Sesión" variant="h1" align="center" />
+      <Title title={t("auth.login.title")} variant="h1" align="center" />
       <Title
-        title="Vuelve a tu rincón especial"
+        title={t("auth.login.subtitle")}
         variant="subtitle"
         align="center"
         style={{ marginBottom: 20 }}
       />
       <Input
-        label="Correo electrónico"
-        placeholder="john.doe@example.com"
+        label={t("auth.login.emailLabel")}
+        placeholder={t("auth.login.emailPlaceholder")}
         leftIcon="mail-outline"
         keyboardType="email-address"
         autoCapitalize="none"
@@ -67,31 +69,31 @@ export const LoginForm = () => {
         value={email}
         onChangeText={handleEmailChange}
         onSubmitEditing={() => passwordRef.current?.focus()}
-        error={errors.email}
+        error={errors.email ? t(errors.email) : undefined}
       />
       <Input
         ref={passwordRef}
-        label="Contraseña"
-        placeholder="********"
+        label={t("auth.login.passwordLabel")}
+        placeholder={t("auth.login.passwordPlaceholder")}
         isPassword
         leftIcon="lock-closed-outline"
         returnKeyType="done"
         value={password}
         onChangeText={handlePasswordChange}
         onSubmitEditing={handleSubmit}
-        error={errors.password ?? mutation.error?.message}
+        error={errors.password ? t(errors.password) : getErrorMessage(mutation.error, t)}
       />
 
       <Button
-        title="Iniciar Sesión"
+        title={t("auth.login.submit")}
         onPress={handleSubmit}
         isLoading={mutation.isPending}
         style={{ marginBottom: 20 }}
       />
 
-      <Text style={styles.hasAccount}>¿Aún no tienes una cuenta?</Text>
+      <Text style={styles.hasAccount}>{t("auth.login.noAccount")}</Text>
       <Link href="/(auth)/register" style={styles.link} replace>
-        Empieza tu viaje aquí
+        {t("auth.login.goToRegister")}
       </Link>
     </>
   );

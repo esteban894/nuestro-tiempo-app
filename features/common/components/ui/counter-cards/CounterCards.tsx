@@ -1,6 +1,7 @@
 import { ThemeColors } from "@/constants/colors";
 import { useThemeColors } from "@/features/theme";
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import { Card } from "../card/Card";
 import { getElapsedTime } from "./getElapsedTime";
@@ -9,15 +10,10 @@ interface Props {
   initDate: string;
 }
 
-const bigUnitLabels = {
-  years: { singular: "Año", plural: "Años" },
-  months: { singular: "Mes", plural: "Meses" },
-  days: { singular: "Día", plural: "Días" },
-};
-
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export const CounterCards = ({ initDate }: Props) => {
+  const { t } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const initialDate = useMemo(() => new Date(initDate), [initDate]);
@@ -34,18 +30,18 @@ export const CounterCards = ({ initDate }: Props) => {
   const showYears = elapsed.years > 0;
   const showMonths = showYears || elapsed.months > 0;
   const bigUnits = [
-    ...(showYears ? [{ key: "years", value: elapsed.years, label: bigUnitLabels.years }] : []),
-    ...(showMonths ? [{ key: "months", value: elapsed.months, label: bigUnitLabels.months }] : []),
-    { key: "days", value: elapsed.days, label: bigUnitLabels.days },
+    ...(showYears ? [{ key: "years", value: elapsed.years }] : []),
+    ...(showMonths ? [{ key: "months", value: elapsed.months }] : []),
+    { key: "days", value: elapsed.days },
   ];
 
   return (
     <View style={styles.container}>
       <View style={styles.bigRow}>
-        {bigUnits.map(({ key, value, label }) => (
+        {bigUnits.map(({ key, value }) => (
           <Card key={key} cardStyles={styles.bigCard}>
             <Text style={styles.bigNumber}>{value}</Text>
-            <Text style={styles.bigLabel}>{value !== 1 ? label.plural : label.singular}</Text>
+            <Text style={styles.bigLabel}>{t(`common.${key}`, { count: value })}</Text>
           </Card>
         ))}
       </View>

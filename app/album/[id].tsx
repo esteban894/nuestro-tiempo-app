@@ -38,6 +38,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -58,6 +59,7 @@ function filterByFavorite(
 }
 
 export default function AlbumDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -140,20 +142,16 @@ export default function AlbumDetailScreen() {
   const handleMarkAsCurrent = () => markAsCurrentMutation.mutate();
 
   const handleDeleteAlbum = () => {
-    Alert.alert(
-      "Eliminar álbum",
-      "Esta acción no se puede deshacer. Se eliminará el álbum y todas sus fotos.",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: () => {
-            deleteAlbumMutation.mutate(id, { onSuccess: () => router.replace("/albums") });
-          },
+    Alert.alert(t("albums.deleteConfirm.title"), t("albums.deleteConfirm.message"), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("common.delete"),
+        style: "destructive",
+        onPress: () => {
+          deleteAlbumMutation.mutate(id, { onSuccess: () => router.replace("/albums") });
         },
-      ],
-    );
+      },
+    ]);
   };
 
   const handleDeleteImage = (index: number) => {
@@ -175,15 +173,15 @@ export default function AlbumDetailScreen() {
       { url: image.url, filename: image.filename },
       {
         onSuccess: () => {
-          Toast.show({ type: "success", text1: "Imagen guardada en tu galería" });
+          Toast.show({ type: "success", text1: t("albums.downloadToast.success") });
         },
         onError: (error) => {
           Toast.show({
             type: "error",
-            text1: "No se pudo descargar la imagen",
+            text1: t("albums.downloadToast.errorTitle"),
             text2:
               error instanceof MediaLibraryPermissionError
-                ? "Activa el acceso a tus fotos en los ajustes del dispositivo."
+                ? t("albums.downloadToast.permissionMessage")
                 : undefined,
           });
         },
@@ -206,8 +204,8 @@ export default function AlbumDetailScreen() {
       files = files.slice(0, MAX_IMAGES_PER_BATCH);
       Toast.show({
         type: "info",
-        text1: "Demasiadas fotos",
-        text2: `Se subirán las primeras ${MAX_IMAGES_PER_BATCH} de esta selección.`,
+        text1: t("albums.tooManyPhotos.title"),
+        text2: t("albums.tooManyPhotos.message", { max: MAX_IMAGES_PER_BATCH }),
       });
     }
 
@@ -231,7 +229,7 @@ export default function AlbumDetailScreen() {
     return (
       <View style={styles.notFound}>
         <Stack.Screen options={{ headerTitle: "" }} />
-        <Text style={styles.notFoundText}>Álbum no encontrado</Text>
+        <Text style={styles.notFoundText}>{t("albums.notFound")}</Text>
       </View>
     );
   }
@@ -257,16 +255,19 @@ export default function AlbumDetailScreen() {
         <View style={styles.favoriteFilterSection}>
           <View style={styles.favoriteFilterLabel}>
             <Ionicons name="heart" size={12} color={colors.NEUTRAL[800]} />
-            <Text style={styles.favoriteFilterLabelText}>Favoritas</Text>
+            <Text style={styles.favoriteFilterLabelText}>{t("albums.favoriteFilter.label")}</Text>
           </View>
           <SegmentedControl
             value={favoriteFilter}
             onChange={(value) => setFavoriteFilter(value as FavoriteFilter)}
             options={[
-              { label: "Todas", value: "all" },
-              { label: "Mías", value: "me" },
-              { label: `De ${partner.name.split(" ")[0]}`, value: "partner" },
-              { label: "Nuestras", value: "both" },
+              { label: t("albums.favoriteFilter.all"), value: "all" },
+              { label: t("albums.favoriteFilter.me"), value: "me" },
+              {
+                label: t("albums.favoriteFilter.partner", { name: partner.name.split(" ")[0] }),
+                value: "partner",
+              },
+              { label: t("albums.favoriteFilter.both"), value: "both" },
             ]}
           />
         </View>
@@ -298,12 +299,12 @@ export default function AlbumDetailScreen() {
                 triggerStyle={styles.imageMenuTrigger}
                 options={[
                   {
-                    label: "Descargar",
+                    label: t("albums.imageMenu.download"),
                     icon: "download-outline",
                     onPress: () => handleDownloadImage(index),
                   },
                   {
-                    label: "Eliminar",
+                    label: t("albums.imageMenu.delete"),
                     icon: "trash-outline",
                     destructive: true,
                     onPress: () => handleDeleteImage(index),
@@ -322,14 +323,14 @@ export default function AlbumDetailScreen() {
                 style={styles.expandedActionButton}
                 onPress={() => handleDownloadImage(index)}
                 accessibilityRole="button"
-                accessibilityLabel="Descargar imagen">
+                accessibilityLabel={t("albums.imageMenu.downloadA11y")}>
                 <Ionicons name="download-outline" size={22} color="#fff" />
               </Pressable>
               <Pressable
                 style={styles.expandedActionButton}
                 onPress={() => handleDeleteImage(index)}
                 accessibilityRole="button"
-                accessibilityLabel="Eliminar imagen">
+                accessibilityLabel={t("albums.imageMenu.deleteA11y")}>
                 <Ionicons name="trash-outline" size={22} color={colors.ERROR[500]} />
               </Pressable>
               <ExpandedFavoriteOverlay

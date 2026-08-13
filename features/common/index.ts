@@ -19,3 +19,4 @@ export * from "./components/ui/skeleton/Skeleton";
 export * from "./components/ui/title/Title";
 export * from "./components/ui/toast";
 export * from "./hooks/useReactQueryAppState";
+export * from "./utils/getErrorMessage";

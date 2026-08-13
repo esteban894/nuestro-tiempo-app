@@ -1,6 +1,8 @@
 import { ThemeColors } from "@/constants/colors";
 import { useAuthStore } from "@/features/auth";
 import { AppToast, Button, queryClient, useReactQueryAppState } from "@/features/common";
+import "@/features/i18n/i18n";
+import { useLanguageStore } from "@/features/i18n";
 import {
   handleNotificationReceived,
   handleNotificationResponse,
@@ -18,6 +20,7 @@ import { ErrorBoundaryProps, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { enableFreeze } from "react-native-screens";
@@ -31,6 +34,7 @@ SplashScreen.setOptions({
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const { t } = useTranslation();
   const [loaded, error] = useFonts({
     ElmsSans_400Regular,
     ElmsSans_700Bold,
@@ -46,6 +50,9 @@ export default function RootLayout() {
   const themeColors = useThemeColors();
   const styles = createStyles(themeColors);
 
+  const languageHydrated = useLanguageStore((state) => state.hydrated);
+  const languageHydrate = useLanguageStore((state) => state.hydrate);
+
   useOtaUpdates();
   useReactQueryAppState();
 
@@ -58,14 +65,24 @@ export default function RootLayout() {
   }, [themeHydrate]);
 
   useEffect(() => {
+    languageHydrate();
+  }, [languageHydrate]);
+
+  useEffect(() => {
     return subscribeToSystemScheme();
   }, []);
 
   useEffect(() => {
-    if ((loaded || error) && status !== "idle" && status !== "loading" && themeHydrated) {
+    if (
+      (loaded || error) &&
+      status !== "idle" &&
+      status !== "loading" &&
+      themeHydrated &&
+      languageHydrated
+    ) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error, status, themeHydrated]);
+  }, [loaded, error, status, themeHydrated, languageHydrated]);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -95,7 +112,7 @@ export default function RootLayout() {
     return null;
   }
 
-  if (status === "idle" || status === "loading" || !themeHydrated) {
+  if (status === "idle" || status === "loading" || !themeHydrated || !languageHydrated) {
     return null;
   }
 
@@ -116,8 +133,8 @@ export default function RootLayout() {
             <Stack.Screen
               name="couple"
               options={{
-                headerTitle: "Vincular pareja",
-                headerBackTitle: "Cuenta",
+                headerTitle: t("nav.linkCouple"),
+                headerBackTitle: t("nav.account"),
                 headerTintColor: themeColors.PRIMARY[800],
                 headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
                 headerShadowVisible: false,
@@ -126,8 +143,8 @@ export default function RootLayout() {
             <Stack.Screen
               name="settings"
               options={{
-                headerTitle: "Configuración",
-                headerBackTitle: "Cuenta",
+                headerTitle: t("nav.settings"),
+                headerBackTitle: t("nav.account"),
                 headerTintColor: themeColors.PRIMARY[800],
                 headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
                 headerShadowVisible: false,
@@ -136,7 +153,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="favorites"
               options={{
-                headerBackTitle: "Inicio",
+                headerBackTitle: t("nav.home"),
                 headerTintColor: themeColors.PRIMARY[800],
                 headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
                 headerShadowVisible: false,
@@ -145,7 +162,7 @@ export default function RootLayout() {
             <Stack.Screen
               name="album/[id]"
               options={{
-                headerBackTitle: "Álbumes",
+                headerBackTitle: t("nav.albums"),
                 headerTintColor: themeColors.PRIMARY[800],
                 headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
                 headerShadowVisible: false,
@@ -154,8 +171,8 @@ export default function RootLayout() {
             <Stack.Screen
               name="album/new"
               options={{
-                headerTitle: "Nuevo álbum",
-                headerBackTitle: "Álbumes",
+                headerTitle: t("nav.newAlbum"),
+                headerBackTitle: t("nav.albums"),
                 headerTintColor: themeColors.PRIMARY[800],
                 headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
                 headerShadowVisible: false,
@@ -164,8 +181,8 @@ export default function RootLayout() {
             <Stack.Screen
               name="album/[id]/edit"
               options={{
-                headerTitle: "Editar álbum",
-                headerBackTitle: "Álbum",
+                headerTitle: t("nav.editAlbum"),
+                headerBackTitle: t("nav.album"),
                 headerTintColor: themeColors.PRIMARY[800],
                 headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
                 headerShadowVisible: false,
@@ -185,14 +202,15 @@ const createStyles = (colors: ThemeColors) =>
   });
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  const { t } = useTranslation();
   const colors = useThemeColors();
   const styles = createBoundaryStyles(colors);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Algo salió mal</Text>
+      <Text style={styles.title}>{t("errorBoundary.title")}</Text>
       <Text style={styles.message}>{error.message}</Text>
-      <Button title="Reintentar" leftIcon="refresh" onPress={retry} style={styles.button} />
+      <Button title={t("common.retry")} leftIcon="refresh" onPress={retry} style={styles.button} />
     </View>
   );
 }

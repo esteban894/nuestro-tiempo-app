@@ -1,15 +1,17 @@
 import { ThemeColors } from "@/constants/colors";
-import { Button, Input, Title } from "@/features/common";
+import { Button, getErrorMessage, Input, Title } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TextInput } from "react-native";
 import { register } from "../../api/auth.api";
 import { useAuthStore } from "../../store/authStore";
 import { validateRegisterForm, type RegisterErrors } from "../../validation";
 
 export const RegisterForm = () => {
+  const { t } = useTranslation();
   const setSession = useAuthStore((state) => state.setSession);
   const colors = useThemeColors();
   const styles = createStyles(colors);
@@ -66,27 +68,27 @@ export const RegisterForm = () => {
 
   return (
     <>
-      <Title title="Crear Cuenta" variant="h1" align="center" />
+      <Title title={t("auth.register.title")} variant="h1" align="center" />
       <Title
-        title="Comienza tu viaje con nosotros"
+        title={t("auth.register.subtitle")}
         variant="subtitle"
         align="center"
         style={{ marginBottom: 20 }}
       />
       <Input
-        label="Nombre"
-        placeholder="John Doe"
+        label={t("auth.register.nameLabel")}
+        placeholder={t("auth.register.namePlaceholder")}
         leftIcon="person-outline"
         returnKeyType="next"
         value={name}
         onChangeText={handleNameChange}
         onSubmitEditing={() => emailRef.current?.focus()}
-        error={errors.name}
+        error={errors.name ? t(errors.name) : undefined}
       />
       <Input
         ref={emailRef}
-        label="Correo electrónico"
-        placeholder="john.doe@example.com"
+        label={t("auth.register.emailLabel")}
+        placeholder={t("auth.register.emailPlaceholder")}
         leftIcon="mail-outline"
         keyboardType="email-address"
         autoCapitalize="none"
@@ -94,24 +96,24 @@ export const RegisterForm = () => {
         value={email}
         onChangeText={handleEmailChange}
         onSubmitEditing={() => passwordRef.current?.focus()}
-        error={errors.email}
+        error={errors.email ? t(errors.email) : undefined}
       />
       <Input
         ref={passwordRef}
-        label="Contraseña"
-        placeholder="********"
+        label={t("auth.register.passwordLabel")}
+        placeholder={t("auth.register.passwordPlaceholder")}
         isPassword
         leftIcon="lock-closed-outline"
         returnKeyType="done"
         value={password}
         onChangeText={handlePasswordChange}
         onSubmitEditing={() => password2Ref.current?.focus()}
-        error={errors.password}
+        error={errors.password ? t(errors.password) : undefined}
       />
       <Input
         ref={password2Ref}
-        label="Confirmar Contraseña"
-        placeholder="********"
+        label={t("auth.register.confirmPasswordLabel")}
+        placeholder={t("auth.register.passwordPlaceholder")}
         isPassword
         leftIcon="lock-closed-outline"
         returnKeyType="done"
@@ -119,21 +121,24 @@ export const RegisterForm = () => {
         onChangeText={handleConfirmPasswordChange}
         onSubmitEditing={handleSubmit}
         error={
-          errors.confirmPassword ??
-          (passwordMismatch ? "Las contraseñas no coinciden." : mutation.error?.message)
+          errors.confirmPassword
+            ? t(errors.confirmPassword)
+            : passwordMismatch
+              ? t("auth.validation.passwordMismatch")
+              : getErrorMessage(mutation.error, t)
         }
       />
 
       <Button
-        title="Crear Cuenta"
+        title={t("auth.register.submit")}
         onPress={handleSubmit}
         isLoading={mutation.isPending}
         style={{ marginBottom: 20 }}
       />
 
-      <Text style={styles.hasAccount}>¿Ya tienes una cuenta?</Text>
+      <Text style={styles.hasAccount}>{t("auth.register.hasAccount")}</Text>
       <Link href="/(auth)/login" style={styles.link} replace>
-        Inicia sesión aquí
+        {t("auth.register.goToLogin")}
       </Link>
     </>
   );

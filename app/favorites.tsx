@@ -22,24 +22,20 @@ import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 
-const EMPTY_STATE_COPY: Record<FavoritedByFilter, { title: string; description: string }> = {
-  me: {
-    title: "Todavía no marcaste favoritos",
-    description: "Tocá el corazón en una foto para guardarla acá.",
-  },
+const EMPTY_STATE_KEYS: Record<FavoritedByFilter, { title: string; description: string }> = {
+  me: { title: "favorites.emptyMe.title", description: "favorites.emptyMe.description" },
   partner: {
-    title: "Tu pareja no marcó favoritos",
-    description: "Cuando lo haga, sus fotos favoritas van a aparecer acá.",
+    title: "favorites.emptyPartner.title",
+    description: "favorites.emptyPartner.description",
   },
-  both: {
-    title: "Sin favoritos en común... todavía",
-    description: "Cuando los dos marquen la misma foto, va a aparecer acá.",
-  },
+  both: { title: "favorites.emptyBoth.title", description: "favorites.emptyBoth.description" },
 };
 
 export default function FavoritesScreen() {
+  const { t } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);
 
@@ -86,18 +82,16 @@ export default function FavoritesScreen() {
     });
   };
 
-  const emptyCopy = EMPTY_STATE_COPY[filter];
+  const emptyKeys = EMPTY_STATE_KEYS[filter];
 
   return (
     <View style={styles.screen}>
       <Stack.Screen options={{ headerTitle: "" }} />
       <View style={styles.header}>
-        <Title style={styles.title}>Favoritos</Title>
+        <Title style={styles.title}>{t("favorites.title")}</Title>
         {!isLoading && (
           <Text style={styles.subtitle}>
-            {totalCount === 0
-              ? "Todavía no hay momentos guardados"
-              : `${totalCount} momento${totalCount === 1 ? "" : "s"} guardado${totalCount === 1 ? "" : "s"}`}
+            {totalCount === 0 ? t("favorites.noneYet") : t("favorites.count", { count: totalCount })}
           </Text>
         )}
       </View>
@@ -108,9 +102,12 @@ export default function FavoritesScreen() {
           value={filter}
           onChange={(value) => setFilter(value as FavoritedByFilter)}
           options={[
-            { label: "Mías", value: "me" },
-            { label: `De ${partner.name.split(" ")[0]}`, value: "partner" },
-            { label: "Nuestras", value: "both" },
+            { label: t("favorites.filterMe"), value: "me" },
+            {
+              label: t("favorites.filterPartner", { name: partner.name.split(" ")[0] }),
+              value: "partner",
+            },
+            { label: t("favorites.filterBoth"), value: "both" },
           ]}
         />
       )}
@@ -121,9 +118,9 @@ export default function FavoritesScreen() {
         <Card cardStyles={styles.emptyCard}>
           <Ionicons name="heart-outline" size={40} color={colors.PRIMARY[500]} />
           <Title variant="h3" align="center" style={styles.emptyTitle}>
-            {emptyCopy.title}
+            {t(emptyKeys.title)}
           </Title>
-          <Text style={styles.emptyDescription}>{emptyCopy.description}</Text>
+          <Text style={styles.emptyDescription}>{t(emptyKeys.description)}</Text>
         </Card>
       ) : (
         <ImageGrid

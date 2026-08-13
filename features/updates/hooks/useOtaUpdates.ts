@@ -1,3 +1,4 @@
+import { i18n } from "@/features/i18n";
 import * as Updates from "expo-updates";
 import { useEffect, useRef } from "react";
 import { AppState, type AppStateStatus } from "react-native";
@@ -17,8 +18,8 @@ export function useOtaUpdates() {
       updateOfferedRef.current = true;
       Toast.show({
         type: "info",
-        text1: "Actualización disponible",
-        text2: "Tocá para reiniciar y aplicarla",
+        text1: i18n.t("updates.title"),
+        text2: i18n.t("updates.message"),
         autoHide: false,
         onPress: () => {
           Updates.reloadAsync();

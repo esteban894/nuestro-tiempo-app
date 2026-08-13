@@ -3,15 +3,17 @@ import { AccountMenu } from "@/features/account";
 import { Title } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet } from "react-native";
 
 export default function AccountScreen() {
+  const { t } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <Title title="Mi cuenta" variant="h2" style={styles.title} />
+      <Title title={t("account.title")} variant="h2" style={styles.title} />
       <AccountMenu />
     </ScrollView>
   );

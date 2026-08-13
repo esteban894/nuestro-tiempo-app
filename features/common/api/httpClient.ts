@@ -2,17 +2,23 @@ import { env } from "../config/env";
 
 export class ApiError extends Error {
   status: number;
+  /** Application error code from the API's `error` response field (e.g. "ALBUM_NOT_FOUND").
+   *  Undefined for responses that don't carry one, like Nest's validation-pipe errors. */
+  code?: string;
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, code?: string) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.code = code;
   }
 }
 
 export class NetworkError extends Error {
   constructor(cause?: unknown) {
-    super("No se pudo conectar. Revisa tu conexión.");
+    // Internal/dev-facing message only — showErrorToast renders a translated
+    // "errors.offlineMessage" instead of this string.
+    super("Network request failed.");
     this.name = "NetworkError";
     this.cause = cause;
   }
@@ -81,6 +87,18 @@ function extractErrorMessage(data: unknown, fallback: string): string {
   return fallback;
 }
 
+// The API returns its application error code in the `error` field, e.g.
+// { statusCode: 400, message: "...", error: "ALBUM_COUPLE_REQUIRED" }. Nest's built-in
+// validation pipe instead sends `error: "Bad Request"`, which isn't one of our codes —
+// showErrorToast falls back to a generic message when the code has no dictionary entry.
+function extractErrorCode(data: unknown): string | undefined {
+  if (data && typeof data === "object" && "error" in data) {
+    const code = (data as { error: unknown }).error;
+    if (typeof code === "string") return code;
+  }
+  return undefined;
+}
+
 async function parseResponseBody(response: Response): Promise<unknown> {
   const text = await response.text();
   if (!text) return undefined;
@@ -122,7 +140,11 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
   const data = await parseResponseBody(response);
 
   if (!response.ok) {
-    throw new ApiError(response.status, extractErrorMessage(data, response.statusText));
+    throw new ApiError(
+      response.status,
+      extractErrorMessage(data, response.statusText),
+      extractErrorCode(data),
+    );
   }
 
   return data as T;

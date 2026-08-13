@@ -1,11 +1,14 @@
 import { ThemeColors } from "@/constants/colors";
 import { AlbumForm, AlbumFormSkeleton, albumKeys, getAlbum, updateAlbum } from "@/features/albums";
+import { getErrorMessage } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function EditAlbumScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -35,18 +38,18 @@ export default function EditAlbumScreen() {
   if (isError || !album) {
     return (
       <View style={styles.notFound}>
-        <Text style={styles.notFoundText}>Álbum no encontrado</Text>
+        <Text style={styles.notFoundText}>{t("albums.notFound")}</Text>
       </View>
     );
   }
 
   return (
     <AlbumForm
-      submitLabel="Guardar cambios"
+      submitLabel={t("albums.form.editSubmit")}
       initialValues={{ name: album.name, coverImage: album.coverImage, isPrivate: album.isPrivate }}
       onSubmit={(formData) => mutation.mutate(formData)}
       isSubmitting={mutation.isPending}
-      error={mutation.error?.message ?? null}
+      error={getErrorMessage(mutation.error, t) ?? null}
     />
   );
 }

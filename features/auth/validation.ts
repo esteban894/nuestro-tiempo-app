@@ -1,27 +1,30 @@
 import { z } from "zod";
 
+// Schema messages are i18n keys, not display text — consumers resolve them via t() at
+// render time (see LoginForm/RegisterForm), since Zod validation runs outside any
+// particular language's rendering context.
 export const loginSchema = z.object({
   email: z
     .string()
     .trim()
-    .min(1, { error: "Ingresa tu correo electrónico." })
-    .pipe(z.email({ error: "Correo electrónico inválido." })),
-  password: z.string().min(1, { error: "Ingresa tu contraseña." }),
+    .min(1, { error: "auth.validation.emailRequired" })
+    .pipe(z.email({ error: "auth.validation.emailInvalid" })),
+  password: z.string().min(1, { error: "auth.validation.passwordRequired" }),
 });
 
 export const registerSchema = z
   .object({
-    name: z.string().trim().min(1, { error: "Ingresa tu nombre." }),
+    name: z.string().trim().min(1, { error: "auth.validation.nameRequired" }),
     email: z
       .string()
       .trim()
-      .min(1, { error: "Ingresa tu correo electrónico." })
-      .pipe(z.email({ error: "Correo electrónico inválido." })),
-    password: z.string().min(1, { error: "Ingresa una contraseña." }),
+      .min(1, { error: "auth.validation.emailRequired" })
+      .pipe(z.email({ error: "auth.validation.emailInvalid" })),
+    password: z.string().min(1, { error: "auth.validation.passwordRequiredRegister" }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    error: "Las contraseñas no coinciden.",
+    error: "auth.validation.passwordMismatch",
     path: ["confirmPassword"],
   });
 

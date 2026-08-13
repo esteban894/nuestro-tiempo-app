@@ -1,5 +1,6 @@
 import { ThemeColors } from "@/constants/colors";
 import { useThemeColors } from "@/features/theme";
+import { useTranslation } from "react-i18next";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 interface AlbumUploadStatusProps {
@@ -8,12 +9,13 @@ interface AlbumUploadStatusProps {
 }
 
 export const AlbumUploadStatus = ({ visible, count }: AlbumUploadStatusProps) => {
+  const { t } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);
 
   if (!visible) return null;
 
-  const label = count === 1 ? "Subiendo 1 foto…" : `Subiendo ${count} fotos…`;
+  const label = t("albums.uploadStatus", { count });
 
   return (
     <View style={styles.container}>

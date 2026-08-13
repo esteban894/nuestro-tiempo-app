@@ -2,33 +2,35 @@ import { ThemeColors } from "@/constants/colors";
 import { FlipCard, SegmentedControl, Title } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 import { CreateCoupleCard } from "../create-couple-card/CreateCoupleCard";
 import { JoinCoupleCard } from "../join-couple-card/JoinCoupleCard";
 
 type Mode = "create" | "join";
 
-const OPTIONS = [
-  { label: "Crear", value: "create" },
-  { label: "Unirse", value: "join" },
-];
-
 export const CoupleConnect = () => {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>("create");
   const colors = useThemeColors();
   const styles = createStyles(colors);
 
+  const options = [
+    { label: t("couple.connect.createTab"), value: "create" },
+    { label: t("couple.connect.joinTab"), value: "join" },
+  ];
+
   return (
     <View style={styles.container}>
       <Title
-        title="Vincula tu cuenta con la de tu pareja"
+        title={t("couple.connect.subtitle")}
         variant="subtitle"
         align="center"
         style={styles.subtitle}
       />
 
       <SegmentedControl
-        options={OPTIONS}
+        options={options}
         value={mode}
         onChange={(value) => setMode(value as Mode)}
         style={styles.toggle}

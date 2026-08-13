@@ -3,9 +3,11 @@ import { Button, Card, Title } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text } from "react-native";
 
 export const NoCoupleBanner = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const colors = useThemeColors();
   const styles = createStyles(colors);
@@ -13,12 +15,15 @@ export const NoCoupleBanner = () => {
   return (
     <Card cardStyles={styles.card}>
       <Ionicons name="people-outline" size={40} color={colors.PRIMARY[500]} />
-      <Title title="Empiecen a contar su tiempo juntos" variant="h3" align="center" style={styles.title} />
-      <Text style={styles.description}>
-        Vinculá tu cuenta con la de tu pareja para compartir álbumes y ver cuánto tiempo llevan juntos.
-      </Text>
+      <Title
+        title={t("couple.noCoupleBanner.title")}
+        variant="h3"
+        align="center"
+        style={styles.title}
+      />
+      <Text style={styles.description}>{t("couple.noCoupleBanner.description")}</Text>
       <Button
-        title="Vincular con mi pareja"
+        title={t("couple.noCoupleBanner.cta")}
         leftIcon="link"
         onPress={() => router.navigate("/couple")}
         style={styles.button}

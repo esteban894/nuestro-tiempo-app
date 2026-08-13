@@ -72,7 +72,8 @@
           "photosPermission": "Permitir que Nuestro Tiempo acceda a tus fotos.",
           "savePhotosPermission": "Permitir que Nuestro Tiempo guarde fotos en tu galería."
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

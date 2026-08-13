@@ -1,0 +1,243 @@
+{
+  "common": {
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "retry": "Reintentar",
+    "years_one": "Año",
+    "years_other": "Años",
+    "months_one": "Mes",
+    "months_other": "Meses",
+    "days_one": "Día",
+    "days_other": "Días",
+    "removeFromFavorites": "Quitar de favoritos",
+    "markAsFavorite": "Marcar como favorita"
+  },
+  "nav": {
+    "account": "Cuenta",
+    "linkCouple": "Vincular pareja",
+    "settings": "Configuración",
+    "newAlbum": "Nuevo álbum",
+    "editAlbum": "Editar álbum",
+    "album": "Álbum",
+    "albums": "Álbumes",
+    "home": "Inicio"
+  },
+  "errorBoundary": {
+    "title": "Algo salió mal"
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar Sesión",
+      "subtitle": "Vuelve a tu rincón especial",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "john.doe@example.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "********",
+      "submit": "Iniciar Sesión",
+      "noAccount": "¿Aún no tienes una cuenta?",
+      "goToRegister": "Empieza tu viaje aquí"
+    },
+    "register": {
+      "title": "Crear Cuenta",
+      "subtitle": "Comienza tu viaje con nosotros",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "John Doe",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "john.doe@example.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "********",
+      "confirmPasswordLabel": "Confirmar Contraseña",
+      "submit": "Crear Cuenta",
+      "hasAccount": "¿Ya tienes una cuenta?",
+      "goToLogin": "Inicia sesión aquí"
+    },
+    "validation": {
+      "emailRequired": "Ingresa tu correo electrónico.",
+      "emailInvalid": "Correo electrónico inválido.",
+      "passwordRequired": "Ingresa tu contraseña.",
+      "passwordRequiredRegister": "Ingresa una contraseña.",
+      "nameRequired": "Ingresa tu nombre.",
+      "passwordMismatch": "Las contraseñas no coinciden."
+    }
+  },
+  "couple": {
+    "connect": {
+      "subtitle": "Vincula tu cuenta con la de tu pareja",
+      "createTab": "Crear",
+      "joinTab": "Unirse"
+    },
+    "create": {
+      "title": "Crear pareja",
+      "shareHint": "Comparte este código con tu pareja:",
+      "validUntil": "Válido hasta {{date}}",
+      "waitingHint": "Esperando a que tu pareja se una…",
+      "copy": "Copiar código",
+      "copied": "¡Copiado!",
+      "whenStarted": "¿Cuándo empezó su historia juntos?",
+      "selectDate": "Selecciona una fecha",
+      "submit": "Crear vínculo"
+    },
+    "join": {
+      "title": "Unirse a una pareja",
+      "helper": "Ingresa el código que te compartió tu pareja:",
+      "codePlaceholder": "A1B2C3D4",
+      "submit": "Unirse",
+      "success": "¡Te uniste a la pareja con el código {{code}}!",
+      "codeFormatError": "El código debe tener 8 dígitos hexadecimales."
+    },
+    "noCoupleBanner": {
+      "title": "Empiecen a contar su tiempo juntos",
+      "description": "Vinculá tu cuenta con la de tu pareja para compartir álbumes y ver cuánto tiempo llevan juntos.",
+      "cta": "Vincular con mi pareja"
+    }
+  },
+  "albums": {
+    "screenTitle": "Nuestros Álbumes",
+    "form": {
+      "addCover": "Agregar portada",
+      "titleLabel": "Título",
+      "titlePlaceholder": "Título del álbum",
+      "privateLabel": "Álbum privado",
+      "createSubmit": "Crear álbum",
+      "editSubmit": "Guardar cambios",
+      "defaultSubmit": "Guardar"
+    },
+    "notFound": "Álbum no encontrado",
+    "privateBadge": "Privada",
+    "meatballsMenu": {
+      "edit": "Editar álbum",
+      "markAsCurrent": "Marcar como actual",
+      "delete": "Eliminar álbum"
+    },
+    "deleteConfirm": {
+      "title": "Eliminar álbum",
+      "message": "Esta acción no se puede deshacer. Se eliminará el álbum y todas sus fotos."
+    },
+    "uploadStatus_one": "Subiendo 1 foto…",
+    "uploadStatus_other": "Subiendo {{count}} fotos…",
+    "imagePicker": {
+      "title": "Agregar foto",
+      "takePhoto": "Tomar foto",
+      "chooseFromLibrary": "Elegir de la galería",
+      "cancel": "Cancelar"
+    },
+    "tooManyPhotos": {
+      "title": "Demasiadas fotos",
+      "message": "Se subirán las primeras {{max}} de esta selección."
+    },
+    "favoriteFilter": {
+      "label": "Favoritas",
+      "all": "Todas",
+      "me": "Mías",
+      "partner": "De {{name}}",
+      "both": "Nuestras"
+    },
+    "imageMenu": {
+      "download": "Descargar",
+      "delete": "Eliminar",
+      "downloadA11y": "Descargar imagen",
+      "deleteA11y": "Eliminar imagen"
+    },
+    "downloadToast": {
+      "success": "Imagen guardada en tu galería",
+      "errorTitle": "No se pudo descargar la imagen",
+      "permissionMessage": "Activa el acceso a tus fotos en los ajustes del dispositivo."
+    },
+    "noCurrentAlbumBanner": {
+      "title": "Elegí el álbum de su momento",
+      "description": "Marcá un álbum como actual desde su menú y sus fotos aparecerán acá, en la pantalla principal.",
+      "cta": "Ver mis álbumes"
+    }
+  },
+  "account": {
+    "title": "Mi cuenta",
+    "coupleWith": "En pareja con {{name}}",
+    "linkCouple": "Vincular con tu pareja",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión"
+  },
+  "settings": {
+    "appearance": "Apariencia",
+    "themeLight": "Claro",
+    "themeDark": "Oscuro",
+    "themeSystem": "Sistema",
+    "language": "Idioma",
+    "languageEs": "Español",
+    "languageEn": "English"
+  },
+  "favorites": {
+    "title": "Favoritos",
+    "viewFavoritesA11y": "Ver favoritos",
+    "noneYet": "Todavía no hay momentos guardados",
+    "count_one": "{{count}} momento guardado",
+    "count_other": "{{count}} momentos guardados",
+    "filterMe": "Mías",
+    "filterPartner": "De {{name}}",
+    "filterBoth": "Nuestras",
+    "emptyMe": {
+      "title": "Todavía no marcaste favoritos",
+      "description": "Tocá el corazón en una foto para guardarla acá."
+    },
+    "emptyPartner": {
+      "title": "Tu pareja no marcó favoritos",
+      "description": "Cuando lo haga, sus fotos favoritas van a aparecer acá."
+    },
+    "emptyBoth": {
+      "title": "Sin favoritos en común... todavía",
+      "description": "Cuando los dos marquen la misma foto, va a aparecer acá."
+    }
+  },
+  "updates": {
+    "title": "Actualización disponible",
+    "message": "Tocá para reiniciar y aplicarla"
+  },
+  "errors": {
+    "offlineTitle": "Sin conexión",
+    "offlineMessage": "No se pudo conectar. Revisa tu conexión.",
+    "genericTitle": "Error",
+    "fallback": "Ocurrió un error inesperado.",
+    "ALBUM_NOT_FOUND": "Álbum no encontrado",
+    "ALBUM_ACCESS_DENIED": "No tienes acceso a este álbum",
+    "ALBUM_MEMBERSHIP_REQUIRED": "Debes ser miembro del álbum",
+    "ALBUM_NOT_CREATOR": "Solo el creador del álbum puede realizar esta acción",
+    "ALBUM_COUPLE_REQUIRED": "Debes estar en pareja para crear un álbum",
+    "ALBUM_COUPLE_INCOMPLETE": "Ambos usuarios deben estar en pareja para crear un álbum",
+    "ALBUM_NO_CURRENT_ALBUM": "No hay un álbum actual configurado",
+    "ALBUM_COVER_IMAGE_REQUIRED": "La imagen de portada es obligatoria",
+    "ALBUM_COVER_IMAGE_NOT_FOUND": "Imagen de portada no encontrada",
+    "IMAGE_NOT_FOUND": "Imagen no encontrada",
+    "IMAGE_ACCESS_DENIED": "No tienes acceso a esta imagen",
+    "IMAGE_FILE_REQUIRED": "Se requiere un archivo de imagen",
+    "IMAGE_FILES_REQUIRED": "Se requiere al menos un archivo de imagen",
+    "IMAGE_UPLOAD_FAILED": "No se pudo subir la imagen",
+    "IMAGE_DELETE_FAILED": "No se pudo eliminar la imagen",
+    "USER_NOT_FOUND": "Usuario no encontrado",
+    "USER_ALREADY_EXISTS": "El usuario ya existe",
+    "USER_EMAIL_DELETED_ACCOUNT": "El correo está asociado a una cuenta eliminada",
+    "USER_INVALID_CREDENTIALS": "Credenciales inválidas",
+    "USER_UNAUTHORIZED": "Acceso no autorizado",
+    "AUTH_TOKEN_MISSING": "No se proporcionó el token de autenticación",
+    "AUTH_INVALID_TOKEN": "Token de autenticación inválido",
+    "AUTH_TOKEN_EXPIRED": "El token de autenticación ha expirado",
+    "AUTH_INVALID_CREDENTIALS": "Correo o contraseña inválidos",
+    "AUTH_EMAIL_ALREADY_EXISTS": "El correo ya está registrado",
+    "AUTH_REFRESH_TOKEN_INVALID": "El refresh token es inválido o expiró",
+    "COUPLE_NOT_FOUND": "Pareja no encontrada",
+    "COUPLE_INVALID_REFERENCE": "La referencia de tu pareja es inválida",
+    "COUPLE_COMPLETE": "La pareja ya está completa",
+    "COUPLE_ALREADY_IN_COUPLE": "Ya estás en una pareja",
+    "COUPLE_INVITE_NOT_FOUND": "Invitación no encontrada",
+    "COUPLE_INVITE_EXPIRED": "La invitación ha expirado",
+    "COUPLE_INVITE_ALREADY_USED": "La invitación ya fue utilizada",
+    "COUPLE_SELF_INVITE": "No puedes invitarte a ti mismo",
+    "COUPLE_NOT_IN_COUPLE": "No formas parte de una pareja",
+    "NOTIFICATIONS_INVALID_PUSH_TOKEN": "Token de notificaciones push inválido",
+    "VALIDATION_FAILED": "La validación falló",
+    "INTERNAL_ERROR": "Ocurrió un error interno",
+    "FORBIDDEN": "Acceso prohibido",
+    "UNAUTHORIZED": "No autorizado",
+    "BAD_REQUEST": "Solicitud inválida",
+    "PAGE_OUT_OF_RANGE": "La página excede el total de páginas"
+  }
+}
