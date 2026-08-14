@@ -21,7 +21,11 @@
     "editAlbum": "Edit album",
     "album": "Album",
     "albums": "Albums",
-    "home": "Home"
+    "home": "Home",
+    "calendar": "Calendar",
+    "newEvent": "New event",
+    "editEvent": "Edit event",
+    "event": "Event"
   },
   "errorBoundary": {
     "title": "Something went wrong"
@@ -188,6 +192,91 @@
       "description": "When you both mark the same photo, it'll show up here."
     }
   },
+  "calendar": {
+    "screenTitle": "Calendar",
+    "newEventA11y": "New event",
+    "notFound": "Event not found",
+    "views": {
+      "month": "Month",
+      "week": "Week",
+      "day": "Day"
+    },
+    "memberFilter": {
+      "all": "Both",
+      "me": "Me"
+    },
+    "eventList": {
+      "empty": "No events for this day."
+    },
+    "eventItem": {
+      "allDay": "All day"
+    },
+    "form": {
+      "typeAppointment": "Appointment",
+      "typeImportantDate": "Special date",
+      "category": {
+        "datePlan": "Plan",
+        "anniversary": "Anniversary",
+        "birthday": "Birthday",
+        "milestone": "Milestone",
+        "memory": "Memory",
+        "other": "Other"
+      },
+      "titleLabel": "Title",
+      "titlePlaceholder": "Event title",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Optional",
+      "locationLabel": "Location",
+      "locationPlaceholder": "Optional",
+      "allDay": "All day",
+      "startLabel": "Start",
+      "selectDate": "Select date",
+      "addEnd": "Add end time",
+      "recurrenceLabel": "Repeat",
+      "recurrenceNone": "Never",
+      "recurrenceYearly": "Every year",
+      "recurrenceMonthly": "Every month",
+      "reminder": "Remind me",
+      "reminder15": "15 min before",
+      "reminder60": "1 hour before",
+      "reminder1440": "1 day before",
+      "createSubmit": "Create event",
+      "editSubmit": "Save changes",
+      "defaultSubmit": "Save"
+    },
+    "validation": {
+      "titleRequired": "Enter a title.",
+      "startRequired": "Select a start date.",
+      "endAfterStart": "The end date must be after the start date."
+    },
+    "detail": {
+      "editMenu": "Edit",
+      "deleteMenu": "Delete",
+      "deleteConfirm": {
+        "title": "Delete event",
+        "message": "This action cannot be undone."
+      },
+      "recurrence": {
+        "none": "Does not repeat",
+        "yearly": "Repeats every year",
+        "monthly": "Repeats every month"
+      },
+      "reminderActive": "Reminder on"
+    },
+    "countdown": {
+      "years_one": "in {{count}} year",
+      "years_other": "in {{count}} years",
+      "months_one": "in {{count}} month",
+      "months_other": "in {{count}} months",
+      "days_one": "in {{count}} day",
+      "days_other": "in {{count}} days",
+      "hours_one": "in {{count}} hour",
+      "hours_other": "in {{count}} hours",
+      "minutes_one": "in {{count}} minute",
+      "minutes_other": "in {{count}} minutes",
+      "soon": "very soon"
+    }
+  },
   "updates": {
     "title": "Update available",
     "message": "Tap to restart and apply it"
@@ -197,6 +286,9 @@
     "offlineMessage": "Couldn't connect. Check your connection.",
     "genericTitle": "Error",
     "fallback": "An unexpected error occurred.",
+    "CALENDAR_EVENT_NOT_FOUND": "Calendar event not found",
+    "CALENDAR_COUPLE_REQUIRED": "You must be in a couple to manage calendar events",
+    "CALENDAR_INVALID_DATE_RANGE": "The end date must be after the start date",
     "ALBUM_NOT_FOUND": "Album not found",
     "ALBUM_ACCESS_DENIED": "You do not have access to this album",
     "ALBUM_MEMBERSHIP_REQUIRED": "You must be a member of the album",

@@ -1,5 +1,6 @@
 import { ThemeColors } from "@/constants/colors";
 import { NoCurrentAlbumBanner, useCurrentAlbumQuery } from "@/features/albums";
+import { NextEventCard, useUpcomingEventsQuery } from "@/features/calendar";
 import { ImageCarousel, MediaItem, Title } from "@/features/common";
 import { CounterCards } from "@/features/common/components/ui/counter-cards/CounterCards";
 import { NoCoupleBanner, useCoupleQuery } from "@/features/couple";
@@ -23,6 +24,7 @@ export default function HomeScreen() {
     hasNextPage,
     isFetchingNextPage,
   } = useCurrentAlbumImagesQuery(currentAlbum?.id);
+  const { refetch: refetchUpcomingEvents } = useUpcomingEventsQuery(1);
   const [isRefreshing, setIsRefreshing] = useState(false);
   // Ids already retried once — bounds retries to one refetch per image (not one for the
   // whole screen) so a fresh failure later on can still recover, without looping forever
@@ -39,7 +41,12 @@ export default function HomeScreen() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     retriedImageIdsRef.current = new Set();
-    await Promise.all([refetchCouple(), refetchCurrentAlbum(), refetchImages()]);
+    await Promise.all([
+      refetchCouple(),
+      refetchCurrentAlbum(),
+      refetchImages(),
+      refetchUpcomingEvents(),
+    ]);
     setIsRefreshing(false);
   };
 
@@ -94,6 +101,7 @@ export default function HomeScreen() {
         {couple.user1.name.charAt(0).toUpperCase()} & {couple.user2?.name.charAt(0).toUpperCase()}
       </Title>
       <CounterCards initDate={couple.startDate} />
+      <NextEventCard />
     </ScrollView>
   );
 }

@@ -188,6 +188,35 @@ export default function RootLayout() {
                 headerShadowVisible: false,
               }}
             />
+            <Stack.Screen
+              name="calendar/[id]"
+              options={{
+                headerBackTitle: t("nav.calendar"),
+                headerTintColor: themeColors.PRIMARY[800],
+                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
+                headerShadowVisible: false,
+              }}
+            />
+            <Stack.Screen
+              name="calendar/new"
+              options={{
+                headerTitle: t("nav.newEvent"),
+                headerBackTitle: t("nav.calendar"),
+                headerTintColor: themeColors.PRIMARY[800],
+                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
+                headerShadowVisible: false,
+              }}
+            />
+            <Stack.Screen
+              name="calendar/[id]/edit"
+              options={{
+                headerTitle: t("nav.editEvent"),
+                headerBackTitle: t("nav.event"),
+                headerTintColor: themeColors.PRIMARY[800],
+                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
+                headerShadowVisible: false,
+              }}
+            />
           </Stack>
         </QueryClientProvider>
       </KeyboardProvider>

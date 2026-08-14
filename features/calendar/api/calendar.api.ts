@@ -1,0 +1,81 @@
+import { apiFetch } from "@/features/common/api/httpClient";
+
+export type CalendarEventType = "appointment" | "important_date";
+export type CalendarEventCategory =
+  | "anniversary"
+  | "birthday"
+  | "date_plan"
+  | "milestone"
+  | "memory"
+  | "other";
+export type CalendarEventRecurrence = "none" | "yearly" | "monthly";
+
+export type CalendarEvent = {
+  id: string;
+  coupleId: string;
+  createdBy: string | null;
+  type: CalendarEventType;
+  category: CalendarEventCategory;
+  title: string;
+  description: string | null;
+  location: string | null;
+  startAt: string;
+  endAt: string | null;
+  allDay: boolean;
+  recurrence: CalendarEventRecurrence;
+  reminderMinutesBefore: number | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CalendarEventPayload = {
+  type: CalendarEventType;
+  category?: CalendarEventCategory;
+  title: string;
+  description?: string;
+  location?: string;
+  startAt: string;
+  endAt?: string;
+  allDay?: boolean;
+  recurrence?: CalendarEventRecurrence;
+  reminderMinutesBefore?: number;
+};
+
+export type CalendarEventsQuery = {
+  from?: string;
+  to?: string;
+  createdBy?: string;
+};
+
+function toQueryString(params: Record<string, string | number | undefined>) {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined) search.set(key, String(value));
+  }
+  const query = search.toString();
+  return query ? `?${query}` : "";
+}
+
+export function getCalendarEvents(query: CalendarEventsQuery = {}) {
+  return apiFetch<CalendarEvent[]>(`/calendar/events${toQueryString(query)}`);
+}
+
+export function getUpcomingCalendarEvents(limit = 5) {
+  return apiFetch<CalendarEvent[]>(`/calendar/events/upcoming${toQueryString({ limit })}`);
+}
+
+export function getCalendarEvent(id: string) {
+  return apiFetch<CalendarEvent>(`/calendar/events/${id}`);
+}
+
+export function createCalendarEvent(payload: CalendarEventPayload) {
+  return apiFetch<CalendarEvent>("/calendar/events", { method: "POST", body: payload });
+}
+
+export function updateCalendarEvent(id: string, payload: Partial<CalendarEventPayload>) {
+  return apiFetch<CalendarEvent>(`/calendar/events/${id}`, { method: "PATCH", body: payload });
+}
+
+export function deleteCalendarEvent(id: string) {
+  return apiFetch<void>(`/calendar/events/${id}`, { method: "DELETE" });
+}

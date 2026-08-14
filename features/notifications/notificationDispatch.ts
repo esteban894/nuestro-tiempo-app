@@ -1,4 +1,5 @@
 import { albumKeys } from "@/features/albums";
+import { calendarKeys } from "@/features/calendar";
 import { queryClient } from "@/features/common";
 import { coupleKeys } from "@/features/couple";
 import { imageKeys } from "@/features/images";
@@ -62,6 +63,15 @@ const notificationHandlers: NotificationHandlerRegistry = {
     },
     onResponse: (data) => {
       router.push({ pathname: "/album/[id]", params: { id: data.albumId } });
+    },
+  },
+
+  [NotificationType.EVENT_REMINDER]: {
+    onReceived: () => {
+      queryClient.invalidateQueries({ queryKey: calendarKeys.all });
+    },
+    onResponse: (data) => {
+      router.push({ pathname: "/calendar/[id]", params: { id: data.eventId } });
     },
   },
 };

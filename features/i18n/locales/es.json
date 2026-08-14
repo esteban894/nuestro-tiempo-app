@@ -21,7 +21,11 @@
     "editAlbum": "Editar álbum",
     "album": "Álbum",
     "albums": "Álbumes",
-    "home": "Inicio"
+    "home": "Inicio",
+    "calendar": "Calendario",
+    "newEvent": "Nuevo evento",
+    "editEvent": "Editar evento",
+    "event": "Evento"
   },
   "errorBoundary": {
     "title": "Algo salió mal"
@@ -188,6 +192,91 @@
       "description": "Cuando los dos marquen la misma foto, va a aparecer acá."
     }
   },
+  "calendar": {
+    "screenTitle": "Calendario",
+    "newEventA11y": "Nuevo evento",
+    "notFound": "Evento no encontrado",
+    "views": {
+      "month": "Mes",
+      "week": "Semana",
+      "day": "Día"
+    },
+    "memberFilter": {
+      "all": "Ambos",
+      "me": "Yo"
+    },
+    "eventList": {
+      "empty": "No hay eventos para este día."
+    },
+    "eventItem": {
+      "allDay": "Todo el día"
+    },
+    "form": {
+      "typeAppointment": "Cita",
+      "typeImportantDate": "Fecha especial",
+      "category": {
+        "datePlan": "Plan",
+        "anniversary": "Aniversario",
+        "birthday": "Cumpleaños",
+        "milestone": "Hito",
+        "memory": "Recuerdo",
+        "other": "Otro"
+      },
+      "titleLabel": "Título",
+      "titlePlaceholder": "Título del evento",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Opcional",
+      "locationLabel": "Ubicación",
+      "locationPlaceholder": "Opcional",
+      "allDay": "Todo el día",
+      "startLabel": "Inicio",
+      "selectDate": "Selecciona fecha",
+      "addEnd": "Agregar hora de fin",
+      "recurrenceLabel": "Repetir",
+      "recurrenceNone": "Nunca",
+      "recurrenceYearly": "Cada año",
+      "recurrenceMonthly": "Cada mes",
+      "reminder": "Recordarme",
+      "reminder15": "15 min antes",
+      "reminder60": "1 hora antes",
+      "reminder1440": "1 día antes",
+      "createSubmit": "Crear evento",
+      "editSubmit": "Guardar cambios",
+      "defaultSubmit": "Guardar"
+    },
+    "validation": {
+      "titleRequired": "Ingresa un título.",
+      "startRequired": "Selecciona una fecha de inicio.",
+      "endAfterStart": "La fecha de fin debe ser posterior a la de inicio."
+    },
+    "detail": {
+      "editMenu": "Editar",
+      "deleteMenu": "Eliminar",
+      "deleteConfirm": {
+        "title": "Eliminar evento",
+        "message": "Esta acción no se puede deshacer."
+      },
+      "recurrence": {
+        "none": "No se repite",
+        "yearly": "Se repite cada año",
+        "monthly": "Se repite cada mes"
+      },
+      "reminderActive": "Recordatorio activado"
+    },
+    "countdown": {
+      "years_one": "en {{count}} año",
+      "years_other": "en {{count}} años",
+      "months_one": "en {{count}} mes",
+      "months_other": "en {{count}} meses",
+      "days_one": "en {{count}} día",
+      "days_other": "en {{count}} días",
+      "hours_one": "en {{count}} hora",
+      "hours_other": "en {{count}} horas",
+      "minutes_one": "en {{count}} minuto",
+      "minutes_other": "en {{count}} minutos",
+      "soon": "muy pronto"
+    }
+  },
   "updates": {
     "title": "Actualización disponible",
     "message": "Tocá para reiniciar y aplicarla"
@@ -197,6 +286,9 @@
     "offlineMessage": "No se pudo conectar. Revisa tu conexión.",
     "genericTitle": "Error",
     "fallback": "Ocurrió un error inesperado.",
+    "CALENDAR_EVENT_NOT_FOUND": "Evento de calendario no encontrado",
+    "CALENDAR_COUPLE_REQUIRED": "Debes estar en pareja para gestionar el calendario",
+    "CALENDAR_INVALID_DATE_RANGE": "La fecha de fin debe ser posterior a la de inicio",
     "ALBUM_NOT_FOUND": "Álbum no encontrado",
     "ALBUM_ACCESS_DENIED": "No tienes acceso a este álbum",
     "ALBUM_MEMBERSHIP_REQUIRED": "Debes ser miembro del álbum",
