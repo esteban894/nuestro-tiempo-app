@@ -13,4 +13,7 @@ export * from "./hooks/useEventQuery";
 export * from "./hooks/useEventsQuery";
 export * from "./hooks/useUpcomingEventsQuery";
 export * from "./hooks/useUpdateEventMutation";
+export * from "./utils/categoryColors";
+export * from "./utils/dateGrid";
+export * from "./utils/recurrence";
 export * from "./validation";

@@ -5,9 +5,12 @@ import {
   CalendarView,
   CalendarViewMode,
   EventList,
+  expandEventsInRange,
+  fromDateKey,
   MemberFilter,
   MemberFilterValue,
   MEMBER_FILTER_ALL,
+  toDateKey,
   useEventsQuery,
   ViewSwitcher,
 } from "@/features/calendar";
@@ -19,13 +22,6 @@ import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
-
-function toDateKey(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
 
 export default function CalendarScreen() {
   const { t } = useTranslation();
@@ -58,10 +54,12 @@ export default function CalendarScreen() {
     return events.filter((event) => event.createdBy === memberFilter);
   }, [events, memberFilter]);
 
-  const eventsForSelectedDay = useMemo(
-    () => filteredEvents.filter((event) => toDateKey(new Date(event.startAt)) === selectedDate),
-    [filteredEvents, selectedDate],
-  );
+  const eventsForSelectedDay = useMemo(() => {
+    const dayStart = fromDateKey(selectedDate);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setHours(23, 59, 59, 999);
+    return expandEventsInRange(filteredEvents, dayStart, dayEnd);
+  }, [filteredEvents, selectedDate]);
 
   const handlePressEvent = (event: CalendarEvent) => {
     router.push({ pathname: "/calendar/[id]", params: { id: event.id } });
@@ -131,6 +129,7 @@ export default function CalendarScreen() {
           mode={viewMode}
           selectedDate={selectedDate}
           onSelectDate={setSelectedDate}
+          onPressEvent={handlePressEvent}
           events={filteredEvents}
         />
       )}
