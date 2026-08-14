@@ -7,9 +7,9 @@ import {
   EventList,
   expandEventsInRange,
   fromDateKey,
+  MEMBER_FILTER_ALL,
   MemberFilter,
   MemberFilterValue,
-  MEMBER_FILTER_ALL,
   toDateKey,
   useEventsQuery,
   ViewSwitcher,
@@ -31,11 +31,7 @@ export default function CalendarScreen() {
   const currentUserId = useAuthStore((state) => state.user?.id);
 
   const { data: couple, isLoading: isLoadingCouple } = useCoupleQuery();
-  const {
-    data: events,
-    isLoading: isLoadingEvents,
-    refetch: refetchEvents,
-  } = useEventsQuery();
+  const { data: events, isLoading: isLoadingEvents, refetch: refetchEvents } = useEventsQuery();
 
   const [viewMode, setViewMode] = useState<CalendarViewMode>("month");
   const [memberFilter, setMemberFilter] = useState<MemberFilterValue>(MEMBER_FILTER_ALL);

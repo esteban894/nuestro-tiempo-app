@@ -1,14 +1,34 @@
 import { ThemeColors } from "@/constants/colors";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
+import Animated, {
+  runOnJS,
+  SlideInLeft,
+  SlideInRight,
+  SlideOutLeft,
+  SlideOutRight,
+} from "react-native-reanimated";
 import { CalendarEvent } from "../../api/calendar.api";
-import { addDays, addMonths, fromDateKey, getWeekDays, toDateKey } from "../../utils/dateGrid";
+import {
+  addDays,
+  addMonths,
+  fromDateKey,
+  getWeekDays,
+  startOfWeek,
+  toDateKey,
+} from "../../utils/dateGrid";
 import { CalendarViewMode } from "../view-switcher/ViewSwitcher";
 import { DayTimelineView } from "./DayTimelineView";
 import { MonthGridView } from "./MonthGridView";
 import { WeekTimelineView } from "./WeekTimelineView";
+
+const SWIPE_DISTANCE_THRESHOLD = 50;
+const SWIPE_VELOCITY_THRESHOLD = 500;
+const SLIDE_DURATION = 220;
 
 interface CalendarViewProps {
   mode: CalendarViewMode;
@@ -39,8 +59,39 @@ export const CalendarView = ({
 
   const headerTitle = getHeaderTitle(mode, anchor, i18n.language);
 
+  const previousModeRef = useRef(mode);
+  const previousDateRef = useRef(selectedDate);
+  const isModeChange = previousModeRef.current !== mode;
+  const direction = fromDateKey(selectedDate) >= fromDateKey(previousDateRef.current) ? 1 : -1;
+  previousModeRef.current = mode;
+  previousDateRef.current = selectedDate;
+
+  const entering = isModeChange
+    ? undefined
+    : (direction > 0 ? SlideInRight : SlideInLeft).duration(SLIDE_DURATION);
+  const exiting = isModeChange
+    ? undefined
+    : (direction > 0 ? SlideOutLeft : SlideOutRight).duration(SLIDE_DURATION);
+  const periodKey =
+    mode === "month"
+      ? `${anchor.getFullYear()}-${anchor.getMonth()}`
+      : mode === "week"
+        ? toDateKey(startOfWeek(anchor))
+        : selectedDate;
+
+  const swipeGesture = Gesture.Pan()
+    .activeOffsetX([-20, 20])
+    .failOffsetY([-15, 15])
+    .onEnd((event) => {
+      const isSwipe =
+        Math.abs(event.translationX) > SWIPE_DISTANCE_THRESHOLD ||
+        Math.abs(event.velocityX) > SWIPE_VELOCITY_THRESHOLD;
+      if (!isSwipe) return;
+      runOnJS(shift)(event.translationX > 0 ? -1 : 1);
+    });
+
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       <View style={styles.navRow}>
         <TouchableOpacity onPress={() => shift(-1)} hitSlop={12} style={styles.navBtn}>
           <Ionicons name="chevron-back" size={20} color={colors.PRIMARY[800]} />
@@ -58,26 +109,36 @@ export const CalendarView = ({
         </TouchableOpacity>
       </View>
 
-      {mode === "month" && (
-        <MonthGridView
-          month={anchor}
-          events={events}
-          selectedDate={selectedDate}
-          onSelectDay={onSelectDate}
-        />
-      )}
-      {mode === "week" && (
-        <WeekTimelineView
-          weekAnchor={anchor}
-          events={events}
-          selectedDate={selectedDate}
-          onSelectDay={onSelectDate}
-        />
-      )}
-      {mode === "day" && (
-        <DayTimelineView day={anchor} events={events} onPressEvent={onPressEvent} />
-      )}
-    </View>
+      <GestureDetector gesture={swipeGesture} touchAction="pan-y">
+        <View style={styles.slideClip}>
+          {mode === "month" && (
+            <Animated.View key={periodKey} entering={entering} exiting={exiting}>
+              <MonthGridView
+                month={anchor}
+                events={events}
+                selectedDate={selectedDate}
+                onSelectDay={onSelectDate}
+              />
+            </Animated.View>
+          )}
+          {mode === "week" && (
+            <Animated.View key={periodKey} entering={entering} exiting={exiting}>
+              <WeekTimelineView
+                weekAnchor={anchor}
+                events={events}
+                selectedDate={selectedDate}
+                onSelectDay={onSelectDate}
+              />
+            </Animated.View>
+          )}
+          {mode === "day" && (
+            <Animated.View key={periodKey} entering={entering} exiting={exiting}>
+              <DayTimelineView day={anchor} events={events} onPressEvent={onPressEvent} />
+            </Animated.View>
+          )}
+        </View>
+      </GestureDetector>
+    </GestureHandlerRootView>
   );
 };
 
@@ -130,5 +191,8 @@ const createStyles = (colors: ThemeColors) =>
       fontWeight: "700",
       color: colors.PRIMARY[800],
       textTransform: "capitalize",
+    },
+    slideClip: {
+      overflow: "hidden",
     },
   });

@@ -8,6 +8,7 @@ import {
   handleNotificationResponse,
   registerForPushNotifications,
 } from "@/features/notifications";
+import "@/features/notifications/notificationCategories";
 import "@/features/notifications/notificationHandler";
 import { subscribeToSystemScheme, useThemeColors, useThemeStore } from "@/features/theme";
 import { useOtaUpdates } from "@/features/updates";

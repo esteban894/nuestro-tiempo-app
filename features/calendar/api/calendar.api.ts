@@ -9,6 +9,7 @@ export type CalendarEventCategory =
   | "memory"
   | "other";
 export type CalendarEventRecurrence = "none" | "yearly" | "monthly";
+export type CalendarEventStatus = "proposed" | "confirmed" | "rejected";
 
 export type CalendarEvent = {
   id: string;
@@ -24,6 +25,10 @@ export type CalendarEvent = {
   allDay: boolean;
   recurrence: CalendarEventRecurrence;
   reminderMinutesBefore: number | null;
+  status: CalendarEventStatus;
+  proposedBy: string | null;
+  respondedBy: string | null;
+  respondedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -78,4 +83,12 @@ export function updateCalendarEvent(id: string, payload: Partial<CalendarEventPa
 
 export function deleteCalendarEvent(id: string) {
   return apiFetch<void>(`/calendar/events/${id}`, { method: "DELETE" });
+}
+
+export function confirmCalendarEvent(id: string) {
+  return apiFetch<CalendarEvent>(`/calendar/events/${id}/confirm`, { method: "PATCH" });
+}
+
+export function rejectCalendarEvent(id: string) {
+  return apiFetch<CalendarEvent>(`/calendar/events/${id}/reject`, { method: "PATCH" });
 }

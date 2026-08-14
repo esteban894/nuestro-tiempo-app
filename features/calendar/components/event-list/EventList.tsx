@@ -12,12 +12,7 @@ interface EventListProps {
   emptyLabel?: string;
 }
 
-export const EventList = ({
-  events,
-  currentUserId,
-  onPressEvent,
-  emptyLabel,
-}: EventListProps) => {
+export const EventList = ({ events, currentUserId, onPressEvent, emptyLabel }: EventListProps) => {
   const { t } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);

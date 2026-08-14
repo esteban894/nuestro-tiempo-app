@@ -209,7 +209,9 @@
       "empty": "No events for this day."
     },
     "eventItem": {
-      "allDay": "All day"
+      "allDay": "All day",
+      "pendingBadge": "Pending",
+      "rejectedBadge": "Rejected"
     },
     "form": {
       "typeAppointment": "Appointment",
@@ -247,7 +249,8 @@
     "validation": {
       "titleRequired": "Enter a title.",
       "startRequired": "Select a start date.",
-      "endAfterStart": "The end date must be after the start date."
+      "endAfterStart": "The end date must be after the start date.",
+      "categoryTypeMismatch": "That category doesn't match this event type."
     },
     "detail": {
       "editMenu": "Edit",
@@ -261,7 +264,16 @@
         "yearly": "Repeats every year",
         "monthly": "Repeats every month"
       },
-      "reminderActive": "Reminder on"
+      "reminderActive": "Reminder on",
+      "proposal": {
+        "confirmButton": "I'm in",
+        "counterProposeButton": "Different day",
+        "rejectButton": "Decline",
+        "pendingTitle": "Awaiting confirmation",
+        "pendingSubtitle": "Waiting for your partner to respond.",
+        "confirmedBadge": "Confirmed",
+        "rejectedBadge": "Rejected"
+      }
     },
     "countdown": {
       "years_one": "in {{count}} year",
@@ -289,6 +301,8 @@
     "CALENDAR_EVENT_NOT_FOUND": "Calendar event not found",
     "CALENDAR_COUPLE_REQUIRED": "You must be in a couple to manage calendar events",
     "CALENDAR_INVALID_DATE_RANGE": "The end date must be after the start date",
+    "CALENDAR_NOT_A_PROPOSAL": "This event has no pending proposal",
+    "CALENDAR_CANNOT_RESPOND_TO_OWN_EVENT": "You cannot confirm or reject your own proposal",
     "ALBUM_NOT_FOUND": "Album not found",
     "ALBUM_ACCESS_DENIED": "You do not have access to this album",
     "ALBUM_MEMBERSHIP_REQUIRED": "You must be a member of the album",

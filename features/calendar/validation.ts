@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CATEGORIES_BY_TYPE } from "./utils/categoriesByType";
 
 // Schema messages are i18n keys, not display text — consumers resolve them via t() at
 // render time (see EventForm), since Zod validation runs outside any particular
@@ -19,6 +20,10 @@ export const eventSchema = z
   .refine((data) => !data.endAt || data.endAt >= data.startAt, {
     error: "calendar.validation.endAfterStart",
     path: ["endAt"],
+  })
+  .refine((data) => CATEGORIES_BY_TYPE[data.type].includes(data.category), {
+    error: "calendar.validation.categoryTypeMismatch",
+    path: ["category"],
   });
 
 export type EventFormValues = z.infer<typeof eventSchema>;

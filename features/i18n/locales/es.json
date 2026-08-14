@@ -209,7 +209,9 @@
       "empty": "No hay eventos para este día."
     },
     "eventItem": {
-      "allDay": "Todo el día"
+      "allDay": "Todo el día",
+      "pendingBadge": "Pendiente",
+      "rejectedBadge": "Rechazado"
     },
     "form": {
       "typeAppointment": "Cita",
@@ -247,7 +249,8 @@
     "validation": {
       "titleRequired": "Ingresa un título.",
       "startRequired": "Selecciona una fecha de inicio.",
-      "endAfterStart": "La fecha de fin debe ser posterior a la de inicio."
+      "endAfterStart": "La fecha de fin debe ser posterior a la de inicio.",
+      "categoryTypeMismatch": "Esa categoría no corresponde a este tipo de evento."
     },
     "detail": {
       "editMenu": "Editar",
@@ -261,7 +264,16 @@
         "yearly": "Se repite cada año",
         "monthly": "Se repite cada mes"
       },
-      "reminderActive": "Recordatorio activado"
+      "reminderActive": "Recordatorio activado",
+      "proposal": {
+        "confirmButton": "Me apunto",
+        "counterProposeButton": "Otro día",
+        "rejectButton": "Rechazar",
+        "pendingTitle": "Pendiente de confirmación",
+        "pendingSubtitle": "Esperando la respuesta de tu pareja.",
+        "confirmedBadge": "Confirmado",
+        "rejectedBadge": "Rechazado"
+      }
     },
     "countdown": {
       "years_one": "en {{count}} año",
@@ -289,6 +301,8 @@
     "CALENDAR_EVENT_NOT_FOUND": "Evento de calendario no encontrado",
     "CALENDAR_COUPLE_REQUIRED": "Debes estar en pareja para gestionar el calendario",
     "CALENDAR_INVALID_DATE_RANGE": "La fecha de fin debe ser posterior a la de inicio",
+    "CALENDAR_NOT_A_PROPOSAL": "Este evento no tiene una propuesta pendiente",
+    "CALENDAR_CANNOT_RESPOND_TO_OWN_EVENT": "No puedes confirmar o rechazar tu propia propuesta",
     "ALBUM_NOT_FOUND": "Álbum no encontrado",
     "ALBUM_ACCESS_DENIED": "No tienes acceso a este álbum",
     "ALBUM_MEMBERSHIP_REQUIRED": "Debes ser miembro del álbum",

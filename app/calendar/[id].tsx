@@ -1,6 +1,12 @@
 import { ThemeColors } from "@/constants/colors";
-import { useEventQuery, useDeleteEventMutation } from "@/features/calendar";
-import { Card, OverflowMenu, Skeleton, Title } from "@/features/common";
+import { useAuthStore } from "@/features/auth";
+import {
+  useConfirmEventMutation,
+  useDeleteEventMutation,
+  useEventQuery,
+  useRejectEventMutation,
+} from "@/features/calendar";
+import { Button, Card, OverflowMenu, Skeleton, Title } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -13,9 +19,12 @@ export default function EventDetailScreen() {
   const router = useRouter();
   const colors = useThemeColors();
   const styles = createStyles(colors);
+  const currentUserId = useAuthStore((state) => state.user?.id);
 
   const { data: event, isLoading, isError } = useEventQuery(id);
   const deleteMutation = useDeleteEventMutation();
+  const confirmMutation = useConfirmEventMutation();
+  const rejectMutation = useRejectEventMutation();
 
   const RECURRENCE_LABEL: Record<string, string> = {
     none: t("calendar.detail.recurrence.none"),
@@ -54,6 +63,12 @@ export default function EventDetailScreen() {
 
   const start = new Date(event.startAt);
   const end = event.endAt ? new Date(event.endAt) : null;
+
+  const isProposal = event.type === "appointment";
+  // proposedBy (not createdBy) is who's waiting — a re-proposal after a reject
+  // reassigns it to whoever edited the event, flipping the roles.
+  const isProposer = event.proposedBy === currentUserId;
+  const awaitingResponse = isProposal && event.status === "proposed";
 
   return (
     <View style={styles.content}>
@@ -121,6 +136,65 @@ export default function EventDetailScreen() {
         )}
 
         {event.description && <Text style={styles.description}>{event.description}</Text>}
+
+        {isProposal && awaitingResponse && !isProposer && (
+          <View style={styles.proposalActions}>
+            <Button
+              title={t("calendar.detail.proposal.confirmButton")}
+              variant="primary"
+              size="small"
+              style={styles.proposalButton}
+              isLoading={confirmMutation.isPending}
+              disabled={confirmMutation.isPending || rejectMutation.isPending}
+              onPress={() => confirmMutation.mutate(id)}
+            />
+            <Button
+              title={t("calendar.detail.proposal.counterProposeButton")}
+              variant="outline"
+              size="small"
+              style={styles.proposalButton}
+              disabled={confirmMutation.isPending || rejectMutation.isPending}
+              onPress={handleEdit}
+            />
+            <Button
+              title={t("calendar.detail.proposal.rejectButton")}
+              variant="danger"
+              size="small"
+              style={styles.proposalButton}
+              isLoading={rejectMutation.isPending}
+              disabled={confirmMutation.isPending || rejectMutation.isPending}
+              onPress={() => rejectMutation.mutate(id)}
+            />
+          </View>
+        )}
+
+        {isProposal && awaitingResponse && isProposer && (
+          <View style={[styles.statusBanner, { backgroundColor: colors.SECONDARY[200] }]}>
+            <Ionicons name="time-outline" size={18} color={colors.SECONDARY[500]} />
+            <View style={styles.statusBannerText}>
+              <Text style={styles.statusBannerTitle}>{t("calendar.detail.proposal.pendingTitle")}</Text>
+              <Text style={styles.rowText}>{t("calendar.detail.proposal.pendingSubtitle")}</Text>
+            </View>
+          </View>
+        )}
+
+        {isProposal && event.status === "confirmed" && event.respondedBy && (
+          <View style={[styles.statusBanner, { backgroundColor: colors.PRIMARY[200] }]}>
+            <Ionicons name="checkmark-circle-outline" size={18} color={colors.PRIMARY[500]} />
+            <Text style={styles.statusBannerTitle}>
+              {t("calendar.detail.proposal.confirmedBadge")}
+            </Text>
+          </View>
+        )}
+
+        {isProposal && event.status === "rejected" && (
+          <View style={[styles.statusBanner, { backgroundColor: colors.NEUTRAL[500] }]}>
+            <Ionicons name="close-circle-outline" size={18} color={colors.ERROR[500]} />
+            <Text style={[styles.statusBannerTitle, { color: colors.ERROR[500] }]}>
+              {t("calendar.detail.proposal.rejectedBadge")}
+            </Text>
+          </View>
+        )}
       </Card>
     </View>
   );
@@ -135,4 +209,16 @@ const createStyles = (colors: ThemeColors) =>
     description: { fontSize: 14, color: colors.NEUTRAL[800], marginTop: 8, lineHeight: 20 },
     notFound: { flex: 1, alignItems: "center", justifyContent: "center" },
     notFoundText: { fontSize: 16, color: colors.NEUTRAL[800] },
+    proposalActions: { flexDirection: "row", gap: 10, marginTop: 16 },
+    proposalButton: { flex: 1 },
+    statusBanner: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      borderRadius: 14,
+      padding: 12,
+      marginTop: 16,
+    },
+    statusBannerText: { flex: 1 },
+    statusBannerTitle: { fontSize: 14, fontWeight: "600", color: colors.NEUTRAL[800] },
   });

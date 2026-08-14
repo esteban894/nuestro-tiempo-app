@@ -12,6 +12,7 @@ import {
   CalendarEventRecurrence,
   CalendarEventType,
 } from "../../api/calendar.api";
+import { CATEGORIES_BY_TYPE } from "../../utils/categoriesByType";
 import { EventErrors, validateEventForm } from "../../validation";
 
 type IoniconsName = ComponentProps<typeof Ionicons>["name"];
@@ -114,6 +115,14 @@ export const EventForm = ({
   const [category, setCategory] = useState<CalendarEventCategory>(
     initialValues?.category ?? "date_plan",
   );
+  const allowedCategories = CATEGORIES_BY_TYPE[type];
+
+  const handleTypeChange = (value: CalendarEventType) => {
+    setType(value);
+    if (!CATEGORIES_BY_TYPE[value].includes(category)) {
+      setCategory(CATEGORIES_BY_TYPE[value][0]);
+    }
+  };
   const [title, setTitle] = useState(initialValues?.title ?? "");
   const [description, setDescription] = useState(initialValues?.description ?? "");
   const [location, setLocation] = useState(initialValues?.location ?? "");
@@ -136,9 +145,9 @@ export const EventForm = ({
   );
   const [errors, setErrors] = useState<EventErrors>({});
 
-  const [picker, setPicker] = useState<
-    "startDate" | "startTime" | "endDate" | "endTime" | null
-  >(null);
+  const [picker, setPicker] = useState<"startDate" | "startTime" | "endDate" | "endTime" | null>(
+    null,
+  );
 
   const closePickerIfAndroid = () => {
     if (Platform.OS !== "ios") setPicker(null);
@@ -191,12 +200,12 @@ export const EventForm = ({
       <SegmentedControl
         options={TYPE_OPTIONS}
         value={type}
-        onChange={(value) => setType(value as CalendarEventType)}
+        onChange={(value) => handleTypeChange(value as CalendarEventType)}
         style={styles.field}
       />
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.field}>
-        {CATEGORY_ORDER.map((value) => {
+        {CATEGORY_ORDER.filter((value) => allowedCategories.includes(value)).map((value) => {
           const isActive = value === category;
           return (
             <TouchableOpacity
@@ -255,7 +264,7 @@ export const EventForm = ({
           activeOpacity={0.7}
           onPress={() => setPicker("startDate")}>
           <Ionicons name="calendar-outline" size={18} color={colors.SECONDARY[500]} />
-          <Text style={[styles.dateText, !startAt && styles.datePlaceholder]}>
+          <Text style={[styles.dateText, !startAt && styles.datePlaceholder]} numberOfLines={1}>
             {startAt ? formatDate(startAt, i18n.language) : t("calendar.form.selectDate")}
           </Text>
         </TouchableOpacity>
@@ -287,7 +296,7 @@ export const EventForm = ({
               activeOpacity={0.7}
               onPress={() => setPicker("endDate")}>
               <Ionicons name="calendar-outline" size={18} color={colors.SECONDARY[500]} />
-              <Text style={[styles.dateText, !endAt && styles.datePlaceholder]}>
+              <Text style={[styles.dateText, !endAt && styles.datePlaceholder]} numberOfLines={1}>
                 {endAt ? formatDate(endAt, i18n.language) : t("calendar.form.selectDate")}
               </Text>
             </TouchableOpacity>
@@ -308,9 +317,7 @@ export const EventForm = ({
 
       {picker && (
         <DateTimePicker
-          value={
-            (picker === "startDate" || picker === "startTime" ? startAt : endAt) ?? new Date()
-          }
+          value={(picker === "startDate" || picker === "startTime" ? startAt : endAt) ?? new Date()}
           mode={picker === "startDate" || picker === "endDate" ? "date" : "time"}
           onChange={handlePickerChange}
         />
@@ -413,15 +420,17 @@ const createStyles = (colors: ThemeColors) =>
       minHeight: 50,
     },
     dateFieldFlex: {
-      flex: 1.4,
+      flex: 1,
     },
     timeField: {
-      flex: 1,
+      width: 110,
       justifyContent: "center",
+      paddingHorizontal: 12,
     },
     dateText: {
       fontSize: 15,
       color: colors.NEUTRAL[800],
+      flexShrink: 1,
     },
     datePlaceholder: {
       color: colors.NEUTRAL[600],

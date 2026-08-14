@@ -47,6 +47,20 @@ export const EventItem = ({ event, isMine, onPress }: EventItemProps) => {
           {event.location ? ` · ${event.location}` : ""}
         </Text>
       </View>
+      {event.status === "proposed" && (
+        <View style={[styles.statusPill, { backgroundColor: colors.SECONDARY[200] }]}>
+          <Text style={[styles.statusPillText, { color: colors.SECONDARY[800] }]}>
+            {t("calendar.eventItem.pendingBadge")}
+          </Text>
+        </View>
+      )}
+      {event.status === "rejected" && (
+        <View style={[styles.statusPill, { backgroundColor: colors.NEUTRAL[500] }]}>
+          <Text style={[styles.statusPillText, { color: colors.ERROR[500] }]}>
+            {t("calendar.eventItem.rejectedBadge")}
+          </Text>
+        </View>
+      )}
       <View
         style={[
           styles.creatorDot,
@@ -98,5 +112,15 @@ const createStyles = (colors: ThemeColors) =>
       height: 8,
       borderRadius: 4,
       marginLeft: 8,
+    },
+    statusPill: {
+      borderRadius: 10,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      marginLeft: 8,
+    },
+    statusPillText: {
+      fontSize: 11,
+      fontWeight: "600",
     },
   });
