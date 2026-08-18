@@ -266,7 +266,7 @@
       },
       "reminderActive": "Reminder on",
       "proposal": {
-        "confirmButton": "I'm in",
+        "confirmButton": "Accept",
         "counterProposeButton": "Different day",
         "rejectButton": "Decline",
         "pendingTitle": "Awaiting confirmation",
@@ -287,6 +287,13 @@
       "minutes_one": "in {{count}} minute",
       "minutes_other": "in {{count}} minutes",
       "soon": "very soon"
+    }
+  },
+  "notifications": {
+    "actions": {
+      "confirm": "Accept",
+      "details": "View details",
+      "edit": "Edit"
     }
   },
   "updates": {

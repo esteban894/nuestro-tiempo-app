@@ -26,6 +26,8 @@ export const MonthGridView = ({ month, events, selectedDate, onSelectDay }: Mont
   const weekdayNames = useMemo(() => getWeekdayShortNames(i18n.language), [i18n.language]);
   const monthIndex = month.getMonth();
 
+  const weeks = Array.from({ length: grid.length / 7 }, (_, i) => grid.slice(i * 7, i * 7 + 7));
+
   const eventsByDay = useMemo(() => {
     const rangeStart = grid[0];
     const rangeEnd = new Date(grid[grid.length - 1]);
@@ -51,50 +53,52 @@ export const MonthGridView = ({ month, events, selectedDate, onSelectDay }: Mont
           </Text>
         ))}
       </View>
-      <View style={styles.grid}>
-        {grid.map((day, index) => {
-          const key = toDateKey(day);
-          const inMonth = day.getMonth() === monthIndex;
-          const today = isToday(day);
-          const selected = key === selectedDate;
-          const dayEvents = eventsByDay.get(key) ?? [];
+      {weeks.map((week) => (
+        <View key={toDateKey(week[0])} style={styles.weekCells}>
+          {week.map((day) => {
+            const key = toDateKey(day);
+            const inMonth = day.getMonth() === monthIndex;
+            const today = isToday(day);
+            const selected = key === selectedDate;
+            const dayEvents = eventsByDay.get(key) ?? [];
 
-          return (
-            <TouchableOpacity
-              key={index}
-              style={styles.cell}
-              activeOpacity={0.7}
-              onPress={() => onSelectDay(key)}>
-              <View
-                style={[
-                  styles.dayWrap,
-                  today && styles.todayWrap,
-                  selected && !today && styles.selectedWrap,
-                ]}>
-                <Text
+            return (
+              <TouchableOpacity
+                key={key}
+                style={styles.cell}
+                activeOpacity={0.7}
+                onPress={() => onSelectDay(key)}>
+                <View
                   style={[
-                    styles.dayNum,
-                    !inMonth && styles.dayNumFaded,
-                    (today || selected) && styles.dayNumOnFill,
+                    styles.dayWrap,
+                    today && styles.todayWrap,
+                    selected && !today && styles.selectedWrap,
                   ]}>
-                  {day.getDate()}
-                </Text>
-              </View>
-              <View style={styles.dotRow}>
-                {dayEvents.slice(0, MAX_DOTS).map((event) => (
-                  <View
-                    key={event.occurrenceId}
-                    style={[styles.eventDot, { backgroundColor: CATEGORY_COLOR[event.category] }]}
-                  />
-                ))}
-                {dayEvents.length > MAX_DOTS ? (
-                  <Text style={styles.more}>+{dayEvents.length - MAX_DOTS}</Text>
-                ) : null}
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+                  <Text
+                    style={[
+                      styles.dayNum,
+                      !inMonth && styles.dayNumFaded,
+                      (today || selected) && styles.dayNumOnFill,
+                    ]}>
+                    {day.getDate()}
+                  </Text>
+                </View>
+                <View style={styles.dotRow}>
+                  {dayEvents.slice(0, MAX_DOTS).map((event) => (
+                    <View
+                      key={event.occurrenceId}
+                      style={[styles.eventDot, { backgroundColor: CATEGORY_COLOR[event.category] }]}
+                    />
+                  ))}
+                  {dayEvents.length > MAX_DOTS ? (
+                    <Text style={styles.more}>+{dayEvents.length - MAX_DOTS}</Text>
+                  ) : null}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      ))}
     </View>
   );
 };
@@ -116,12 +120,12 @@ const createStyles = (colors: ThemeColors) =>
       fontWeight: "600",
       textTransform: "uppercase",
     },
-    grid: {
+    weekCells: {
       flexDirection: "row",
-      flexWrap: "wrap",
+      alignItems: "flex-start",
     },
     cell: {
-      width: `${100 / 7}%`,
+      flex: 1,
       aspectRatio: 0.82,
       alignItems: "center",
       paddingTop: 4,

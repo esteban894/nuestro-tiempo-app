@@ -266,7 +266,7 @@
       },
       "reminderActive": "Recordatorio activado",
       "proposal": {
-        "confirmButton": "Me apunto",
+        "confirmButton": "Acepto",
         "counterProposeButton": "Otro día",
         "rejectButton": "Rechazar",
         "pendingTitle": "Pendiente de confirmación",
@@ -287,6 +287,13 @@
       "minutes_one": "en {{count}} minuto",
       "minutes_other": "en {{count}} minutos",
       "soon": "muy pronto"
+    }
+  },
+  "notifications": {
+    "actions": {
+      "confirm": "Acepto",
+      "details": "Ver detalles",
+      "edit": "Editar"
     }
   },
   "updates": {
