@@ -153,7 +153,7 @@ const createStyles = (colors: ThemeColors) =>
       color: colors.NEUTRAL[600],
     },
     dayNumOnFill: {
-      color: "#fff",
+      color: colors.WHITE,
       fontWeight: "700",
     },
     dotRow: {

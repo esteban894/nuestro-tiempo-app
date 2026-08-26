@@ -11,7 +11,11 @@
     "days_one": "Día",
     "days_other": "Días",
     "removeFromFavorites": "Quitar de favoritos",
-    "markAsFavorite": "Marcar como favorita"
+    "markAsFavorite": "Marcar como favorita",
+    "emptyImages": {
+      "title": "Aún no hay fotos",
+      "description": "Aún no hay fotos aquí — suban la primera juntos"
+    }
   },
   "nav": {
     "account": "Cuenta",
@@ -28,7 +32,8 @@
     "event": "Evento"
   },
   "errorBoundary": {
-    "title": "Algo salió mal"
+    "title": "Algo salió mal",
+    "message": "Intentalo de nuevo. Si el problema persiste, reiniciá la app."
   },
   "auth": {
     "login": {

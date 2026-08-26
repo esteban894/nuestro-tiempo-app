@@ -136,9 +136,7 @@ export default function RootLayout() {
               options={{
                 headerTitle: t("nav.linkCouple"),
                 headerBackTitle: t("nav.account"),
-                headerTintColor: themeColors.PRIMARY[800],
-                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-                headerShadowVisible: false,
+                ...themedStackOptions(themeColors),
               }}
             />
             <Stack.Screen
@@ -146,27 +144,21 @@ export default function RootLayout() {
               options={{
                 headerTitle: t("nav.settings"),
                 headerBackTitle: t("nav.account"),
-                headerTintColor: themeColors.PRIMARY[800],
-                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-                headerShadowVisible: false,
+                ...themedStackOptions(themeColors),
               }}
             />
             <Stack.Screen
               name="favorites"
               options={{
                 headerBackTitle: t("nav.home"),
-                headerTintColor: themeColors.PRIMARY[800],
-                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-                headerShadowVisible: false,
+                ...themedStackOptions(themeColors),
               }}
             />
             <Stack.Screen
               name="album/[id]"
               options={{
                 headerBackTitle: t("nav.albums"),
-                headerTintColor: themeColors.PRIMARY[800],
-                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-                headerShadowVisible: false,
+                ...themedStackOptions(themeColors),
               }}
             />
             <Stack.Screen
@@ -174,9 +166,7 @@ export default function RootLayout() {
               options={{
                 headerTitle: t("nav.newAlbum"),
                 headerBackTitle: t("nav.albums"),
-                headerTintColor: themeColors.PRIMARY[800],
-                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-                headerShadowVisible: false,
+                ...themedStackOptions(themeColors),
               }}
             />
             <Stack.Screen
@@ -184,18 +174,14 @@ export default function RootLayout() {
               options={{
                 headerTitle: t("nav.editAlbum"),
                 headerBackTitle: t("nav.album"),
-                headerTintColor: themeColors.PRIMARY[800],
-                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-                headerShadowVisible: false,
+                ...themedStackOptions(themeColors),
               }}
             />
             <Stack.Screen
               name="calendar/[id]"
               options={{
                 headerBackTitle: t("nav.calendar"),
-                headerTintColor: themeColors.PRIMARY[800],
-                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-                headerShadowVisible: false,
+                ...themedStackOptions(themeColors),
               }}
             />
             <Stack.Screen
@@ -203,9 +189,7 @@ export default function RootLayout() {
               options={{
                 headerTitle: t("nav.newEvent"),
                 headerBackTitle: t("nav.calendar"),
-                headerTintColor: themeColors.PRIMARY[800],
-                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-                headerShadowVisible: false,
+                ...themedStackOptions(themeColors),
               }}
             />
             <Stack.Screen
@@ -213,9 +197,7 @@ export default function RootLayout() {
               options={{
                 headerTitle: t("nav.editEvent"),
                 headerBackTitle: t("nav.event"),
-                headerTintColor: themeColors.PRIMARY[800],
-                headerStyle: { backgroundColor: themeColors.NEUTRAL[200] },
-                headerShadowVisible: false,
+                ...themedStackOptions(themeColors),
               }}
             />
           </Stack>
@@ -225,6 +207,12 @@ export default function RootLayout() {
     </View>
   );
 }
+
+const themedStackOptions = (colors: ThemeColors) => ({
+  headerTintColor: colors.PRIMARY[800],
+  headerStyle: { backgroundColor: colors.NEUTRAL[200] },
+  headerShadowVisible: false,
+});
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
@@ -239,7 +227,8 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t("errorBoundary.title")}</Text>
-      <Text style={styles.message}>{error.message}</Text>
+      <Text style={styles.message}>{t("errorBoundary.message")}</Text>
+      {__DEV__ && <Text style={styles.message}>{error.message}</Text>}
       <Button title={t("common.retry")} leftIcon="refresh" onPress={retry} style={styles.button} />
     </View>
   );

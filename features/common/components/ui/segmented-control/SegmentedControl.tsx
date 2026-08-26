@@ -127,6 +127,6 @@ const createStyles = (colors: ThemeColors) =>
       color: colors.NEUTRAL[800],
     },
     labelActive: {
-      color: "#fff",
+      color: colors.WHITE,
     },
   });

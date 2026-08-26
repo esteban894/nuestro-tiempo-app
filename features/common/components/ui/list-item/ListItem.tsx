@@ -28,7 +28,11 @@ export const ListItem = ({ leftIcon, label, rightIcon = "chevron-forward", onPre
   );
 
   if (!onPress) {
-    return <View style={styles.container}>{content}</View>;
+    return (
+      <View style={styles.container} accessibilityRole="text">
+        {content}
+      </View>
+    );
   }
 
   return (

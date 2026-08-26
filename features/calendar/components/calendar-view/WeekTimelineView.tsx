@@ -209,7 +209,7 @@ const createStyles = (colors: ThemeColors) =>
       fontWeight: "600",
     },
     dayHeaderNumOnFill: {
-      color: "#fff",
+      color: colors.WHITE,
     },
     allDayRow: {
       flexDirection: "row",

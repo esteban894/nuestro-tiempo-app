@@ -3,6 +3,7 @@ import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { ReactNode, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
@@ -44,6 +45,7 @@ export function ImageGrid({
   onRefresh,
   onImageError,
 }: Props) {
+  const { t } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -59,7 +61,7 @@ export function ImageGrid({
     return (
       <View style={styles.emptyContainer}>
         <Ionicons name="images-outline" size={32} color={colors.NEUTRAL[600]} />
-        <Text style={styles.emptyText}>No hay imágenes</Text>
+        <Text style={styles.emptyText}>{t("common.emptyImages.title")}</Text>
       </View>
     );
   }

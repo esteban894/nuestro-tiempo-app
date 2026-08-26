@@ -6,6 +6,10 @@ export type ThemeColors = {
   ON_ERROR: string;
   WHITE: string;
   SHADOW: string;
+  /** Scrim behind icon-button chrome floating over photos — intentionally identical in both themes. */
+  OVERLAY: string;
+  /** Fullscreen image-viewer backdrop — intentionally identical in both themes. */
+  OVERLAY_STRONG: string;
 };
 
 export const lightColors: ThemeColors = {
@@ -34,6 +38,8 @@ export const lightColors: ThemeColors = {
   ON_ERROR: "#FFFFFF",
   WHITE: "#FFFFFF",
   SHADOW: "#6E5228",
+  OVERLAY: "rgba(0,0,0,0.45)",
+  OVERLAY_STRONG: "rgba(0,0,0,0.9)",
 };
 
 export const darkColors: ThemeColors = {
@@ -62,4 +68,6 @@ export const darkColors: ThemeColors = {
   ON_ERROR: "#161717",
   WHITE: "#FFFFFF",
   SHADOW: "#000000",
+  OVERLAY: "rgba(0,0,0,0.45)",
+  OVERLAY_STRONG: "rgba(0,0,0,0.9)",
 };

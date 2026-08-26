@@ -216,7 +216,7 @@ export const EventForm = ({
               <Ionicons
                 name={CATEGORY_ICONS[value]}
                 size={16}
-                color={isActive ? "#fff" : colors.NEUTRAL[800]}
+                color={isActive ? colors.WHITE : colors.NEUTRAL[800]}
               />
               <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
                 {CATEGORY_LABELS[value]}
@@ -398,7 +398,7 @@ const createStyles = (colors: ThemeColors) =>
       color: colors.NEUTRAL[800],
     },
     chipLabelActive: {
-      color: "#fff",
+      color: colors.WHITE,
     },
     checkbox: {
       marginBottom: 20,

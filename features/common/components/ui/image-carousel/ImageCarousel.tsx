@@ -3,6 +3,7 @@ import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { ReactNode, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
@@ -29,6 +30,7 @@ export function ImageCarousel({
   onImageError,
   onReachEnd,
 }: Props) {
+  const { t } = useTranslation();
   const ref = useRef<ICarouselInstance>(null);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const progress = useSharedValue(0);
@@ -40,7 +42,7 @@ export function ImageCarousel({
       <View style={styles.wrapper}>
         <View style={[styles.carouselContainer, styles.emptyContainer]}>
           <Ionicons name="images-outline" size={32} color={colors.NEUTRAL[600]} />
-          <Text style={styles.emptyText}>Aún no hay fotos aquí — suban la primera juntos</Text>
+          <Text style={styles.emptyText}>{t("common.emptyImages.description")}</Text>
         </View>
       </View>
     );
@@ -99,7 +101,7 @@ export function ImageCarousel({
                 isSingleImage && styles.arrowButtonDisabled,
               ]}
               onPress={() => ref.current?.prev()}>
-              <Ionicons name="chevron-back" size={24} color="white" />
+              <Ionicons name="chevron-back" size={24} color={colors.WHITE} />
             </Pressable>
 
             <Pressable
@@ -110,7 +112,7 @@ export function ImageCarousel({
                 isSingleImage && styles.arrowButtonDisabled,
               ]}
               onPress={() => ref.current?.next()}>
-              <Ionicons name="chevron-forward" size={24} color="white" />
+              <Ionicons name="chevron-forward" size={24} color={colors.WHITE} />
             </Pressable>
           </>
         )}
@@ -178,7 +180,7 @@ const createStyles = (colors: ThemeColors) =>
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: "rgba(0,0,0,0.45)",
+      backgroundColor: colors.OVERLAY,
       alignItems: "center",
       justifyContent: "center",
       zIndex: 10,

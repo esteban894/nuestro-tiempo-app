@@ -1,6 +1,5 @@
+import { getStoredValue, setStoredValue } from "@/features/common/utils/crossPlatformStorage";
 import * as Localization from "expo-localization";
-import * as SecureStore from "expo-secure-store";
-import { Platform } from "react-native";
 import { create } from "zustand";
 import { i18n } from "../i18n";
 
@@ -21,20 +20,12 @@ function resolveDeviceLanguage(): LanguageMode {
 }
 
 async function getStoredLanguage(): Promise<LanguageMode | null> {
-  const value =
-    Platform.OS === "web"
-      ? window.localStorage.getItem(LANGUAGE_KEY)
-      : await SecureStore.getItemAsync(LANGUAGE_KEY);
-
+  const value = await getStoredValue(LANGUAGE_KEY);
   return value === "es" || value === "en" ? value : null;
 }
 
 async function setStoredLanguage(language: LanguageMode): Promise<void> {
-  if (Platform.OS === "web") {
-    window.localStorage.setItem(LANGUAGE_KEY, language);
-    return;
-  }
-  await SecureStore.setItemAsync(LANGUAGE_KEY, language);
+  await setStoredValue(LANGUAGE_KEY, language);
 }
 
 export const useLanguageStore = create<LanguageState>((set) => ({

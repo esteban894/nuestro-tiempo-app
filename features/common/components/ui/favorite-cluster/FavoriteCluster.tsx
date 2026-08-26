@@ -1,3 +1,4 @@
+import { ThemeColors } from "@/constants/colors";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -38,6 +39,7 @@ export function FavoriteCluster({
 }: Props) {
   const { t } = useTranslation();
   const colors = useThemeColors();
+  const styles = createStyles(colors);
   const dims = DIMENSIONS[size];
   const scale = useSharedValue(1);
 
@@ -71,7 +73,7 @@ export function FavoriteCluster({
           <Ionicons
             name={favoritedByMe ? "heart" : "heart-outline"}
             size={dims.heart}
-            color={favoritedByMe ? colors.PRIMARY[500] : "#fff"}
+            color={favoritedByMe ? colors.PRIMARY[500] : colors.WHITE}
           />
         </Animated.View>
       </Pressable>
@@ -93,21 +95,22 @@ export function FavoriteCluster({
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  trigger: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.45)",
-  },
-  bubbles: {
-    flexDirection: "row",
-    marginLeft: 4,
-  },
-  bubbleOverlap: {
-    marginLeft: -6,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    trigger: {
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.OVERLAY,
+    },
+    bubbles: {
+      flexDirection: "row",
+      marginLeft: 4,
+    },
+    bubbleOverlap: {
+      marginLeft: -6,
+    },
+  });

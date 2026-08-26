@@ -18,7 +18,7 @@ export const AlbumFab = ({ icon = "add", onPress = () => {}, style }: AlbumFabPr
 
   return (
     <TouchableOpacity style={[styles.fab, style]} activeOpacity={0.8} onPress={onPress}>
-      <Ionicons name={icon} size={28} color="#fff" />
+      <Ionicons name={icon} size={28} color={colors.WHITE} />
     </TouchableOpacity>
   );
 };

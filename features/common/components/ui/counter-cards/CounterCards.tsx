@@ -1,6 +1,6 @@
 import { ThemeColors } from "@/constants/colors";
 import { useThemeColors } from "@/features/theme";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import { Card } from "../card/Card";
@@ -16,7 +16,7 @@ export const CounterCards = ({ initDate }: Props) => {
   const { t } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);
-  const initialDate = useMemo(() => new Date(initDate), [initDate]);
+  const initialDate = new Date(initDate);
 
   const [elapsed, setElapsed] = useState(() => getElapsedTime(initialDate, new Date()));
 

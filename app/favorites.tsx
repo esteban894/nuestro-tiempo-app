@@ -5,16 +5,15 @@ import {
   Card,
   ExpandedFavoriteOverlay,
   FavoriteCluster,
-  FavoriterBubble,
   ImageGrid,
   MediaItem,
   SegmentedControl,
   Title,
 } from "@/features/common";
-import { useCoupleQuery } from "@/features/couple";
+import { usePartner } from "@/features/couple";
 import {
-  AlbumImage,
   FavoritedByFilter,
+  toFavoriterBubbles,
   useFavoriteImagesInfiniteQuery,
   useSetImageFavoriteMutation,
 } from "@/features/images";
@@ -39,14 +38,8 @@ export default function FavoritesScreen() {
   const colors = useThemeColors();
   const styles = createStyles(colors);
 
-  const currentUser = useAuthStore((state) => state.user);
-  const { data: couple } = useCoupleQuery();
-  const partner =
-    couple && currentUser
-      ? couple.user1.id === currentUser.id
-        ? couple.user2
-        : couple.user1
-      : null;
+  const currentUserId = useAuthStore((state) => state.user?.id);
+  const partner = usePartner();
 
   const [filter, setFilter] = useState<FavoritedByFilter>("me");
   const { data, isLoading, isRefetching, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -65,12 +58,6 @@ export default function FavoritesScreen() {
     retriedImageIdsRef.current.add(item.id);
     refetch();
   };
-
-  const getFavoriters = (image: AlbumImage): FavoriterBubble[] =>
-    image.favoritedBy.map((favoriter) => ({
-      name: favoriter.name,
-      tone: favoriter.userId === currentUser?.id ? "me" : "partner",
-    }));
 
   const handleToggleFavorite = (index: number) => {
     const image = favoriteImages[index];
@@ -138,7 +125,7 @@ export default function FavoritesScreen() {
             return (
               <FavoriteCluster
                 favoritedByMe={image.favoritedByMe}
-                favoriters={getFavoriters(image)}
+                favoriters={toFavoriterBubbles(image, currentUserId)}
                 onToggle={() => handleToggleFavorite(index)}
                 style={styles.favoriteCluster}
               />
@@ -151,7 +138,7 @@ export default function FavoritesScreen() {
               <View style={styles.expandedFavoriteBar}>
                 <ExpandedFavoriteOverlay
                   favoritedByMe={image.favoritedByMe}
-                  favoriters={getFavoriters(image)}
+                  favoriters={toFavoriterBubbles(image, currentUserId)}
                   onToggle={() => handleToggleFavorite(index)}
                 />
               </View>

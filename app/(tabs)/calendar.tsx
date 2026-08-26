@@ -102,7 +102,7 @@ export default function CalendarScreen() {
           hitSlop={12}
           accessibilityRole="button"
           accessibilityLabel={t("calendar.newEventA11y")}>
-          <Ionicons name="add" size={24} color="#fff" />
+          <Ionicons name="add" size={24} color={colors.WHITE} />
         </Pressable>
       </View>
 

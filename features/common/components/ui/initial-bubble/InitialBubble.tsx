@@ -36,6 +36,6 @@ const createStyles = (colors: ThemeColors) =>
     },
     label: {
       fontWeight: "700",
-      color: "#fff",
+      color: colors.WHITE,
     },
   });

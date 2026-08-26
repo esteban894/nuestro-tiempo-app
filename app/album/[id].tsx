@@ -1,5 +1,4 @@
 import { ThemeColors } from "@/constants/colors";
-import { MAX_IMAGES_PER_BATCH } from "@/constants/upload";
 import {
   AlbumDetailSkeleton,
   AlbumFab,
@@ -7,214 +6,58 @@ import {
   AlbumImagePickerSheet,
   AlbumMeatballsMenu,
   AlbumUploadStatus,
-  albumKeys,
-  getAlbum,
-  setCurrentAlbum,
-  useDeleteAlbumMutation,
+  useAlbumDetailController,
 } from "@/features/albums";
-import { useAuthStore } from "@/features/auth";
 import {
   ExpandedFavoriteOverlay,
   FavoriteCluster,
-  FavoriterBubble,
   ImageGrid,
-  MediaItem,
   OverflowMenu,
   SegmentedControl,
 } from "@/features/common";
-import { useCoupleQuery } from "@/features/couple";
-import {
-  AlbumImage,
-  ImageFilePart,
-  MediaLibraryPermissionError,
-  useAlbumImagesInfiniteQuery,
-  useDeleteImageMutation,
-  useDownloadImageMutation,
-  useSetImageFavoriteMutation,
-  useUploadImagesMutation,
-} from "@/features/images";
+import { toFavoriterBubbles } from "@/features/images";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
-import Toast from "react-native-toast-message";
-
-type FavoriteFilter = "all" | "me" | "partner" | "both";
-
-function filterByFavorite(
-  images: AlbumImage[],
-  filter: FavoriteFilter,
-  partnerId: string | undefined,
-): AlbumImage[] {
-  if (filter === "all") return images;
-  const favoritedByPartner = (image: AlbumImage) =>
-    !!partnerId && image.favoritedBy.some((f) => f.userId === partnerId);
-
-  if (filter === "me") return images.filter((image) => image.favoritedByMe);
-  if (filter === "partner") return images.filter(favoritedByPartner);
-  return images.filter((image) => image.favoritedByMe && favoritedByPartner(image));
-}
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function AlbumDetailScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
-  const queryClient = useQueryClient();
   const colors = useThemeColors();
   const styles = createStyles(colors);
 
   const {
-    data: album,
+    album,
     isLoading,
     isError,
-  } = useQuery({
-    queryKey: albumKeys.detail(id),
-    queryFn: () => getAlbum(id),
-    enabled: !!id,
-  });
-
-  const {
-    data: imagesData,
-    fetchNextPage,
-    hasNextPage,
+    partner,
+    currentUserId,
+    favoriteFilter,
+    setFavoriteFilter,
+    images,
+    imageGridColumns,
+    filteredAlbumImages,
     isFetchingNextPage,
-    isRefetching: isRefetchingImages,
-    refetch: refetchImages,
-  } = useAlbumImagesInfiniteQuery(id);
-  const albumImages = imagesData?.pages.flatMap((page) => page.data) ?? [];
-
-  const currentUser = useAuthStore((state) => state.user);
-  const { data: couple } = useCoupleQuery();
-  const partner =
-    couple && currentUser
-      ? couple.user1.id === currentUser.id
-        ? couple.user2
-        : couple.user1
-      : null;
-
-  const [favoriteFilter, setFavoriteFilter] = useState<FavoriteFilter>("all");
-  const filteredAlbumImages = filterByFavorite(albumImages, favoriteFilter, partner?.id);
-  const images = filteredAlbumImages.map((image) => ({ id: image.id, url: image.url }));
-  const imageGridColumns = images.length > 100 ? 3 : undefined;
-
-  const getFavoriters = (image: AlbumImage): FavoriterBubble[] =>
-    image.favoritedBy.map((favoriter) => ({
-      name: favoriter.name,
-      tone: favoriter.userId === currentUser?.id ? "me" : "partner",
-    }));
-
-  const uploadImagesMutation = useUploadImagesMutation();
-  const deleteImageMutation = useDeleteImageMutation();
-  const downloadImageMutation = useDownloadImageMutation();
-  const setFavoriteMutation = useSetImageFavoriteMutation();
-  const deleteAlbumMutation = useDeleteAlbumMutation();
-  const [pickerVisible, setPickerVisible] = useState(false);
-  const [uploadCount, setUploadCount] = useState<number | null>(null);
-  const retriedImageIdsRef = useRef<Set<string>>(new Set());
-
-  useEffect(() => {
-    retriedImageIdsRef.current = new Set();
-  }, [id]);
-
-  const handleImageError = (item: MediaItem) => {
-    if (retriedImageIdsRef.current.has(item.id)) return;
-    retriedImageIdsRef.current.add(item.id);
-    refetchImages();
-  };
-
-  const handleRefreshImages = () => {
-    retriedImageIdsRef.current = new Set();
-    refetchImages();
-  };
-
-  const markAsCurrentMutation = useMutation({
-    mutationFn: () => setCurrentAlbum(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: albumKeys.current() });
-    },
-  });
-
-  const handleEdit = () => router.push({ pathname: "/album/[id]/edit", params: { id } });
-
-  const handleMarkAsCurrent = () => markAsCurrentMutation.mutate();
-
-  const handleDeleteAlbum = () => {
-    Alert.alert(t("albums.deleteConfirm.title"), t("albums.deleteConfirm.message"), [
-      { text: t("common.cancel"), style: "cancel" },
-      {
-        text: t("common.delete"),
-        style: "destructive",
-        onPress: () => {
-          deleteAlbumMutation.mutate(id, { onSuccess: () => router.replace("/albums") });
-        },
-      },
-    ]);
-  };
-
-  const handleDeleteImage = (index: number) => {
-    const image = filteredAlbumImages[index];
-    if (!image) return;
-    deleteImageMutation.mutate({ id: image.id, albumId: id });
-  };
-
-  const handleToggleFavorite = (index: number) => {
-    const image = filteredAlbumImages[index];
-    if (!image) return;
-    setFavoriteMutation.mutate({ id: image.id, favorite: !image.favoritedByMe, albumId: id });
-  };
-
-  const handleDownloadImage = (index: number) => {
-    const image = filteredAlbumImages[index];
-    if (!image) return;
-    downloadImageMutation.mutate(
-      { url: image.url, filename: image.filename },
-      {
-        onSuccess: () => {
-          Toast.show({ type: "success", text1: t("albums.downloadToast.success") });
-        },
-        onError: (error) => {
-          Toast.show({
-            type: "error",
-            text1: t("albums.downloadToast.errorTitle"),
-            text2:
-              error instanceof MediaLibraryPermissionError
-                ? t("albums.downloadToast.permissionMessage")
-                : undefined,
-          });
-        },
-      },
-    );
-  };
-
-  const buildImageFilePart = (uri: string): ImageFilePart => {
-    const name = uri.split("/").pop() ?? "photo.jpg";
-    const ext = name.split(".").pop()?.toLowerCase();
-    const type = ext === "png" ? "image/png" : "image/jpeg";
-    return { uri, name, type };
-  };
-
-  const handlePickImages = (uris: string[]) => {
-    if (uris.length === 0) return;
-
-    let files = uris;
-    if (files.length > MAX_IMAGES_PER_BATCH) {
-      files = files.slice(0, MAX_IMAGES_PER_BATCH);
-      Toast.show({
-        type: "info",
-        text1: t("albums.tooManyPhotos.title"),
-        text2: t("albums.tooManyPhotos.message", { max: MAX_IMAGES_PER_BATCH }),
-      });
-    }
-
-    setUploadCount(files.length);
-    uploadImagesMutation.mutate(
-      { albumId: id, files: files.map(buildImageFilePart) },
-      { onSettled: () => setUploadCount(null) },
-    );
-  };
+    isRefetchingImages,
+    handleFetchNextPage,
+    handleImageError,
+    handleRefreshImages,
+    handleEdit,
+    handleMarkAsCurrent,
+    handleDeleteAlbum,
+    handleDeleteImage,
+    handleToggleFavorite,
+    handleDownloadImage,
+    handlePickImages,
+    markAsCurrentMutation,
+    deleteAlbumMutation,
+    uploadImagesMutation,
+    pickerVisible,
+    setPickerVisible,
+    uploadCount,
+  } = useAlbumDetailController(id);
 
   if (isLoading) {
     return (
@@ -259,7 +102,7 @@ export default function AlbumDetailScreen() {
           </View>
           <SegmentedControl
             value={favoriteFilter}
-            onChange={(value) => setFavoriteFilter(value as FavoriteFilter)}
+            onChange={(value) => setFavoriteFilter(value as typeof favoriteFilter)}
             options={[
               { label: t("albums.favoriteFilter.all"), value: "all" },
               { label: t("albums.favoriteFilter.me"), value: "me" },
@@ -275,9 +118,7 @@ export default function AlbumDetailScreen() {
       <ImageGrid
         data={images}
         numColumns={imageGridColumns}
-        onEndReached={() => {
-          if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-        }}
+        onEndReached={handleFetchNextPage}
         isFetchingNextPage={isFetchingNextPage}
         refreshing={isRefetchingImages}
         onRefresh={handleRefreshImages}
@@ -289,13 +130,13 @@ export default function AlbumDetailScreen() {
             <>
               <FavoriteCluster
                 favoritedByMe={image.favoritedByMe}
-                favoriters={getFavoriters(image)}
+                favoriters={toFavoriterBubbles(image, currentUserId)}
                 onToggle={() => handleToggleFavorite(index)}
                 style={styles.favoriteCluster}
               />
               <OverflowMenu
                 triggerIcon="ellipsis-vertical"
-                triggerColor="#fff"
+                triggerColor={colors.WHITE}
                 triggerStyle={styles.imageMenuTrigger}
                 options={[
                   {
@@ -324,7 +165,7 @@ export default function AlbumDetailScreen() {
                 onPress={() => handleDownloadImage(index)}
                 accessibilityRole="button"
                 accessibilityLabel={t("albums.imageMenu.downloadA11y")}>
-                <Ionicons name="download-outline" size={22} color="#fff" />
+                <Ionicons name="download-outline" size={22} color={colors.WHITE} />
               </Pressable>
               <Pressable
                 style={styles.expandedActionButton}
@@ -335,7 +176,7 @@ export default function AlbumDetailScreen() {
               </Pressable>
               <ExpandedFavoriteOverlay
                 favoritedByMe={image.favoritedByMe}
-                favoriters={getFavoriters(image)}
+                favoriters={toFavoriterBubbles(image, currentUserId)}
                 onToggle={() => handleToggleFavorite(index)}
               />
             </View>
@@ -394,7 +235,7 @@ const createStyles = (colors: ThemeColors) =>
       width: 32,
       height: 32,
       borderRadius: 16,
-      backgroundColor: "rgba(0,0,0,0.45)",
+      backgroundColor: colors.OVERLAY,
     },
     expandedActionBar: {
       position: "absolute",
@@ -412,7 +253,7 @@ const createStyles = (colors: ThemeColors) =>
       borderRadius: 22,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "rgba(0,0,0,0.45)",
+      backgroundColor: colors.OVERLAY,
     },
     fab: {
       position: "absolute",

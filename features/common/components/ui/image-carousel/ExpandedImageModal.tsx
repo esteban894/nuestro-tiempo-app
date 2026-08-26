@@ -1,3 +1,5 @@
+import { ThemeColors } from "@/constants/colors";
+import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { ReactNode, useState } from "react";
 import { Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
@@ -27,6 +29,8 @@ export function ExpandedImageModal({
 }: Props) {
   const [isZoomed, setIsZoomed] = useState(false);
   const isSingleImage = data.length <= 1;
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
 
   return (
     <Modal
@@ -64,38 +68,39 @@ export function ExpandedImageModal({
         )}
 
         <Pressable style={styles.closeButton} onPress={onClose}>
-          <Ionicons name="close" size={28} color="white" />
+          <Ionicons name="close" size={28} color={colors.WHITE} />
         </Pressable>
       </GestureHandlerRootView>
     </Modal>
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.9)",
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  itemWrapper: {
-    width: "100%",
-    height: "100%",
-    position: "relative",
-  },
-  closeButton: {
-    position: "absolute",
-    top: 50,
-    right: 20,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 10,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.OVERLAY_STRONG,
+    },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    itemWrapper: {
+      width: "100%",
+      height: "100%",
+      position: "relative",
+    },
+    closeButton: {
+      position: "absolute",
+      top: 50,
+      right: 20,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: colors.OVERLAY,
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 10,
+    },
+  });

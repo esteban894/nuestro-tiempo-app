@@ -7,3 +7,4 @@ export * from "./hooks/useDownloadImageMutation";
 export * from "./hooks/useFavoriteImagesInfiniteQuery";
 export * from "./hooks/useSetImageFavoriteMutation";
 export * from "./hooks/useUploadImagesMutation";
+export * from "./utils/toFavoriterBubbles";

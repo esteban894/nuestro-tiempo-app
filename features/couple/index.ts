@@ -3,4 +3,5 @@ export * from "./api/queryKeys";
 export * from "./components/couple-connect/CoupleConnect";
 export * from "./components/no-couple-banner/NoCoupleBanner";
 export * from "./hooks/useCoupleQuery";
+export * from "./hooks/usePartner";
 export * from "./utils/generateInviteCode";

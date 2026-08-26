@@ -22,7 +22,7 @@ export const Checkbox = ({ checked, onChange, label, disabled, style }: Checkbox
       disabled={disabled}
       onPress={() => onChange(!checked)}>
       <View style={[styles.box, checked && styles.boxChecked]}>
-        {checked && <Ionicons name="checkmark" size={16} color="#fff" />}
+        {checked && <Ionicons name="checkmark" size={16} color={colors.WHITE} />}
       </View>
       {label && <Text style={styles.label}>{label}</Text>}
     </TouchableOpacity>

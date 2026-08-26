@@ -78,6 +78,8 @@ type ApiFetchOptions = Omit<RequestInit, "body"> & {
   skipAuthRetry?: boolean;
 };
 
+const REQUEST_TIMEOUT_MS = 15000;
+
 function extractErrorMessage(data: unknown, fallback: string): string {
   if (data && typeof data === "object" && "message" in data) {
     const message = (data as { message: unknown }).message;
@@ -118,6 +120,7 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
   try {
     response = await fetch(`${env.API_URL}${path}`, {
       ...rest,
+      signal: rest.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       headers: {
         // Let fetch set the multipart boundary itself for FormData bodies.
         ...(isFormData ? {} : { "Content-Type": "application/json" }),

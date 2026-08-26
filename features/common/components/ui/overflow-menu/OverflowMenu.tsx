@@ -95,6 +95,7 @@ export const OverflowMenu = ({
         ref={triggerRef}
         style={[styles.trigger, triggerStyle]}
         activeOpacity={0.7}
+        hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
         onPress={handleOpen}>
         <Ionicons name={triggerIcon} size={20} color={resolvedTriggerColor} />
       </TouchableOpacity>

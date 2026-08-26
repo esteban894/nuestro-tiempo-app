@@ -11,7 +11,11 @@
     "days_one": "Day",
     "days_other": "Days",
     "removeFromFavorites": "Remove from favorites",
-    "markAsFavorite": "Mark as favorite"
+    "markAsFavorite": "Mark as favorite",
+    "emptyImages": {
+      "title": "No photos yet",
+      "description": "No photos here yet — upload the first one together"
+    }
   },
   "nav": {
     "account": "Account",
@@ -28,7 +32,8 @@
     "event": "Event"
   },
   "errorBoundary": {
-    "title": "Something went wrong"
+    "title": "Something went wrong",
+    "message": "Please try again. If the problem keeps happening, restart the app."
   },
   "auth": {
     "login": {

@@ -105,9 +105,7 @@ const notificationHandlers: NotificationHandlerRegistry = {
         // the partner can still confirm from the event detail screen; the
         // server status stays the single source of truth either way.
         confirmCalendarEvent(data.eventId)
-          .catch(() => {
-            console.log("doesn't send to back");
-          })
+          .catch(() => {})
           .finally(() => queryClient.invalidateQueries({ queryKey: calendarKeys.all }));
         return;
       }

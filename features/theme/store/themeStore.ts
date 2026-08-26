@@ -1,5 +1,5 @@
-import { Appearance, Platform } from "react-native";
-import * as SecureStore from "expo-secure-store";
+import { getStoredValue, setStoredValue } from "@/features/common/utils/crossPlatformStorage";
+import { Appearance } from "react-native";
 import { create } from "zustand";
 
 const THEME_MODE_KEY = "theme.mode";
@@ -22,20 +22,12 @@ function resolveScheme(mode: ThemeMode, systemScheme: ResolvedScheme): ResolvedS
 }
 
 async function getStoredMode(): Promise<ThemeMode | null> {
-  const value =
-    Platform.OS === "web"
-      ? window.localStorage.getItem(THEME_MODE_KEY)
-      : await SecureStore.getItemAsync(THEME_MODE_KEY);
-
+  const value = await getStoredValue(THEME_MODE_KEY);
   return value === "system" || value === "light" || value === "dark" ? value : null;
 }
 
 async function setStoredMode(mode: ThemeMode): Promise<void> {
-  if (Platform.OS === "web") {
-    window.localStorage.setItem(THEME_MODE_KEY, mode);
-    return;
-  }
-  await SecureStore.setItemAsync(THEME_MODE_KEY, mode);
+  await setStoredValue(THEME_MODE_KEY, mode);
 }
 
 export const useThemeStore = create<ThemeState>((set, get) => ({

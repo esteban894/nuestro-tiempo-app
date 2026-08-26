@@ -12,6 +12,7 @@ export * from "./components/album-image-picker-sheet/AlbumImagePickerSheet";
 export * from "./components/album-meatballs-menu/AlbumMeatballsMenu";
 export * from "./components/album-upload-status/AlbumUploadStatus";
 export * from "./components/no-current-album-banner/NoCurrentAlbumBanner";
+export * from "./hooks/useAlbumDetailController";
 export * from "./hooks/useAlbumsInfiniteQuery";
 export * from "./hooks/useCurrentAlbumQuery";
 export * from "./hooks/useDeleteAlbumMutation";
