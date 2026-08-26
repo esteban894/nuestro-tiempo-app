@@ -41,7 +41,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="albums"
         options={{
-          title: "albums",
+          title: t("nav.albums"),
+          tabBarAccessibilityLabel: t("nav.albums"),
           tabBarIcon: ({ focused, color }) => (
             <Ionicons size={28} name={focused ? "albums" : "albums-outline"} color={color} />
           ),
@@ -50,7 +51,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "index",
+          title: t("nav.home"),
+          tabBarAccessibilityLabel: t("nav.home"),
           tabBarIcon: ({ focused, color }) => (
             <Ionicons size={28} name={focused ? "home" : "home-outline"} color={color} />
           ),
@@ -59,7 +61,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="calendar"
         options={{
-          title: "calendar",
+          title: t("nav.calendar"),
+          tabBarAccessibilityLabel: t("nav.calendar"),
           tabBarIcon: ({ focused, color }) => (
             <Ionicons size={28} name={focused ? "calendar" : "calendar-outline"} color={color} />
           ),
@@ -68,7 +71,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="account"
         options={{
-          title: "account",
+          title: t("nav.account"),
+          tabBarAccessibilityLabel: t("nav.account"),
           tabBarIcon: ({ focused, color }) => (
             <Ionicons size={28} name={focused ? "person" : "person-outline"} color={color} />
           ),

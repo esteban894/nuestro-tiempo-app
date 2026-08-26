@@ -160,6 +160,6 @@ const createStyles = (colors: ThemeColors) =>
     link: {
       textAlign: "center",
       fontWeight: "bold",
-      color: colors.PRIMARY[500],
+      color: colors.PRIMARY[800],
     },
   });

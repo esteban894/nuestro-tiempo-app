@@ -60,7 +60,13 @@ export const Button = ({
 
   const currentIconSize = iconSize || (size === "small" ? 16 : size === "large" ? 24 : 20);
 
-  const iconColor = variant === "outline" || variant === "ghost" ? colors.PRIMARY[800] : "#fff";
+  const onColor =
+    variant === "outline" || variant === "ghost"
+      ? colors.PRIMARY[800]
+      : variant === "danger"
+        ? colors.ON_ERROR
+        : colors.WHITE;
+  const iconColor = onColor;
 
   return (
     <TouchableOpacity
@@ -69,10 +75,7 @@ export const Button = ({
       activeOpacity={0.7}
       {...rest}>
       {isLoading ? (
-        <ActivityIndicator
-          color={variant === "outline" || variant === "ghost" ? colors.PRIMARY[800] : "#fff"}
-          size="small"
-        />
+        <ActivityIndicator color={onColor} size="small" />
       ) : (
         <View style={styles.content}>
           {leftIcon && (
@@ -111,10 +114,10 @@ const createStyles = (colors: ThemeColors) =>
     },
 
     primary: {
-      backgroundColor: colors.PRIMARY[500],
+      backgroundColor: colors.PRIMARY[600],
     },
     secondary: {
-      backgroundColor: "#757575",
+      backgroundColor: colors.SECONDARY[600],
     },
     outline: {
       backgroundColor: "transparent",
@@ -125,7 +128,7 @@ const createStyles = (colors: ThemeColors) =>
       backgroundColor: "transparent",
     },
     danger: {
-      backgroundColor: "#f44336",
+      backgroundColor: colors.ERROR[500],
     },
 
     size_small: {
@@ -168,10 +171,10 @@ const createStyles = (colors: ThemeColors) =>
       textAlign: "center",
     },
     text_primary: {
-      color: "#fff",
+      color: colors.WHITE,
     },
     text_secondary: {
-      color: "#fff",
+      color: colors.WHITE,
     },
     text_outline: {
       color: colors.PRIMARY[800],
@@ -180,7 +183,7 @@ const createStyles = (colors: ThemeColors) =>
       color: colors.PRIMARY[800],
     },
     text_danger: {
-      color: "#fff",
+      color: colors.ON_ERROR,
     },
     textSize_small: {
       fontSize: 14,

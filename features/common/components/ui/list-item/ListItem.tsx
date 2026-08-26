@@ -13,22 +13,32 @@ interface ListItemProps {
   onPress?: () => void;
 }
 
-export const ListItem = ({
-  leftIcon,
-  label,
-  rightIcon = "chevron-forward",
-  onPress,
-}: ListItemProps) => {
+export const ListItem = ({ leftIcon, label, rightIcon = "chevron-forward", onPress }: ListItemProps) => {
   const colors = useThemeColors();
   const styles = createStyles(colors);
 
-  return (
-    <TouchableOpacity style={styles.container} activeOpacity={0.7} onPress={onPress}>
+  const content = (
+    <>
       <View style={styles.iconWrapper}>
         <Ionicons name={leftIcon} size={22} color={colors.PRIMARY[500]} />
       </View>
       <Text style={styles.label}>{label}</Text>
-      <Ionicons name={rightIcon} size={20} color={colors.NEUTRAL[600]} />
+      {onPress && <Ionicons name={rightIcon} size={20} color={colors.NEUTRAL[600]} />}
+    </>
+  );
+
+  if (!onPress) {
+    return <View style={styles.container}>{content}</View>;
+  }
+
+  return (
+    <TouchableOpacity
+      style={styles.container}
+      activeOpacity={0.7}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}>
+      {content}
     </TouchableOpacity>
   );
 };

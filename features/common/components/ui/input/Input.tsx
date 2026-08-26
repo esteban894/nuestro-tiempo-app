@@ -73,7 +73,7 @@ export const Input = ({
 
         <TextInput
           style={[styles.input, style]}
-          placeholderTextColor={colors.NEUTRAL[600]}
+          placeholderTextColor={colors.NEUTRAL[700]}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           secureTextEntry={isPassword && !isPasswordVisible}
