@@ -1,3 +1,4 @@
+import { buildQuery } from "@/features/common/api/buildQuery";
 import { apiFetch } from "@/features/common/api/httpClient";
 
 export type CalendarEventType = "appointment" | "important_date";
@@ -52,21 +53,12 @@ export type CalendarEventsQuery = {
   createdBy?: string;
 };
 
-function toQueryString(params: Record<string, string | number | undefined>) {
-  const search = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined) search.set(key, String(value));
-  }
-  const query = search.toString();
-  return query ? `?${query}` : "";
-}
-
 export function getCalendarEvents(query: CalendarEventsQuery = {}) {
-  return apiFetch<CalendarEvent[]>(`/calendar/events${toQueryString(query)}`);
+  return apiFetch<CalendarEvent[]>(`/calendar/events${buildQuery(query)}`);
 }
 
 export function getUpcomingCalendarEvents(limit = 5) {
-  return apiFetch<CalendarEvent[]>(`/calendar/events/upcoming${toQueryString({ limit })}`);
+  return apiFetch<CalendarEvent[]>(`/calendar/events/upcoming${buildQuery({ limit })}`);
 }
 
 export function getCalendarEvent(id: string) {

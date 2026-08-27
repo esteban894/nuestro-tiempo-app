@@ -8,19 +8,37 @@ export const loginSchema = z.object({
     .string()
     .trim()
     .min(1, { error: "auth.validation.emailRequired" })
+    .max(255, { error: "auth.validation.emailTooLong" })
     .pipe(z.email({ error: "auth.validation.emailInvalid" })),
-  password: z.string().min(1, { error: "auth.validation.passwordRequired" }),
+  // Mirrors LoginDto exactly. Enforcing the minimum client-side is safe because no stored
+  // password predates the rule — the API would reject those with the same bound anyway.
+  password: z
+    .string()
+    .min(1, { error: "auth.validation.passwordRequired" })
+    .min(8, { error: "auth.validation.passwordTooShort" })
+    .max(72, { error: "auth.validation.passwordTooLong" }),
 });
 
 export const registerSchema = z
   .object({
-    name: z.string().trim().min(1, { error: "auth.validation.nameRequired" }),
+    name: z
+      .string()
+      .trim()
+      .min(1, { error: "auth.validation.nameRequired" })
+      .max(100, { error: "auth.validation.nameTooLong" }),
     email: z
       .string()
       .trim()
       .min(1, { error: "auth.validation.emailRequired" })
+      .max(255, { error: "auth.validation.emailTooLong" })
       .pipe(z.email({ error: "auth.validation.emailInvalid" })),
-    password: z.string().min(1, { error: "auth.validation.passwordRequiredRegister" }),
+    // Bounds mirror the API's RegisterDto; bcrypt truncates past 72 bytes, so the API
+    // rejects anything longer outright.
+    password: z
+      .string()
+      .min(1, { error: "auth.validation.passwordRequiredRegister" })
+      .min(8, { error: "auth.validation.passwordTooShort" })
+      .max(72, { error: "auth.validation.passwordTooLong" }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {

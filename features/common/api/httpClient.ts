@@ -2,8 +2,9 @@ import { env } from "../config/env";
 
 export class ApiError extends Error {
   status: number;
-  /** Application error code from the API's `error` response field (e.g. "ALBUM_NOT_FOUND").
-   *  Undefined for responses that don't carry one, like Nest's validation-pipe errors. */
+  /** Stable domain error code from the API's `error` response field (e.g. "ALBUM_NOT_FOUND").
+   *  Undefined for responses that don't carry one — including validation-pipe errors, whose
+   *  `error` field holds an HTTP status name rather than a code (see extractErrorCode). */
   code?: string;
 
   constructor(status: number, message: string, code?: string) {
@@ -81,6 +82,9 @@ type ApiFetchOptions = Omit<RequestInit, "body"> & {
 const REQUEST_TIMEOUT_MS = 15000;
 
 function extractErrorMessage(data: unknown, fallback: string): string {
+  // Rate-limit responses aren't an object at all — the throttler serializes a bare JSON
+  // string ("ThrottlerException: Too Many Requests").
+  if (typeof data === "string") return data;
   if (data && typeof data === "object" && "message" in data) {
     const message = (data as { message: unknown }).message;
     if (Array.isArray(message)) return message.join(" ");
@@ -91,12 +95,27 @@ function extractErrorMessage(data: unknown, fallback: string): string {
 
 // The API returns its application error code in the `error` field, e.g.
 // { statusCode: 400, message: "...", error: "ALBUM_COUPLE_REQUIRED" }. Nest's built-in
-// validation pipe instead sends `error: "Bad Request"`, which isn't one of our codes —
-// showErrorToast falls back to a generic message when the code has no dictionary entry.
+// validation pipe instead reuses the field for the HTTP status name ("Bad Request"), which
+// is not a stable code and must never be branched on — those are dropped here so
+// ApiError.code always means "domain error code" and resolveApiErrorText can fall back to
+// the status instead.
+const GENERIC_STATUS_LABELS = new Set([
+  "Bad Request",
+  "Unauthorized",
+  "Forbidden",
+  "Not Found",
+  "Conflict",
+  "Payload Too Large",
+  "Unsupported Media Type",
+  "Too Many Requests",
+  "Internal Server Error",
+  "Not Implemented",
+]);
+
 function extractErrorCode(data: unknown): string | undefined {
   if (data && typeof data === "object" && "error" in data) {
     const code = (data as { error: unknown }).error;
-    if (typeof code === "string") return code;
+    if (typeof code === "string" && !GENERIC_STATUS_LABELS.has(code)) return code;
   }
   return undefined;
 }

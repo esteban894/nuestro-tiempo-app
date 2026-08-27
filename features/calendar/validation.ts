@@ -15,7 +15,14 @@ export const eventSchema = z
     endAt: z.date().optional(),
     allDay: z.boolean(),
     recurrence: z.enum(["none", "yearly", "monthly"]),
-    reminderMinutesBefore: z.number().min(0).optional(),
+    // 43200 min = 30 days, the API's ceiling. The form's presets top out at 1440, so this
+    // only fires when editing an event whose stored reminder came from elsewhere.
+    reminderMinutesBefore: z
+      .number()
+      .int()
+      .min(0)
+      .max(43200, { error: "calendar.validation.reminderTooLarge" })
+      .optional(),
   })
   .refine((data) => !data.endAt || data.endAt >= data.startAt, {
     error: "calendar.validation.endAfterStart",

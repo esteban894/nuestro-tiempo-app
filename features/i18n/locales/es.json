@@ -67,7 +67,11 @@
       "passwordRequired": "Ingresá tu contraseña.",
       "passwordRequiredRegister": "Ingresá una contraseña.",
       "nameRequired": "Ingresá tu nombre.",
-      "passwordMismatch": "Las contraseñas no coinciden."
+      "passwordMismatch": "Las contraseñas no coinciden.",
+      "emailTooLong": "El correo no puede superar los 255 caracteres.",
+      "nameTooLong": "El nombre no puede superar los 100 caracteres.",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+      "passwordTooLong": "La contraseña no puede superar los 72 caracteres."
     }
   },
   "couple": {
@@ -255,7 +259,8 @@
       "titleRequired": "Ingresá un título.",
       "startRequired": "Seleccioná una fecha de inicio.",
       "endAfterStart": "La fecha de fin debe ser posterior a la de inicio.",
-      "categoryTypeMismatch": "Esa categoría no corresponde a este tipo de evento."
+      "categoryTypeMismatch": "Esa categoría no corresponde a este tipo de evento.",
+      "reminderTooLarge": "El recordatorio no puede ser de más de 30 días antes."
     },
     "detail": {
       "editMenu": "Editar",
@@ -356,6 +361,12 @@
     "FORBIDDEN": "Acceso prohibido",
     "UNAUTHORIZED": "No autorizado",
     "BAD_REQUEST": "Solicitud inválida",
-    "PAGE_OUT_OF_RANGE": "La página excede el total de páginas"
+    "PAGE_OUT_OF_RANGE": "La página excede el total de páginas",
+    "sessionExpiredTitle": "Sesión expirada",
+    "sessionExpired": "Tu sesión expiró. Iniciá sesión de nuevo.",
+    "tooManyRequests": "Demasiados intentos. Esperá unos minutos y probá otra vez.",
+    "validation": "Revisá los datos ingresados.",
+    "NOTIFICATIONS_PUSH_TOKEN_NOT_FOUND": "El token de notificaciones no está registrado",
+    "IMAGE_INVALID_CONTENT": "El archivo no es una imagen en un formato soportado"
   }
 }

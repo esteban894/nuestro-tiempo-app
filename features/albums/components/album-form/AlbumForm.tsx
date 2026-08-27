@@ -1,5 +1,6 @@
 import { ThemeColors } from "@/constants/colors";
 import { Button, Checkbox, Input } from "@/features/common";
+import { buildImageFilePart, type PickedImage } from "@/features/images";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
@@ -34,16 +35,18 @@ export const AlbumForm = ({
   const styles = createStyles(colors);
   const [name, setName] = useState(initialValues?.name ?? "");
   const [coverImage, setCoverImage] = useState(initialValues?.coverImage ?? "");
-  const [isNewCoverImage, setIsNewCoverImage] = useState(false);
+  // Holds the freshly picked asset (never the already-uploaded initial cover), so it
+  // doubles as the "needs uploading" flag and carries the picker's real mime type.
+  const [newCoverAsset, setNewCoverAsset] = useState<PickedImage | null>(null);
   const [isPrivate, setIsPrivate] = useState(initialValues?.isPrivate ?? true);
   const [pickerVisible, setPickerVisible] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
 
-  const handlePickCoverImage = (uris: string[]) => {
-    const uri = uris[0];
-    if (!uri) return;
-    setCoverImage(uri);
-    setIsNewCoverImage(true);
+  const handlePickCoverImage = (assets: PickedImage[]) => {
+    const asset = assets[0];
+    if (!asset) return;
+    setCoverImage(asset.uri);
+    setNewCoverAsset(asset);
   };
 
   const handleSubmit = async () => {
@@ -51,14 +54,10 @@ export const AlbumForm = ({
     formData.append("name", name.trim());
     formData.append("isPrivate", String(isPrivate));
 
-    if (isNewCoverImage && coverImage) {
-      const filename = coverImage.split("/").pop() ?? "cover.jpg";
-      const ext = filename.split(".").pop()?.toLowerCase();
-      const type = ext === "png" ? "image/png" : "image/jpeg";
-
+    if (newCoverAsset) {
       setIsUploadingCover(true);
       try {
-        const result = await prepareCoverImageUpload({ uri: coverImage, name: filename, type });
+        const result = await prepareCoverImageUpload(buildImageFilePart(newCoverAsset));
         if (result.kind === "key") {
           formData.append("coverImageKey", result.coverImageKey);
         } else {

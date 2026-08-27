@@ -39,8 +39,11 @@ export function register(payload: RegisterPayload) {
   });
 }
 
+/** Refresh tokens are single-use: the response always carries a NEW refresh token and
+ *  the one just sent is revoked. Reusing a rotated token outside the API's grace window
+ *  revokes the whole token family (theft detection), so the caller must persist both. */
 export function refreshAccessToken(refreshToken: string) {
-  return apiFetch<{ access_token: string }>("/auth/refresh", {
+  return apiFetch<{ access_token: string; refresh_token: string }>("/auth/refresh", {
     method: "POST",
     body: { refresh_token: refreshToken },
     skipAuthRetry: true,

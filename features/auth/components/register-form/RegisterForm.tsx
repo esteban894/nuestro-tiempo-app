@@ -79,6 +79,7 @@ export const RegisterForm = () => {
         label={t("auth.register.nameLabel")}
         placeholder={t("auth.register.namePlaceholder")}
         leftIcon="person-outline"
+        maxLength={100}
         returnKeyType="next"
         value={name}
         onChangeText={handleNameChange}
@@ -92,6 +93,7 @@ export const RegisterForm = () => {
         leftIcon="mail-outline"
         keyboardType="email-address"
         autoCapitalize="none"
+        maxLength={255}
         returnKeyType="next"
         value={email}
         onChangeText={handleEmailChange}
@@ -104,6 +106,7 @@ export const RegisterForm = () => {
         placeholder={t("auth.register.passwordPlaceholder")}
         isPassword
         leftIcon="lock-closed-outline"
+        maxLength={72}
         returnKeyType="done"
         value={password}
         onChangeText={handlePasswordChange}
@@ -116,6 +119,7 @@ export const RegisterForm = () => {
         placeholder={t("auth.register.passwordPlaceholder")}
         isPassword
         leftIcon="lock-closed-outline"
+        maxLength={72}
         returnKeyType="done"
         value={confirmPassword}
         onChangeText={handleConfirmPasswordChange}

@@ -1,3 +1,4 @@
+import { buildQuery } from "@/features/common/api/buildQuery";
 import {
   ApiError,
   apiFetch,
@@ -53,7 +54,7 @@ function withResolvedCover<T extends { coverImage?: string | null }>(album: T): 
 
 export async function listAlbums({ page = 1, pageSize = 10 }: ListAlbumsParams = {}) {
   const response = await apiFetch<PaginatedResponse<Album>>(
-    `/albums?page=${page}&pageSize=${pageSize}`,
+    `/albums${buildQuery({ page, pageSize })}`,
   );
   return { ...response, data: response.data.map(withResolvedCover) };
 }

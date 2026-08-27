@@ -3,8 +3,9 @@ import { useAuthStore } from "@/features/auth";
 import { usePartner } from "@/features/couple";
 import {
   AlbumImage,
-  ImageFilePart,
+  buildImageFilePart,
   MediaLibraryPermissionError,
+  type PickedImage,
   useAlbumImagesInfiniteQuery,
   useDeleteImageMutation,
   useDownloadImageMutation,
@@ -35,13 +36,6 @@ function filterByFavorite(
   if (filter === "me") return images.filter((image) => image.favoritedByMe);
   if (filter === "partner") return images.filter(favoritedByPartner);
   return images.filter((image) => image.favoritedByMe && favoritedByPartner(image));
-}
-
-function buildImageFilePart(uri: string): ImageFilePart {
-  const name = uri.split("/").pop() ?? "photo.jpg";
-  const ext = name.split(".").pop()?.toLowerCase();
-  const type = ext === "png" ? "image/png" : "image/jpeg";
-  return { uri, name, type };
 }
 
 export function useAlbumDetailController(id: string) {
@@ -160,10 +154,10 @@ export function useAlbumDetailController(id: string) {
     );
   };
 
-  const handlePickImages = (uris: string[]) => {
-    if (uris.length === 0) return;
+  const handlePickImages = (assets: PickedImage[]) => {
+    if (assets.length === 0) return;
 
-    let files = uris;
+    let files = assets;
     if (files.length > MAX_IMAGES_PER_BATCH) {
       files = files.slice(0, MAX_IMAGES_PER_BATCH);
       Toast.show({

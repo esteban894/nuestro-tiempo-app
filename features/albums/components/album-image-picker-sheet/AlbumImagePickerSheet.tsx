@@ -1,15 +1,22 @@
 import { ThemeColors } from "@/constants/colors";
 import { MAX_IMAGES_PER_BATCH } from "@/constants/upload";
+import type { PickedImage } from "@/features/images";
 import { useThemeColors } from "@/features/theme";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useTranslation } from "react-i18next";
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+/** Keeps the picker's own `mimeType` alongside the uri — it's the only reliable read of
+ *  what the asset actually is, and the presigned upload path needs an honest type. */
+function toPickedImage(asset: ImagePicker.ImagePickerAsset): PickedImage {
+  return { uri: asset.uri, fileName: asset.fileName, mimeType: asset.mimeType };
+}
+
 interface AlbumImagePickerSheetProps {
   visible: boolean;
   onClose: () => void;
-  onPickImages: (uris: string[]) => void;
+  onPickImages: (assets: PickedImage[]) => void;
   allowsMultipleSelection?: boolean;
 }
 
@@ -29,8 +36,8 @@ export const AlbumImagePickerSheet = ({
     if (!permission.granted) return;
 
     const result = await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 0.8 });
-    const uri = result.assets?.[0]?.uri;
-    if (!result.canceled && uri) onPickImages([uri]);
+    const asset = result.assets?.[0];
+    if (!result.canceled && asset) onPickImages([toPickedImage(asset)]);
   };
 
   const handleChooseFromLibrary = async () => {
@@ -44,8 +51,8 @@ export const AlbumImagePickerSheet = ({
       allowsMultipleSelection,
       selectionLimit: allowsMultipleSelection ? MAX_IMAGES_PER_BATCH : 1,
     });
-    const uris = result.assets?.map((asset) => asset.uri) ?? [];
-    if (!result.canceled && uris.length > 0) onPickImages(uris);
+    const assets = result.assets?.map(toPickedImage) ?? [];
+    if (!result.canceled && assets.length > 0) onPickImages(assets);
   };
 
   return (

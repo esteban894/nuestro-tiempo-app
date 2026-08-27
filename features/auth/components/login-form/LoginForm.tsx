@@ -65,6 +65,7 @@ export const LoginForm = () => {
         leftIcon="mail-outline"
         keyboardType="email-address"
         autoCapitalize="none"
+        maxLength={255}
         returnKeyType="next"
         value={email}
         onChangeText={handleEmailChange}
@@ -77,6 +78,7 @@ export const LoginForm = () => {
         placeholder={t("auth.login.passwordPlaceholder")}
         isPassword
         leftIcon="lock-closed-outline"
+        maxLength={72}
         returnKeyType="done"
         value={password}
         onChangeText={handlePasswordChange}

@@ -67,7 +67,11 @@
       "passwordRequired": "Enter your password.",
       "passwordRequiredRegister": "Enter a password.",
       "nameRequired": "Enter your name.",
-      "passwordMismatch": "Passwords don't match."
+      "passwordMismatch": "Passwords don't match.",
+      "emailTooLong": "Email cannot be longer than 255 characters.",
+      "nameTooLong": "Name cannot be longer than 100 characters.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "passwordTooLong": "Password cannot be longer than 72 characters."
     }
   },
   "couple": {
@@ -255,7 +259,8 @@
       "titleRequired": "Enter a title.",
       "startRequired": "Select a start date.",
       "endAfterStart": "The end date must be after the start date.",
-      "categoryTypeMismatch": "That category doesn't match this event type."
+      "categoryTypeMismatch": "That category doesn't match this event type.",
+      "reminderTooLarge": "The reminder cannot be more than 30 days before."
     },
     "detail": {
       "editMenu": "Edit",
@@ -356,6 +361,12 @@
     "FORBIDDEN": "Access forbidden",
     "UNAUTHORIZED": "Unauthorized",
     "BAD_REQUEST": "Bad request",
-    "PAGE_OUT_OF_RANGE": "Page exceeds total number of pages"
+    "PAGE_OUT_OF_RANGE": "Page exceeds total number of pages",
+    "sessionExpiredTitle": "Session expired",
+    "sessionExpired": "Your session expired. Please log in again.",
+    "tooManyRequests": "Too many attempts. Wait a few minutes and try again.",
+    "validation": "Please check the information you entered.",
+    "NOTIFICATIONS_PUSH_TOKEN_NOT_FOUND": "Push token is not registered",
+    "IMAGE_INVALID_CONTENT": "The file is not a supported image format"
   }
 }

@@ -1,3 +1,4 @@
+import { buildQuery } from "@/features/common/api/buildQuery";
 import {
   ApiError,
   apiFetch,
@@ -55,13 +56,10 @@ export interface PresignedUpload {
 
 export async function listImagesByAlbum(
   albumId: string,
-  { page = 1, pageSize = 50, favoritedBy }: ListImagesParams = {},
+  { page = 1, pageSize = 20, favoritedBy }: ListImagesParams = {},
 ) {
-  const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
-  if (favoritedBy) query.set("favoritedBy", favoritedBy);
-
   const response = await apiFetch<PaginatedResponse<AlbumImage>>(
-    `/images/album/${albumId}?${query.toString()}`,
+    `/images/album/${albumId}${buildQuery({ page, pageSize, favoritedBy })}`,
   );
   return {
     ...response,
@@ -72,12 +70,11 @@ export async function listImagesByAlbum(
 export async function listFavoriteImages({
   favoritedBy,
   page = 1,
-  pageSize = 50,
+  pageSize = 20,
 }: ListImagesParams = {}) {
-  const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
-  if (favoritedBy) query.set("favoritedBy", favoritedBy);
-
-  const response = await apiFetch<PaginatedResponse<AlbumImage>>(`/images?${query.toString()}`);
+  const response = await apiFetch<PaginatedResponse<AlbumImage>>(
+    `/images${buildQuery({ page, pageSize, favoritedBy })}`,
+  );
   return {
     ...response,
     data: response.data.map((image) => ({ ...image, url: resolveMediaUrl(image.url) })),
