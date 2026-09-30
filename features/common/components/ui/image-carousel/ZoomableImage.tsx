@@ -24,9 +24,10 @@ interface Props {
   recyclingKey?: string;
   onZoomChange?: (zoomed: boolean) => void;
   onError?: () => void;
+  onSingleTap?: () => void;
 }
 
-export function ZoomableImage({ uri, recyclingKey, onZoomChange, onError }: Props) {
+export function ZoomableImage({ uri, recyclingKey, onZoomChange, onError, onSingleTap }: Props) {
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
   const translateX = useSharedValue(0);
@@ -99,8 +100,16 @@ export function ZoomableImage({ uri, recyclingKey, onZoomChange, onError }: Prop
       }
     });
 
+  const singleTapGesture = Gesture.Tap()
+    .numberOfTaps(1)
+    .onEnd(() => {
+      if (onSingleTap) runOnJS(onSingleTap)();
+    });
+
+  // Exclusive: the single tap only fires once the double tap has failed,
+  // so zooming never toggles the viewer's controls.
   const composedGesture = Gesture.Race(
-    doubleTapGesture,
+    Gesture.Exclusive(doubleTapGesture, singleTapGesture),
     Gesture.Simultaneous(pinchGesture, panGesture),
   );
 

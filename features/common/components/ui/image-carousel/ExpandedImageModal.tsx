@@ -4,11 +4,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { ReactNode, useState } from "react";
 import { Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import { MediaItem } from "../image-grid/ImageGrid";
 import { ZoomableImage } from "./ZoomableImage";
 
 const { width, height } = Dimensions.get("window");
+
+const CHROME_FADE_MS = 200;
 
 interface Props {
   data: MediaItem[];
@@ -28,9 +31,19 @@ export function ExpandedImageModal({
   onImageError,
 }: Props) {
   const [isZoomed, setIsZoomed] = useState(false);
+  const [chromeVisible, setChromeVisible] = useState(true);
+  const chromeOpacity = useSharedValue(1);
   const isSingleImage = data.length <= 1;
   const colors = useThemeColors();
   const styles = createStyles(colors);
+  const currentItem = index !== null ? data[index] : undefined;
+
+  const showChrome = (visible: boolean) => {
+    setChromeVisible(visible);
+    chromeOpacity.value = withTiming(visible ? 1 : 0, { duration: CHROME_FADE_MS });
+  };
+
+  const chromeStyle = useAnimatedStyle(() => ({ opacity: chromeOpacity.value }));
 
   return (
     <Modal
@@ -38,6 +51,7 @@ export function ExpandedImageModal({
       transparent
       animationType="fade"
       statusBarTranslucent
+      onShow={() => showChrome(true)}
       onRequestClose={onClose}>
       <GestureHandlerRootView style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={onClose} />
@@ -52,7 +66,7 @@ export function ExpandedImageModal({
             loop={!isSingleImage}
             enabled={!isSingleImage && !isZoomed}
             onSnapToItem={onIndexChange}
-            renderItem={({ item, index: itemIndex }) => (
+            renderItem={({ item }) => (
               <View style={styles.itemWrapper}>
                 <ZoomableImage
                   key={item.id}
@@ -60,16 +74,23 @@ export function ExpandedImageModal({
                   recyclingKey={item.id}
                   onZoomChange={setIsZoomed}
                   onError={() => onImageError?.(item)}
+                  onSingleTap={() => showChrome(!chromeVisible)}
                 />
-                {renderOverlay?.(item, itemIndex)}
               </View>
             )}
           />
         )}
 
-        <Pressable style={styles.closeButton} onPress={onClose}>
-          <Ionicons name="close" size={28} color={colors.WHITE} />
-        </Pressable>
+        {/* Controls live outside the carousel so they stay put while swiping;
+            a single tap on the image fades them in and out. */}
+        <Animated.View
+          style={[StyleSheet.absoluteFill, chromeStyle]}
+          pointerEvents={chromeVisible ? "box-none" : "none"}>
+          {index !== null && currentItem && renderOverlay?.(currentItem, index)}
+          <Pressable style={styles.closeButton} onPress={onClose}>
+            <Ionicons name="close" size={28} color={colors.WHITE} />
+          </Pressable>
+        </Animated.View>
       </GestureHandlerRootView>
     </Modal>
   );
