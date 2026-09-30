@@ -23,7 +23,6 @@ jest.mock("@/features/notifications/utils/registerForPushNotifications", () => (
 jest.mock("@/features/common/components/ui/toast/showSessionExpiredToast", () => ({
   showSessionExpiredToast: jest.fn(),
 }));
-jest.mock("expo-crypto", () => ({ randomUUID: () => "device-uuid" }));
 
 const USER = { id: "u1", name: "Ana", email: "ana@test" };
 

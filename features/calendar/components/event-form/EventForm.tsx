@@ -14,6 +14,8 @@ import {
 } from "../../api/calendar.api";
 import { CATEGORIES_BY_TYPE } from "../../utils/categoriesByType";
 import { EventErrors, validateEventForm } from "../../validation";
+import { getDeviceTimeZone } from "@/features/common/utils/deviceTimeZone";
+import { normalizeEventDates } from "../../utils/eventZone";
 
 type IoniconsName = ComponentProps<typeof Ionicons>["name"];
 
@@ -181,15 +183,19 @@ export const EventForm = ({
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0 || !startAt) return;
 
+    const dates = normalizeEventDates(startAt, hasEnd ? endAt : null, allDay);
     onSubmit({
       type,
       category,
       title: title.trim(),
       description: description.trim() || undefined,
       location: location.trim() || undefined,
-      startAt: startAt.toISOString(),
-      endAt: hasEnd && endAt ? endAt.toISOString() : undefined,
+      startAt: dates.startAt.toISOString(),
+      endAt: dates.endAt ? dates.endAt.toISOString() : undefined,
       allDay,
+      // Where this is being planned. The API anchors recurrences and all-day dates to
+      // it, and only takes it when the dates change.
+      timeZone: getDeviceTimeZone() ?? undefined,
       recurrence,
       reminderMinutesBefore: reminderEnabled ? Number(reminderMinutesBefore) : undefined,
     });

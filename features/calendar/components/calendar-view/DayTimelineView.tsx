@@ -6,6 +6,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-nati
 import { CalendarEvent } from "../../api/calendar.api";
 import { CATEGORY_COLOR } from "../../utils/categoryColors";
 import { formatHourLabel, minutesFromMidnight, toDateKey } from "../../utils/dateGrid";
+import { eventDateKey } from "../../utils/eventZone";
 import { expandEventsInRange } from "../../utils/recurrence";
 
 const HOUR_HEIGHT = 60;
@@ -35,14 +36,14 @@ export const DayTimelineView = ({ day, events, onPressEvent }: DayTimelineViewPr
   }, [events, day]);
 
   const allDayEvents = useMemo(
-    () => dayOccurrences.filter((event) => event.allDay && toDateKey(new Date(event.startAt)) === key),
+    () => dayOccurrences.filter((event) => event.allDay && eventDateKey(event) === key),
     [dayOccurrences, key],
   );
 
   const timedEvents = useMemo(
     () =>
       dayOccurrences
-        .filter((event) => !event.allDay && toDateKey(new Date(event.startAt)) === key)
+        .filter((event) => !event.allDay && eventDateKey(event) === key)
         .sort((a, b) => a.startAt.localeCompare(b.startAt)),
     [dayOccurrences, key],
   );

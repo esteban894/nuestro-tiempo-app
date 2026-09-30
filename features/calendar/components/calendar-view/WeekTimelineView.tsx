@@ -13,6 +13,7 @@ import {
   minutesFromMidnight,
   toDateKey,
 } from "../../utils/dateGrid";
+import { eventDateKey } from "../../utils/eventZone";
 import { expandEventsInRange } from "../../utils/recurrence";
 
 const HOUR_HEIGHT = 52;
@@ -49,7 +50,7 @@ export const WeekTimelineView = ({
     const timed = new Map<string, typeof occurrences>();
     const allDay = new Map<string, typeof occurrences>();
     for (const event of occurrences) {
-      const key = toDateKey(new Date(event.startAt));
+      const key = eventDateKey(event);
       const bucket = event.allDay ? allDay : timed;
       const list = bucket.get(key) ?? [];
       list.push(event);

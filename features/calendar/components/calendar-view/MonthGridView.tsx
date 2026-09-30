@@ -6,6 +6,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { CalendarEvent } from "../../api/calendar.api";
 import { CATEGORY_COLOR } from "../../utils/categoryColors";
 import { getMonthGrid, getWeekdayShortNames, isToday, toDateKey } from "../../utils/dateGrid";
+import { eventDateKey } from "../../utils/eventZone";
 import { expandEventsInRange } from "../../utils/recurrence";
 
 const MAX_DOTS = 3;
@@ -36,7 +37,7 @@ export const MonthGridView = ({ month, events, selectedDate, onSelectDay }: Mont
 
     const map = new Map<string, typeof occurrences>();
     for (const event of occurrences) {
-      const key = toDateKey(new Date(event.startAt));
+      const key = eventDateKey(event);
       const list = map.get(key) ?? [];
       list.push(event);
       map.set(key, list);

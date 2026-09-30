@@ -46,12 +46,20 @@ function mockPagedApi() {
 const requestedPaths = () => mockApiFetch.mock.calls.map(([path]) => path);
 
 let queryClient: QueryClient;
+/** Observers mounted by a test, unsubscribed after it so no timers outlive the run. */
+const unsubscribers: (() => void)[] = [];
 
 beforeEach(() => {
   jest.clearAllMocks();
-  queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  // gcTime Infinity: no garbage-collection timers left pending once a test ends.
+  queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: Infinity } },
+  });
 });
-afterEach(() => queryClient.clear());
+afterEach(() => {
+  unsubscribers.splice(0).forEach((unsubscribe) => unsubscribe());
+  queryClient.clear();
+});
 
 function observe(filter: Parameters<typeof albumImagesQueryOptions>[1] = "all") {
   return new InfiniteQueryObserver(queryClient, albumImagesQueryOptions(ALBUM_ID, filter));
@@ -61,6 +69,7 @@ function observe(filter: Parameters<typeof albumImagesQueryOptions>[1] = "all") 
 async function mount(filter: Parameters<typeof albumImagesQueryOptions>[1] = "all") {
   const observer = observe(filter);
   const unsubscribe = observer.subscribe(() => {});
+  unsubscribers.push(unsubscribe);
   await queryClient.getQueryCache().find({ queryKey: imageKeys.albumList(ALBUM_ID, filter) })?.promise;
   return { observer, unsubscribe };
 }
@@ -117,7 +126,7 @@ describe("albumImagesQueryOptions", () => {
 
   it("stays idle without an album id", () => {
     const observer = new InfiniteQueryObserver(queryClient, albumImagesQueryOptions(undefined));
-    observer.subscribe(() => {});
+    unsubscribers.push(observer.subscribe(() => {}));
     expect(mockApiFetch).not.toHaveBeenCalled();
   });
 });

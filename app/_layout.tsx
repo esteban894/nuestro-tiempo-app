@@ -22,7 +22,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View } from "react-native";
+import { AppState, StyleSheet, Text, View } from "react-native";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { enableFreeze } from "react-native-screens";
 
@@ -101,11 +101,18 @@ export default function RootLayout() {
     const pushTokenSubscription = Notifications.addPushTokenListener(() => {
       registerForPushNotifications();
     });
+    // The device's time zone changes when traveling; re-registering on foreground keeps
+    // the zone the API renders push dates in current. A no-op when nothing changed, and
+    // it never re-prompts for permission.
+    const appStateSubscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") registerForPushNotifications({ requestPermission: false });
+    });
 
     return () => {
       receivedSubscription.remove();
       responseSubscription.remove();
       pushTokenSubscription.remove();
+      appStateSubscription.remove();
     };
   }, [status]);
 

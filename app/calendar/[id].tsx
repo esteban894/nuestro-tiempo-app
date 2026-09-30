@@ -1,6 +1,7 @@
 import { ThemeColors } from "@/constants/colors";
 import { useAuthStore } from "@/features/auth";
 import {
+  formatAllDayDate,
   useConfirmEventMutation,
   useDeleteEventMutation,
   useEventQuery,
@@ -99,11 +100,7 @@ export default function EventDetailScreen() {
           <Ionicons name="calendar-outline" size={18} color={colors.SECONDARY[500]} />
           <Text style={styles.rowText}>
             {event.allDay
-              ? start.toLocaleDateString(i18n.language, {
-                  day: "2-digit",
-                  month: "long",
-                  year: "numeric",
-                })
+              ? formatAllDayDate(event, i18n.language)
               : start.toLocaleString(i18n.language, {
                   day: "2-digit",
                   month: "long",

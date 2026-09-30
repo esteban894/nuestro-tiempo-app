@@ -24,6 +24,8 @@ export type CalendarEvent = {
   startAt: string;
   endAt: string | null;
   allDay: boolean;
+  /** IANA zone the event was planned in; null for events predating per-event zones. */
+  timeZone: string | null;
   recurrence: CalendarEventRecurrence;
   reminderMinutesBefore: number | null;
   status: CalendarEventStatus;
@@ -43,6 +45,8 @@ export type CalendarEventPayload = {
   startAt: string;
   endAt?: string;
   allDay?: boolean;
+  /** This device's zone. The API only applies it when the dates change. */
+  timeZone?: string;
   recurrence?: CalendarEventRecurrence;
   reminderMinutesBefore?: number;
 };
