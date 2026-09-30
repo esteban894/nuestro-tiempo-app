@@ -42,10 +42,10 @@ Entities and business rules (Couple/invite codes, private Albums, cascade delete
 
 The app is wired to the API. Key infrastructure already in place:
 
-- **HTTP client** — `features/common/api/httpClient.ts` (`apiFetch`) reads the API base URL from `features/common/config/env.ts` (which validates `EXPO_PUBLIC_API_URL` at module load, failing fast if unset), attaches the `Authorization: Bearer` header, and on a 401 runs a deduplicated refresh-and-retry flow. Errors are typed as `ApiError` (non-2xx response) or `NetworkError` (request never completed). `resolveMediaUrl` prefixes relative media paths; `uploadToPresignedUrl` posts directly to S3.
+- **HTTP client** — `features/common/api/httpClient.ts` (`apiFetch`) reads the API base URL from `features/common/config/env.ts` (which validates `EXPO_PUBLIC_API_URL` at module load, failing fast if unset), attaches the `Authorization: Bearer` header, and on a 401 runs a deduplicated refresh-and-retry flow. Errors are typed as `ApiError` (non-2xx response) or `NetworkError` (request never completed). `resolveMediaUrl` prefixes relative media paths; `uploadToPresignedUrl` posts directly to S3 via XMLHttpRequest (for upload progress).
 - **Auth/session** — `features/auth/store/authStore.ts` (Zustand) holds the session, persists tokens in `expo-secure-store`, hydrates on launch, and wires the refresh flow into the HTTP client via `configureApiAuth`. The root layout gates routes on `status` with `Stack.Protected`.
 - **Server state — React Query.** Each feature owns an `api/queryKeys.ts` (namespaced key factory) plus `hooks/` wrapping `useQuery`/`useMutation` (e.g. `useCoupleQuery`, `useAlbumsInfiniteQuery`, `useUploadImagesMutation`). Mutations revalidate by invalidating the relevant keys. The global `queryClient` (`features/common/api/queryClient.ts`) surfaces errors as toasts unless a query/mutation sets `meta.suppressErrorToast`. Prefer this pattern over ad-hoc stores for anything server-derived. Zustand is reserved for pure client state (`themeStore`).
-- **Features wired:** auth, couple (create/join + `useCoupleQuery`), albums, images (presigned S3 upload with multipart fallback on a 501), notifications (`expo-notifications` push, registered post-auth, routed through a type-safe dispatcher in `features/notifications/notificationDispatch.ts`), and updates (EAS Update OTA — `expo-updates`, `fingerprint` runtime policy, `useOtaUpdates` checks on launch + foreground and surfaces an "actualización disponible" toast that reloads on tap; publish JS-only changes with `eas update --branch preview`, no rebuild).
+- **Features wired:** auth, couple (create/join + `useCoupleQuery`), albums, images (presigned S3 upload — at most `UPLOAD_CONCURRENCY` files at a time with per-file retries and progress, partial batches confirmed — with multipart fallback on a 501; album lists are cursor-paged and share one cache entry per album+filter under `imageKeys.byAlbum`), notifications (`expo-notifications` push, registered post-auth, routed through a type-safe dispatcher in `features/notifications/notificationDispatch.ts`), and updates (EAS Update OTA — `expo-updates`, `fingerprint` runtime policy, `useOtaUpdates` checks on launch + foreground and surfaces an "actualización disponible" toast that reloads on tap; publish JS-only changes with `eas update --branch preview`, no rebuild).
 
 When adding endpoints, check the sibling `nuestro-tiempo-api` README/entities for the contract before inventing one.
 
@@ -54,6 +54,7 @@ When adding endpoints, check the sibling `nuestro-tiempo-api` README/entities fo
 - `npx expo start` — dev server (Expo Go or dev client)
 - `npx expo start --clear` — same, clearing Metro cache (use after dependency/native changes acting weird)
 - `npm run lint` — ESLint (`eslint-config-expo`)
+- `npm test` — Jest unit tests (`jest-expo` preset)
 - `npm run android` / `npm run ios` — local native build/run (requires Android Studio/Xcode; generates gitignored `android/`/`ios/` via CNG)
 - `eas build --profile <development|preview|production> --platform <android|ios>` — cloud builds
 
@@ -65,4 +66,4 @@ When adding endpoints, check the sibling `nuestro-tiempo-api` README/entities fo
 - **Typography:** `Title` (`features/common`) renders in the ElmsSans brand font; Parisienne is reserved for emotional accents (couple initials, brand header), not general UI.
 - **Form validation:** Zod, in `features/<feature>/validation.ts` (pure `validate*` functions returning a field→message record). Validate client-side before firing the mutation; the server stays the source of truth (its errors surface via `mutation.error`).
 - Don't add native modules unsupported by Expo Go without flagging it — doing so forces every contributor onto a development build (see README's Expo Go vs. development build section).
-- No test suite exists yet — don't assume `npm test` works.
+- Unit tests: Jest with the `jest-expo` preset (`npm test`). Tests live next to the code in `__tests__/*.test.ts` and cover logic and React Query cache behavior (a real `QueryClient` + observers) rather than rendering screens. `jest.setup.ts` defines a dummy `EXPO_PUBLIC_API_URL` because `env.ts` fails fast without one.

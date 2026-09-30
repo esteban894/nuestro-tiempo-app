@@ -127,8 +127,17 @@
       "title": "Eliminar álbum",
       "message": "Esta acción no se puede deshacer. Se eliminará el álbum y todas sus fotos."
     },
-    "uploadStatus_one": "Subiendo 1 foto…",
-    "uploadStatus_other": "Subiendo {{count}} fotos…",
+    "uploadProgress": "Subiendo {{done}}/{{total}} fotos…",
+    "uploadItemFailedA11y": "Falló la subida de esta foto",
+    "uploadPartialError": {
+      "title_one": "No se pudo subir 1 foto",
+      "title_other": "No se pudieron subir {{count}} fotos",
+      "message": "Revisa tu conexión y vuelve a intentarlo con esas fotos."
+    },
+    "uploadAllFailed": {
+      "title_one": "No se pudo subir la foto",
+      "title_other": "No se pudo subir ninguna de las {{count}} fotos"
+    },
     "imagePicker": {
       "title": "Agregar foto",
       "takePhoto": "Tomar foto",

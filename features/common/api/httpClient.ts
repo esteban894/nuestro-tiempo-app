@@ -54,24 +54,54 @@ export interface LocalFilePart {
   type: string;
 }
 
-export async function uploadToPresignedUrl(
+/** Upload progress as a 0–1 fraction, or null while the total size is unknown. */
+export type UploadProgressHandler = (fraction: number | null) => void;
+
+/** A single photo on a slow link can legitimately take a while; this only catches stalls. */
+const STORAGE_UPLOAD_TIMEOUT_MS = 120_000;
+
+/**
+ * POSTs a file straight to storage (presigned S3 POST). Uses XMLHttpRequest rather than
+ * fetch because React Native's fetch exposes no upload progress.
+ */
+export function uploadToPresignedUrl(
   uploadUrl: string,
   fields: Record<string, string>,
   file: LocalFilePart,
+  { onProgress }: { onProgress?: UploadProgressHandler } = {},
 ): Promise<void> {
   const formData = new FormData();
   Object.entries(fields).forEach(([key, value]) => formData.append(key, value));
   formData.append("file", file as unknown as Blob);
 
-  let response: Response;
-  try {
-    response = await fetch(uploadUrl, { method: "POST", body: formData });
-  } catch (error) {
-    throw new NetworkError(error);
-  }
-  if (!response.ok) {
-    throw new ApiError(response.status, `Failed to upload file to storage (${response.status})`);
-  }
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", uploadUrl);
+    xhr.timeout = STORAGE_UPLOAD_TIMEOUT_MS;
+
+    if (xhr.upload) {
+      xhr.upload.onprogress = (event) => {
+        onProgress?.(
+          event.lengthComputable && event.total > 0
+            ? Math.min(Math.max(event.loaded / event.total, 0), 1)
+            : null,
+        );
+      };
+    }
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress?.(1);
+        resolve();
+      } else {
+        reject(new ApiError(xhr.status, `Failed to upload file to storage (${xhr.status})`));
+      }
+    };
+    xhr.onerror = () => reject(new NetworkError());
+    xhr.ontimeout = () => reject(new NetworkError(new Error("Storage upload timed out")));
+    xhr.onabort = () => reject(new NetworkError(new Error("Storage upload aborted")));
+
+    xhr.send(formData);
+  });
 }
 
 type ApiFetchOptions = Omit<RequestInit, "body"> & {

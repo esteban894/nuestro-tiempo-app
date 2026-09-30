@@ -2,7 +2,7 @@ import { albumKeys } from "@/features/albums";
 import { calendarKeys, confirmCalendarEvent } from "@/features/calendar";
 import { queryClient } from "@/features/common";
 import { coupleKeys } from "@/features/couple";
-import { imageKeys } from "@/features/images";
+import { refreshAlbumImagesFirstPage } from "@/features/images";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 import { NotificationAction } from "./notificationCategories";
@@ -49,8 +49,7 @@ const notificationHandlers: NotificationHandlerRegistry = {
 
   [NotificationType.IMAGE_UPLOADED]: {
     onReceived: (data) => {
-      queryClient.invalidateQueries({ queryKey: imageKeys.byAlbum(data.albumId) });
-      queryClient.invalidateQueries({ queryKey: imageKeys.byAlbumInfinite(data.albumId) });
+      refreshAlbumImagesFirstPage(queryClient, data.albumId);
     },
     onResponse: (data) => {
       router.push({ pathname: "/album/[id]", params: { id: data.albumId } });
@@ -59,8 +58,7 @@ const notificationHandlers: NotificationHandlerRegistry = {
 
   [NotificationType.IMAGES_BATCH_UPLOADED]: {
     onReceived: (data) => {
-      queryClient.invalidateQueries({ queryKey: imageKeys.byAlbum(data.albumId) });
-      queryClient.invalidateQueries({ queryKey: imageKeys.byAlbumInfinite(data.albumId) });
+      refreshAlbumImagesFirstPage(queryClient, data.albumId);
     },
     onResponse: (data) => {
       router.push({ pathname: "/album/[id]", params: { id: data.albumId } });

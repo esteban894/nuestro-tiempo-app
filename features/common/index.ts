@@ -1,6 +1,7 @@
 export * from "./api/buildQuery";
 export * from "./api/httpClient";
 export * from "./api/queryClient";
+export * from "./api/staleTime";
 export * from "./config/env";
 export * from "./components/ui/button/Button";
 export * from "./components/ui/card/Card";

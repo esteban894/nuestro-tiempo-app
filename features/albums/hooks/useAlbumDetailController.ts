@@ -1,11 +1,15 @@
 import { DENSE_GRID_IMAGE_THRESHOLD, MAX_IMAGES_PER_BATCH } from "@/constants/upload";
 import { useAuthStore } from "@/features/auth";
+import { LIST_STALE_TIME_MS, showErrorToast } from "@/features/common";
 import { usePartner } from "@/features/couple";
 import {
-  AlbumImage,
+  type AlbumImageFilter,
   buildImageFilePart,
+  type FileUploadState,
+  limitBatch,
   MediaLibraryPermissionError,
   type PickedImage,
+  UploadFailedError,
   useAlbumImagesInfiniteQuery,
   useDeleteImageMutation,
   useDownloadImageMutation,
@@ -22,21 +26,7 @@ import { getAlbum, setCurrentAlbum } from "../api/album.api";
 import { albumKeys } from "../api/queryKeys";
 import { useDeleteAlbumMutation } from "./useDeleteAlbumMutation";
 
-export type FavoriteFilter = "all" | "me" | "partner" | "both";
-
-function filterByFavorite(
-  images: AlbumImage[],
-  filter: FavoriteFilter,
-  partnerId: string | undefined,
-): AlbumImage[] {
-  if (filter === "all") return images;
-  const favoritedByPartner = (image: AlbumImage) =>
-    !!partnerId && image.favoritedBy.some((f) => f.userId === partnerId);
-
-  if (filter === "me") return images.filter((image) => image.favoritedByMe);
-  if (filter === "partner") return images.filter(favoritedByPartner);
-  return images.filter((image) => image.favoritedByMe && favoritedByPartner(image));
-}
+export type FavoriteFilter = AlbumImageFilter;
 
 export function useAlbumDetailController(id: string) {
   const { t } = useTranslation();
@@ -53,7 +43,13 @@ export function useAlbumDetailController(id: string) {
     queryKey: albumKeys.detail(id),
     queryFn: () => getAlbum(id),
     enabled: !!id,
+    staleTime: LIST_STALE_TIME_MS,
   });
+
+  const [favoriteFilter, setFavoriteFilter] = useState<FavoriteFilter>("all");
+  // The filter UI only exists with a partner; if the couple breaks up while a partner
+  // filter is selected, fall back to the full list instead of an always-empty one.
+  const activeFilter: FavoriteFilter = partner ? favoriteFilter : "all";
 
   const {
     data: imagesData,
@@ -62,11 +58,9 @@ export function useAlbumDetailController(id: string) {
     isFetchingNextPage,
     isRefetching: isRefetchingImages,
     refetch: refetchImages,
-  } = useAlbumImagesInfiniteQuery(id);
-  const albumImages = imagesData?.pages.flatMap((page) => page.data) ?? [];
-
-  const [favoriteFilter, setFavoriteFilter] = useState<FavoriteFilter>("all");
-  const filteredAlbumImages = filterByFavorite(albumImages, favoriteFilter, partner?.id);
+  } = useAlbumImagesInfiniteQuery(id, activeFilter);
+  // Already filtered by the API (and paged per filter), not by what happens to be loaded.
+  const filteredAlbumImages = imagesData?.pages.flatMap((page) => page.data) ?? [];
   const images = filteredAlbumImages.map((image) => ({ id: image.id, url: image.url }));
   const imageGridColumns =
     images.length > DENSE_GRID_IMAGE_THRESHOLD ? 3 : undefined;
@@ -77,7 +71,9 @@ export function useAlbumDetailController(id: string) {
   const setFavoriteMutation = useSetImageFavoriteMutation();
   const deleteAlbumMutation = useDeleteAlbumMutation();
   const [pickerVisible, setPickerVisible] = useState(false);
-  const [uploadCount, setUploadCount] = useState<number | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<FileUploadState[] | null>(null);
+  const [uploadUris, setUploadUris] = useState<string[]>([]);
+  const uploadItems = uploadProgress?.map((state, index) => ({ ...state, uri: uploadUris[index] }));
   const retriedImageIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -157,9 +153,8 @@ export function useAlbumDetailController(id: string) {
   const handlePickImages = (assets: PickedImage[]) => {
     if (assets.length === 0) return;
 
-    let files = assets;
-    if (files.length > MAX_IMAGES_PER_BATCH) {
-      files = files.slice(0, MAX_IMAGES_PER_BATCH);
+    const { items: picked, truncated } = limitBatch(assets);
+    if (truncated) {
       Toast.show({
         type: "info",
         text1: t("albums.tooManyPhotos.title"),
@@ -167,10 +162,37 @@ export function useAlbumDetailController(id: string) {
       });
     }
 
-    setUploadCount(files.length);
+    setUploadUris(picked.map((asset) => asset.uri));
+    setUploadProgress(picked.map(() => ({ status: "pending", progress: 0 })));
     uploadImagesMutation.mutate(
-      { albumId: id, files: files.map(buildImageFilePart) },
-      { onSettled: () => setUploadCount(null) },
+      {
+        albumId: id,
+        files: picked.map(buildImageFilePart),
+        onProgress: setUploadProgress,
+      },
+      {
+        onSuccess: ({ failedCount }) => {
+          if (failedCount > 0) {
+            Toast.show({
+              type: "error",
+              text1: t("albums.uploadPartialError.title", { count: failedCount }),
+              text2: t("albums.uploadPartialError.message"),
+            });
+          }
+        },
+        onError: (error) => {
+          if (error instanceof UploadFailedError) {
+            Toast.show({
+              type: "error",
+              text1: t("albums.uploadAllFailed.title", { count: error.total }),
+              text2: t("albums.uploadPartialError.message"),
+            });
+          } else {
+            showErrorToast(error);
+          }
+        },
+        onSettled: () => setUploadProgress(null),
+      },
     );
   };
 
@@ -206,6 +228,6 @@ export function useAlbumDetailController(id: string) {
     uploadImagesMutation,
     pickerVisible,
     setPickerVisible,
-    uploadCount,
+    uploadItems,
   };
 }

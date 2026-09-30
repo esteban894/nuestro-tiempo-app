@@ -1,9 +1,11 @@
 import { useAuthStore } from "@/features/auth";
 import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AlbumImage, PaginatedResponse, setImageFavorite } from "../api/image.api";
+import { invalidateAfterFavoriteToggle } from "../api/albumImagesCache";
+import { AlbumImage, setImageFavorite } from "../api/image.api";
 import { imageKeys } from "../api/queryKeys";
 
-type ImagesPage = InfiniteData<PaginatedResponse<AlbumImage>>;
+/** Album lists (cursor pages) and the favorites screen (offset pages) share this shape. */
+type ImagesPage = InfiniteData<{ data: AlbumImage[] }>;
 
 interface ToggleFavoriteInput {
   id: string;
@@ -55,10 +57,6 @@ export function useSetImageFavoriteMutation() {
         queryClient.setQueryData(key, data);
       });
     },
-    onSettled: (_data, _error, { albumId }) => {
-      queryClient.invalidateQueries({ queryKey: imageKeys.byAlbum(albumId) });
-      queryClient.invalidateQueries({ queryKey: imageKeys.byAlbumInfinite(albumId) });
-      queryClient.invalidateQueries({ queryKey: ["images", "favorites"] });
-    },
+    onSettled: (_data, _error, { albumId }) => invalidateAfterFavoriteToggle(queryClient, albumId),
   });
 }

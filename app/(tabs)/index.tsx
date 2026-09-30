@@ -5,7 +5,7 @@ import { ImageCarousel, MediaItem, Title } from "@/features/common";
 import { CounterCards } from "@/features/common/components/ui/counter-cards/CounterCards";
 import { NoCoupleBanner, useCoupleQuery } from "@/features/couple";
 import { HomeSkeleton } from "@/features/home";
-import { useCurrentAlbumImagesQuery } from "@/features/images";
+import { useAlbumImagesInfiniteQuery } from "@/features/images";
 import { useThemeColors } from "@/features/theme";
 import React, { useRef, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
@@ -17,13 +17,15 @@ export default function HomeScreen() {
     isLoading: isLoadingCurrentAlbum,
     refetch: refetchCurrentAlbum,
   } = useCurrentAlbumQuery();
+  // Same cache entry as the album screen's unfiltered list: opening the current album
+  // from here (or coming back) reuses the pages instead of fetching them twice.
   const {
     data: imagesData,
     refetch: refetchImages,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useCurrentAlbumImagesQuery(currentAlbum?.id);
+  } = useAlbumImagesInfiniteQuery(currentAlbum?.id, "all");
   const { refetch: refetchUpcomingEvents } = useUpcomingEventsQuery(1);
   const [isRefreshing, setIsRefreshing] = useState(false);
   // Ids already retried once — bounds retries to one refetch per image (not one for the

@@ -1,3 +1,4 @@
+import { LIST_STALE_TIME_MS } from "@/features/common/api/staleTime";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { FavoritedByFilter, listFavoriteImages } from "../api/image.api";
 import { imageKeys } from "../api/queryKeys";
@@ -12,5 +13,6 @@ export function useFavoriteImagesInfiniteQuery(favoritedBy: FavoritedByFilter) {
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    staleTime: LIST_STALE_TIME_MS,
   });
 }

@@ -1,3 +1,4 @@
+import { UPLOAD_CONCURRENCY } from "@/constants/upload";
 import { buildQuery } from "@/features/common/api/buildQuery";
 import {
   ApiError,
@@ -6,6 +7,9 @@ import {
   resolveMediaUrl,
   uploadToPresignedUrl,
 } from "@/features/common/api/httpClient";
+import { runWithConcurrency } from "@/features/common/utils/runWithConcurrency";
+import { createUploadProgressTracker, type FileUploadState } from "../utils/uploadProgress";
+import { uploadWithRetry } from "../utils/uploadWithRetry";
 
 export interface Favoriter {
   userId: string;
@@ -13,6 +17,8 @@ export interface Favoriter {
 }
 
 export type FavoritedByFilter = "me" | "partner" | "both";
+/** Album image list variant: every image, or only those favorited by me/partner/both. */
+export type AlbumImageFilter = "all" | FavoritedByFilter;
 
 export interface AlbumImage {
   id: string;
@@ -40,6 +46,22 @@ export type ListImagesParams = {
   favoritedBy?: FavoritedByFilter;
 };
 
+/** A page of an album listing. Paged by opaque cursor: `nextCursor` is null on the last
+ *  page. The first page (no cursor) also carries totals; cursor pages don't. */
+export interface AlbumImagesPage {
+  data: AlbumImage[];
+  pageSize: number;
+  count: number;
+  nextCursor: string | null;
+  totalRecords?: number;
+}
+
+export type ListAlbumImagesParams = {
+  cursor?: string | null;
+  pageSize?: number;
+  filter?: AlbumImageFilter;
+};
+
 export type ImageFilePart = LocalFilePart;
 
 export interface CreatedImage {
@@ -56,13 +78,20 @@ export interface PresignedUpload {
 
 export async function listImagesByAlbum(
   albumId: string,
-  { page = 1, pageSize = 20, favoritedBy }: ListImagesParams = {},
-) {
-  const response = await apiFetch<PaginatedResponse<AlbumImage>>(
-    `/images/album/${albumId}${buildQuery({ page, pageSize, favoritedBy })}`,
+  { cursor, pageSize = 24, filter = "all" }: ListAlbumImagesParams = {},
+): Promise<AlbumImagesPage> {
+  const response = await apiFetch<AlbumImagesPage>(
+    `/images/album/${albumId}${buildQuery({
+      pageSize,
+      cursor,
+      favoritedBy: filter === "all" ? undefined : filter,
+    })}`,
   );
   return {
     ...response,
+    // An API predating cursor pagination omits the field; treat that as "no more pages"
+    // rather than looping on the first page.
+    nextCursor: response.nextCursor ?? null,
     data: response.data.map((image) => ({ ...image, url: resolveMediaUrl(image.url) })),
   };
 }
@@ -136,7 +165,38 @@ async function confirmImageUploads(albumId: string, keys: string[]) {
   return response.map((image) => ({ ...image, url: resolveMediaUrl(image.url) }));
 }
 
-export async function uploadImages(albumId: string, files: ImageFilePart[]) {
+/** Thrown when not a single file of a batch reached storage, so nothing was confirmed. */
+export class UploadFailedError extends Error {
+  readonly total: number;
+
+  constructor(total: number) {
+    super(`None of the ${total} files could be uploaded.`);
+    this.name = "UploadFailedError";
+    this.total = total;
+  }
+}
+
+export interface UploadImagesResult {
+  images: CreatedImage[];
+  /** Files that didn't make it: storage upload failed after retries, or the API rejected
+   *  the confirmation (e.g. not a real image). */
+  failedCount: number;
+}
+
+export type UploadImagesOptions = {
+  onProgress?: (states: FileUploadState[]) => void;
+};
+
+/**
+ * Uploads a batch straight to storage, at most `UPLOAD_CONCURRENCY` files at a time with
+ * per-file retries, then confirms only the files that arrived. One failed file no longer
+ * sinks the batch: the rest are confirmed and `failedCount` says how many were lost.
+ */
+export async function uploadImages(
+  albumId: string,
+  files: ImageFilePart[],
+  { onProgress }: UploadImagesOptions = {},
+): Promise<UploadImagesResult> {
   let uploads: PresignedUpload[];
   try {
     const requested = await requestImageUploadUrls(
@@ -146,21 +206,43 @@ export async function uploadImages(albumId: string, files: ImageFilePart[]) {
     uploads = requested.uploads;
   } catch (error) {
     if (error instanceof ApiError && error.status === 501) {
-      return files.length === 1
-        ? [await createImage(albumId, files[0])]
-        : createImagesBatch(albumId, files);
+      // Multipart fallback (local storage): one request, all-or-nothing.
+      const images =
+        files.length === 1
+          ? [await createImage(albumId, files[0])]
+          : await createImagesBatch(albumId, files);
+      return { images, failedCount: 0 };
     }
     throw error;
   }
 
-  await Promise.all(
-    uploads.map((upload, index) =>
-      uploadToPresignedUrl(upload.uploadUrl, upload.fields, files[index]),
-    ),
+  const tracker = createUploadProgressTracker(files.length, onProgress ?? (() => {}));
+  const results = await runWithConcurrency(
+    uploads.slice(0, files.length),
+    UPLOAD_CONCURRENCY,
+    async (upload, index) => {
+      try {
+        await uploadWithRetry(
+          (report) =>
+            uploadToPresignedUrl(upload.uploadUrl, upload.fields, files[index], {
+              onProgress: report,
+            }),
+          { onProgress: (fraction) => tracker.progress(index, fraction) },
+        );
+      } catch (error) {
+        tracker.fail(index);
+        throw error;
+      }
+      tracker.done(index);
+      return upload.key;
+    },
   );
 
-  return confirmImageUploads(
-    albumId,
-    uploads.map((upload) => upload.key),
+  const uploadedKeys = results.flatMap((result) =>
+    result.status === "fulfilled" ? [result.value] : [],
   );
+  if (uploadedKeys.length === 0) throw new UploadFailedError(files.length);
+
+  const images = await confirmImageUploads(albumId, uploadedKeys);
+  return { images, failedCount: Math.max(files.length - images.length, 0) };
 }

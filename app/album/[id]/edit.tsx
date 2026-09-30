@@ -1,6 +1,6 @@
 import { ThemeColors } from "@/constants/colors";
 import { AlbumForm, AlbumFormSkeleton, albumKeys, getAlbum, updateAlbum } from "@/features/albums";
-import { getErrorMessage } from "@/features/common";
+import { getErrorMessage, LIST_STALE_TIME_MS } from "@/features/common";
 import { useThemeColors } from "@/features/theme";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -19,6 +19,7 @@ export default function EditAlbumScreen() {
     queryKey: albumKeys.detail(id),
     queryFn: () => getAlbum(id),
     enabled: !!id,
+    staleTime: LIST_STALE_TIME_MS,
   });
 
   const mutation = useMutation({

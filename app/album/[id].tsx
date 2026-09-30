@@ -56,7 +56,7 @@ export default function AlbumDetailScreen() {
     uploadImagesMutation,
     pickerVisible,
     setPickerVisible,
-    uploadCount,
+    uploadItems,
   } = useAlbumDetailController(id);
 
   if (isLoading) {
@@ -183,7 +183,7 @@ export default function AlbumDetailScreen() {
           );
         }}
       />
-      <AlbumUploadStatus visible={uploadImagesMutation.isPending} count={uploadCount ?? 0} />
+      <AlbumUploadStatus items={uploadImagesMutation.isPending ? uploadItems : undefined} />
       <AlbumFab
         icon="camera-outline"
         onPress={() => {
