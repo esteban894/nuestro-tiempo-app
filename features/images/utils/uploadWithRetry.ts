@@ -1,4 +1,4 @@
-import { ApiError, NetworkError, type UploadProgressHandler } from "@/features/common/api/httpClient";
+import { isTransientError, type UploadProgressHandler } from "@/features/common/api/httpClient";
 
 /** Backoff before the 2nd and 3rd attempt — i.e. at most 3 attempts per file. */
 export const UPLOAD_RETRY_DELAYS_MS = [500, 1500] as const;
@@ -9,8 +9,7 @@ export const UPLOAD_RETRY_DELAYS_MS = [500, 1500] as const;
  * policy (403) or an oversized file (400 EntityTooLarge) will fail identically again.
  */
 export function isRetryableUploadError(error: unknown): boolean {
-  if (error instanceof NetworkError) return true;
-  return error instanceof ApiError && (error.status >= 500 || error.status === 429);
+  return isTransientError(error);
 }
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));

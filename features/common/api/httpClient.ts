@@ -25,13 +25,37 @@ export class NetworkError extends Error {
   }
 }
 
+/** A request got a 401 and the session couldn't be refreshed for a transient reason
+ *  (no connectivity, server error). The session was NOT rejected, so callers treat this
+ *  like being offline — it is a NetworkError — and must not end the session over it. */
+export class SessionRefreshUnavailableError extends NetworkError {
+  constructor(cause?: unknown) {
+    super(cause);
+    this.name = "SessionRefreshUnavailableError";
+  }
+}
+
 export function isNetworkError(error: unknown): error is NetworkError {
   return error instanceof NetworkError;
 }
 
+/** Failures worth retrying because they say nothing about the request itself: the
+ *  connection dropped, the server errored (5xx), or it's throttling (429). */
+export function isTransientError(error: unknown): boolean {
+  if (error instanceof NetworkError) return true;
+  return error instanceof ApiError && (error.status >= 500 || error.status === 429);
+}
+
+/** What happened when a 401 triggered a session refresh. Only `rejected` means the
+ *  server refused the session; `unavailable` means it couldn't be asked. */
+export type RefreshOutcome =
+  | { status: "refreshed"; token: string }
+  | { status: "rejected" }
+  | { status: "unavailable"; cause: unknown };
+
 type AuthAccessors = {
   getAccessToken: () => string | null;
-  onUnauthorized: () => Promise<string | null>;
+  onUnauthorized: () => Promise<RefreshOutcome>;
 };
 
 let authAccessors: AuthAccessors | null = null;
@@ -183,9 +207,14 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
   }
 
   if (response.status === 401 && !skipAuthRetry && authAccessors) {
-    const newAccessToken = await authAccessors.onUnauthorized();
-    if (newAccessToken) {
+    const outcome = await authAccessors.onUnauthorized();
+    if (outcome.status === "refreshed") {
       return apiFetch<T>(path, { ...options, skipAuthRetry: true });
+    }
+    // Surfacing this request's own 401 here would read as "token rejected" to callers
+    // (e.g. app launch), which would end a session the server never refused.
+    if (outcome.status === "unavailable") {
+      throw new SessionRefreshUnavailableError(outcome.cause);
     }
   }
 

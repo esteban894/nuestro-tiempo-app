@@ -1,4 +1,5 @@
 import { apiFetch } from "@/features/common/api/httpClient";
+import { getDeviceId } from "../utils/deviceId";
 
 export type UserInfo = {
   id: string;
@@ -23,18 +24,20 @@ export type RegisterPayload = {
   password: string;
 };
 
-export function login(payload: LoginPayload) {
+/** Login and registration identify the device, so the API ends only this device's
+ *  previous session instead of every session of the user. */
+export async function login(payload: LoginPayload) {
   return apiFetch<AuthResponse>("/auth/login", {
     method: "POST",
-    body: payload,
+    body: { ...payload, deviceId: await getDeviceId() },
     skipAuthRetry: true,
   });
 }
 
-export function register(payload: RegisterPayload) {
+export async function register(payload: RegisterPayload) {
   return apiFetch<AuthResponse>("/auth/register", {
     method: "POST",
-    body: payload,
+    body: { ...payload, deviceId: await getDeviceId() },
     skipAuthRetry: true,
   });
 }

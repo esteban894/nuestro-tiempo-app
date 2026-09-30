@@ -1,3 +1,4 @@
+import { waitForPendingRefresh } from "@/features/auth/store/authStore";
 import { i18n } from "@/features/i18n";
 import * as Updates from "expo-updates";
 import { useEffect, useRef } from "react";
@@ -21,7 +22,9 @@ export function useOtaUpdates() {
         text1: i18n.t("updates.title"),
         text2: i18n.t("updates.message"),
         autoHide: false,
-        onPress: () => {
+        onPress: async () => {
+          // Reloading mid-refresh would drop the rotated token the API just issued.
+          await waitForPendingRefresh();
           Updates.reloadAsync();
         },
       });
