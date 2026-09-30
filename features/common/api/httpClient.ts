@@ -189,11 +189,18 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
   const accessToken = authAccessors?.getAccessToken();
   const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
 
+  // AbortSignal.timeout() doesn't exist in React Native (its AbortSignal comes from the
+  // `abort-controller` polyfill), so the timeout is wired by hand.
+  const timeoutController = rest.signal ? undefined : new AbortController();
+  const timeoutId = timeoutController
+    ? setTimeout(() => timeoutController.abort(), REQUEST_TIMEOUT_MS)
+    : undefined;
+
   let response: Response;
   try {
     response = await fetch(`${env.API_URL}${path}`, {
       ...rest,
-      signal: rest.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: rest.signal ?? timeoutController?.signal,
       headers: {
         // Let fetch set the multipart boundary itself for FormData bodies.
         ...(isFormData ? {} : { "Content-Type": "application/json" }),
@@ -204,6 +211,8 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
     });
   } catch (error) {
     throw new NetworkError(error);
+  } finally {
+    clearTimeout(timeoutId);
   }
 
   if (response.status === 401 && !skipAuthRetry && authAccessors) {
