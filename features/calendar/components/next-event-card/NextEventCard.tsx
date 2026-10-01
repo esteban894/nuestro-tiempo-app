@@ -10,8 +10,8 @@ import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useUpcomingEventsQuery } from "../../hooks/useUpcomingEventsQuery";
 
-function formatCountdown(startAt: string, now: Date, t: TFunction) {
-  const { years, months, days, hours, minutes } = getElapsedTime(now, new Date(startAt));
+function formatCountdown(occurrenceAt: string, now: Date, t: TFunction) {
+  const { years, months, days, hours, minutes } = getElapsedTime(now, new Date(occurrenceAt));
 
   if (years > 0) return t("calendar.countdown.years", { count: years });
   if (months > 0) return t("calendar.countdown.months", { count: months });
@@ -47,7 +47,7 @@ export const NextEventCard = () => {
         <Text style={styles.title} numberOfLines={1}>
           {nextEvent.title}
         </Text>
-        <Text style={styles.countdown}>{formatCountdown(nextEvent.startAt, now, t)}</Text>
+        <Text style={styles.countdown}>{formatCountdown(nextEvent.nextOccurrence, now, t)}</Text>
       </Card>
     </TouchableOpacity>
   );

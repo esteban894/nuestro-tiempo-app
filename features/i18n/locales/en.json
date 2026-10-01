@@ -224,7 +224,11 @@
       "me": "Me"
     },
     "eventList": {
-      "empty": "No events for this day."
+      "empty": {
+        "month": "No events this month.",
+        "week": "No events this week.",
+        "day": "No events for this day."
+      }
     },
     "eventItem": {
       "allDay": "All day",

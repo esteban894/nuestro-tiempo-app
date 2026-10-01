@@ -18,5 +18,6 @@ export * from "./utils/categoriesByType";
 export * from "./utils/categoryColors";
 export * from "./utils/dateGrid";
 export * from "./utils/eventZone";
+export * from "./utils/groupEventsByDay";
 export * from "./utils/recurrence";
 export * from "./validation";

@@ -1,3 +1,5 @@
+import type { CalendarViewMode } from "../components/view-switcher/ViewSwitcher";
+
 /** Local "YYYY-MM-DD" key for a date — avoids UTC/timezone drift from toISOString(). */
 export function toDateKey(date: Date): string {
   const y = date.getFullYear();
@@ -57,6 +59,28 @@ export function getMonthGrid(date: Date): Date[] {
 export function getWeekDays(date: Date): Date[] {
   const start = startOfWeek(date);
   return Array.from({ length: 7 }, (_, i) => addDays(start, i));
+}
+
+/** First and last instant (local) of the month, week or day `anchor` belongs to. */
+export function getPeriodRange(
+  mode: CalendarViewMode,
+  anchor: Date,
+): { start: Date; end: Date } {
+  let start: Date;
+  let end: Date;
+  if (mode === "month") {
+    start = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
+    end = new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0);
+  } else if (mode === "week") {
+    start = startOfWeek(anchor);
+    end = addDays(start, 6);
+  } else {
+    start = new Date(anchor);
+    end = new Date(anchor);
+  }
+  start.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
+  return { start, end };
 }
 
 export function minutesFromMidnight(date: Date): number {

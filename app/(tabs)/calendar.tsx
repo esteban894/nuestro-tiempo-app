@@ -5,8 +5,9 @@ import {
   CalendarView,
   CalendarViewMode,
   EventList,
-  expandEventsInRange,
   fromDateKey,
+  getPeriodRange,
+  groupEventsByDay,
   MEMBER_FILTER_ALL,
   MemberFilter,
   MemberFilterValue,
@@ -50,12 +51,10 @@ export default function CalendarScreen() {
     return events.filter((event) => event.createdBy === memberFilter);
   }, [events, memberFilter]);
 
-  const eventsForSelectedDay = useMemo(() => {
-    const dayStart = fromDateKey(selectedDate);
-    const dayEnd = new Date(dayStart);
-    dayEnd.setHours(23, 59, 59, 999);
-    return expandEventsInRange(filteredEvents, dayStart, dayEnd);
-  }, [filteredEvents, selectedDate]);
+  const eventGroups = useMemo(() => {
+    const { start, end } = getPeriodRange(viewMode, fromDateKey(selectedDate));
+    return groupEventsByDay(filteredEvents, start, end);
+  }, [filteredEvents, viewMode, selectedDate]);
 
   const handlePressEvent = (event: CalendarEvent) => {
     router.push({ pathname: "/calendar/[id]", params: { id: event.id } });
@@ -133,7 +132,10 @@ export default function CalendarScreen() {
       <View style={styles.gap} />
 
       <EventList
-        events={eventsForSelectedDay}
+        groups={eventGroups}
+        highlightedDateKey={viewMode === "day" ? undefined : selectedDate}
+        showDayHeaders={viewMode !== "day"}
+        emptyLabel={t(`calendar.eventList.empty.${viewMode}`)}
         currentUserId={currentUserId}
         onPressEvent={handlePressEvent}
       />
