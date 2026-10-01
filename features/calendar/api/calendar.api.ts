@@ -36,6 +36,9 @@ export type CalendarEvent = {
   updatedAt: string;
 };
 
+/** An upcoming event plus the occurrence the countdown should aim at (differs from startAt for recurring events). */
+export type UpcomingCalendarEvent = CalendarEvent & { nextOccurrence: string };
+
 export type CalendarEventPayload = {
   type: CalendarEventType;
   category?: CalendarEventCategory;
@@ -62,7 +65,7 @@ export function getCalendarEvents(query: CalendarEventsQuery = {}) {
 }
 
 export function getUpcomingCalendarEvents(limit = 5) {
-  return apiFetch<CalendarEvent[]>(`/calendar/events/upcoming${buildQuery({ limit })}`);
+  return apiFetch<UpcomingCalendarEvent[]>(`/calendar/events/upcoming${buildQuery({ limit })}`);
 }
 
 export function getCalendarEvent(id: string) {

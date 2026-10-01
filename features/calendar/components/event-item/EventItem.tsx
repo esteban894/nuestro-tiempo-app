@@ -20,10 +20,12 @@ const CATEGORY_ICON: Record<CalendarEventCategory, IoniconsName> = {
 interface EventItemProps {
   event: CalendarEvent;
   isMine: boolean;
+  /** Marks the event as belonging to the day selected in the calendar. */
+  highlighted?: boolean;
   onPress?: () => void;
 }
 
-export const EventItem = ({ event, isMine, onPress }: EventItemProps) => {
+export const EventItem = ({ event, isMine, highlighted = false, onPress }: EventItemProps) => {
   const { t, i18n } = useTranslation();
   const colors = useThemeColors();
   const styles = createStyles(colors);
@@ -34,7 +36,7 @@ export const EventItem = ({ event, isMine, onPress }: EventItemProps) => {
     : start.toLocaleTimeString(i18n.language, { hour: "2-digit", minute: "2-digit" });
 
   return (
-    <TouchableOpacity style={styles.container} activeOpacity={0.7} onPress={onPress}>
+    <TouchableOpacity style={[styles.container, highlighted && styles.highlighted]} activeOpacity={0.7} onPress={onPress}>
       <View style={[styles.iconWrapper, { backgroundColor: colors.SECONDARY[200] }]}>
         <Ionicons name={CATEGORY_ICON[event.category]} size={20} color={colors.PRIMARY[500]} />
       </View>
@@ -80,11 +82,16 @@ const createStyles = (colors: ThemeColors) =>
       borderRadius: 16,
       paddingVertical: 12,
       paddingHorizontal: 14,
+      borderWidth: 1.5,
+      borderColor: "transparent",
       elevation: 1,
       shadowColor: colors.SHADOW,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.08,
       shadowRadius: 6,
+    },
+    highlighted: {
+      borderColor: colors.PRIMARY[500],
     },
     iconWrapper: {
       width: 36,
